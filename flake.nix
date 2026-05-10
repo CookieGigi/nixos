@@ -4,7 +4,7 @@ inputs = {
 };
 
 outputs = { self, nixpkgs, ... }: {
-  nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
+  nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
     modules = [ ./hosts/xps/configuration.nix ];
   };
