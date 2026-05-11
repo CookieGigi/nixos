@@ -86,8 +86,11 @@
   programs.git.enable = true;
 
   # install vim
-  programs.vim.enable = true;
-  programs.vim.defaultEditor = true;
+  programs.vim = {
+    enable = true;
+    defaultEditor = true;
+    package = pkgs.vim-full;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
