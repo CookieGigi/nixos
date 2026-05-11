@@ -1,0 +1,3 @@
+- [ ] secret management 
+- [ ] user pwd in config
+- [ ] btrfs
