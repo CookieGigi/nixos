@@ -11,7 +11,8 @@
               size = "1G";
               type = "EF00";
               content = {
-                type = "vfat";
+                type = "filesystem";
+                format = "vfat";
                 mountpoint = "/boot";
               };
             };
