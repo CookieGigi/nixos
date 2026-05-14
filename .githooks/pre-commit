@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run alejandra (nix fmt) on all .nix files
+if ! nix fmt .; then
+    echo "nix fmt failed"
+    exit 1
+fi
+
+# Check if any .nix files were reformatted
+CHANGED_FILES=$(git diff --name-only --diff-filter=M | grep '\.nix$' || true)
+
+if [ -n "$CHANGED_FILES" ]; then
+    echo "Reformatted Nix files:"
+    echo "$CHANGED_FILES"
+    echo ""
+    echo "Staging formatted files..."
+    echo "$CHANGED_FILES" | xargs git add
+    echo "Formatted files staged. Continuing with commit."
+fi
+
+exit 0

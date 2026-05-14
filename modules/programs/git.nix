@@ -1,4 +1,9 @@
 {
   # Install git
-  programs.git.enable = true;
+  programs.git = {
+    enable = true;
+    config = {
+      core.hooksPath = ".githooks";
+    };
+  };
 }
