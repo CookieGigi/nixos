@@ -9,100 +9,11 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./persistence.nix
     ./disko.nix
   ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
   networking.hostName = "xps";
   networking.domain = "cookiegigi.com";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Europe/Paris";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "fr_FR.UTF-8";
-    LC_IDENTIFICATION = "fr_FR.UTF-8";
-    LC_MEASUREMENT = "fr_FR.UTF-8";
-    LC_MONETARY = "fr_FR.UTF-8";
-    LC_NAME = "fr_FR.UTF-8";
-    LC_NUMERIC = "fr_FR.UTF-8";
-    LC_PAPER = "fr_FR.UTF-8";
-    LC_TELEPHONE = "fr_FR.UTF-8";
-    LC_TIME = "fr_FR.UTF-8";
-  };
-
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.xfce.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "fr";
-    variant = "azerty";
-  };
-
-  # Configure console keymap
-  console.keyMap = "fr";
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    wireplumber.enable = true;
-  };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.cookiegigi = {
-    isNormalUser = true;
-    initialPassword = "cookiegigi";
-    description = "cookiegigi";
-    extraGroups = ["networkmanager" "wheel"];
-  };
-
-  # Install firefox.
-  programs.firefox.enable = true;
-
-  # Install git
-  programs.git.enable = true;
-
-  # install vim
-  programs.vim = {
-    enable = true;
-    defaultEditor = true;
-    package = pkgs.vim-full;
-  };
-
-  programs.ssh.startAgent = true;
-  services.gnome.gcr-ssh-agent.enable = false;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    wget
-    xclip
-  ];
-
-  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

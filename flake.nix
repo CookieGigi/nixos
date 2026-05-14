@@ -26,6 +26,13 @@
         ./hosts/xps/configuration.nix
         impermanence.nixosModules.impermanence
         disko.nixosModules.disko
+        ./modules/core.nix
+        ./modules/clipboard/xclip.nix
+        ./modules/desktop/xfce.nix
+        ./modules/audio.nix
+        ./modules/localization/frenglish.nix
+        ./modules/programs/programs.nix
+        ./modules/users/cookiegigi.nix
       ];
     };
 
@@ -39,7 +46,7 @@
         # 3. disko module (need for disko.nix to work)
         disko.nixosModules.disko
         # 4. overrides (new file!)
-        ./hosts/xps/iso.nix
+        ./modules/iso.nix
       ];
     };
 

@@ -1,14 +1,16 @@
 {
-  fileSystems."/persist".neededForBoot = true;
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.cookiegigi = {
+    isNormalUser = true;
+    initialPassword = "cookiegigi";
+    description = "cookiegigi";
+    extraGroups = ["networkmanager" "wheel"];
+  };
 
+  # Persist
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
-      "/etc/NetworkManager/system-connections"
-      "/var/log"
-      "/var/lib/nixos"
-      "/var/lib/systemd/coredump"
-
       "/home/cookiegigi/.ssh"
       "/home/cookiegigi/Documents"
       "/home/cookiegigi/nixos"
