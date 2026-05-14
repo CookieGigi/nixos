@@ -4,19 +4,28 @@
     disko = {
       url = "github:nix-community/disko";
     };
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
     disko,
+    impermanence,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
 
     nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      modules = [./hosts/xps/configuration.nix disko.nixosModules.disko];
+      modules = [
+        ./hosts/xps/configuration.nix
+        impermanence.nixosModules.impermanence
+        disko.nixosModules.disko
+      ];
     };
 
     nixosConfigurations.xps-iso = nixpkgs.lib.nixosSystem {
