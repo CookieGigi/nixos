@@ -4,5 +4,6 @@
     ./vim.nix
     ./git.nix
     ./wget.nix
+    ./opencode.nix
   ];
 }
