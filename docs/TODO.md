@@ -24,8 +24,3 @@
 - [ ] Remove `hardware-configuration.nix` import from `xps-iso` (or define generic ISO hardware config) — host-specific Intel microcode is unnecessary in a live CD
 - [ ] Explicitly set `nixpkgs.config.allowUnfree = true` (or keep `false` intentionally and document why)
 - [ ] Consider adopting `home-manager` as a flake input to declaratively manage dotfiles instead of hand-maintaining `environment.persistence` entries for every new dotfile directory
-
-## Existing items (kept from previous list)
-- [ ] secret management
-- [ ] user pwd in config
-- [ ] btrfs
