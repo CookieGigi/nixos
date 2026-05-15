@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "formatter": {
+    "nix": {
+      "command": ["nix", "fmt", "."],
+      "extensions": [".nix"]
+    }
+  },
+  "lsp": {
+    "nix": {
+      "command": ["nil"],
+      "extensions": [".nix"]
+    }
+  },
+  "skills": {
+    "paths": [".opencode/skills", "/home/cookiegigi/.config/opencode/skills"]
+  },
+  "plugin": ["@tarquinen/opencode-dcp@latest"],
+  "instructions": [
+    "AGENTS.md",
+    "README.md",
+    "flake.nix"
+  ]
+}

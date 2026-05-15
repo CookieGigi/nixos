@@ -12,7 +12,7 @@
 
 | Path | Purpose | Persistence Required |
 |------|---------|----------------------|
-| `~/.config/opencode/.opencode.json` | **Main configuration file** (agents, providers, themes, LSP, MCP, shell, etc.) | Yes |
+| `~/.config/opencode/opencode.json` | **Main configuration file** (agents, providers, themes, LSP, MCP, shell, etc.) | Yes |
 | `~/.config/opencode/package.json` | Plugin manifest (managed by `opencode plugin`) | Yes |
 | `~/.local/share/opencode/` | Auth tokens (`auth.json`), SQLite DB, session snapshots, logs | Yes |
 | `~/.local/state/opencode/` | Model preferences (`model.json`) | Yes |
@@ -33,15 +33,15 @@ environment.persistence."/persist" = {
 
 ---
 
-## Configuration File: `.opencode.json`
+## Configuration File: `opencode.json`
 
 OpenCode searches for config in this order:
 
 1. `$HOME/.opencode.json`
-2. `$XDG_CONFIG_HOME/opencode/.opencode.json`
+2. `$XDG_CONFIG_HOME/opencode/opencode.json`
 3. `./.opencode.json` (project-local, in CWD)
 
-The canonical location for user-wide config is **`~/.config/opencode/.opencode.json`**.
+The canonical location for user-wide config is **`~/.config/opencode/opencode.json`**.
 
 ### Key Structure
 
@@ -146,10 +146,10 @@ in {
   # after the first boot.
   system.activationScripts.opencode-config = ''
     mkdir -p /home/cookiegigi/.config/opencode
-    if [ ! -f /home/cookiegigi/.config/opencode/.opencode.json ]; then
-      cp ${opencodeConfig} /home/cookiegigi/.config/opencode/.opencode.json
-      chown cookiegigi:users /home/cookiegigi/.config/opencode/.opencode.json
-      chmod 644 /home/cookiegigi/.config/opencode/.opencode.json
+    if [ ! -f /home/cookiegigi/.config/opencode/opencode.json ]; then
+      cp ${opencodeConfig} /home/cookiegigi/.config/opencode/opencode.json
+      chown cookiegigi:users /home/cookiegigi/.config/opencode/opencode.json
+      chmod 644 /home/cookiegigi/.config/opencode/opencode.json
     fi
   '';
 
@@ -164,14 +164,14 @@ in {
 }
 ```
 
-**Trade-off:** OpenCode may later rewrite `.opencode.json` (e.g. when changing models via the TUI). Because the file is persisted, those mutations survive reboots. If you want to force a reset to the Nix-defined version, delete the file and rebuild.
+**Trade-off:** OpenCode may later rewrite `opencode.json` (e.g. when changing models via the TUI). Because the file is persisted, those mutations survive reboots. If you want to force a reset to the Nix-defined version, delete the file and rebuild.
 
 ### Approach 2: home-manager
 
 If home-manager is added as a flake input (see `docs/TODO.md`), dotfiles can be managed like this:
 
 ```nix
-xdg.configFile."opencode/.opencode.json".source =
+xdg.configFile."opencode/opencode.json".source =
   (pkgs.formats.json {}).generate "opencode.json" { /* ... */ };
 ```
 
@@ -181,7 +181,7 @@ xdg.configFile."opencode/.opencode.json".source =
 
 ## Secrets: Do NOT Put API Keys in the Nix Store
 
-The Nix store is world-readable. Never write raw API keys into `.opencode.json` inside a Nix expression.
+The Nix store is world-readable. Never write raw API keys into `opencode.json` inside a Nix expression.
 
 OpenCode supports environment variables for every major provider:
 
@@ -213,7 +213,7 @@ Because `~/.config/opencode` is already persisted, custom commands survive reboo
 
 ## LSP & MCP
 
-- **LSP** servers are declared under the `lsp` key in `.opencode.json`.
+- **LSP** servers are declared under the `lsp` key in `opencode.json`.
 - **MCP** servers are declared under `mcpServers`.
 
 Both can reference Nix store paths via interpolation in the Nix expression, ensuring the required binaries (e.g. `gopls`, `typescript-language-server`) are available without relying on a manual `$PATH`.
