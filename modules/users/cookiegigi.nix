@@ -15,7 +15,6 @@
       "/home/cookiegigi/Documents"
       "/home/cookiegigi/nixos"
       "/home/cookiegigi/Downloads"
-      "/home/cookiegigi/.config/mozilla"
     ];
   };
 }
