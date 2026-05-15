@@ -59,6 +59,12 @@ Personal NixOS system configuration for host `xps` (x86_64-linux). Flake-based, 
 - Keep host-specific settings in `hosts/xps/`. Keep reusable modules in `modules/`.
 - `.gitignore` ignores `result` and `*.qcow2` (build outputs).
 
+## Global Configuration Enforcement
+
+- **Never edit generated files directly in `~/.config/`** (e.g. `~/.config/opencode/`). These files are generated and overwritten by NixOS activation scripts on every rebuild.
+- **Nix is the source of truth**: the authoritative declaration lives in `modules/programs/opencode.nix`. Any change to global OpenCode config (agents, models, tools, themes, etc.) must be made there.
+- Manual edits to the live files under `~/.config/opencode/` will be silently lost on the next `nixos-rebuild switch`.
+
 ## Working on Other Projects
 
 When an agent works on a project *outside* this repository (e.g., in `~/projects/` or elsewhere) and that project needs:

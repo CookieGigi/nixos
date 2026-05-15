@@ -1,3 +1,6 @@
+# WARN: This file is the single source of truth for the global OpenCode configuration.
+# Always edit THIS Nix file; the live ~/.config/opencode files are generated from here.
+# Nix is the source of truth for global config.
 {
   pkgs,
   lib,
@@ -7,7 +10,7 @@
     agent = {
       explaining = {
         model = "opencode-go/kimi-k2.6";
-        mode = "subagent";
+        mode = "primary";
         description = "Read and execute non-destructive commands to answer questions in a pedagogical way";
         prompt = ''
           You are a pedagogical explaining agent. Your goal is to help the user understand concepts by reading relevant files and executing safe, non-destructive commands.
@@ -35,7 +38,7 @@
 
       configuration = {
         model = "opencode-go/deepseek-v4-pro";
-        mode = "subagent";
+        mode = "primary";
         description = "Nix/NixOS and project configuration expert that stays in the Nix way";
         prompt = ''
           You are a Nix and system configuration expert. You help with NixOS configuration, Nix flakes, and project setup following Nix conventions.
