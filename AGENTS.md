@@ -1,4 +1,12 @@
-# AGENTS.md — NixOS Config Flake
+# AGENTS.md — Global Agent Context
+
+## System Overview
+
+This machine runs **NixOS**, a declarative Linux distribution managed entirely through configuration files (this repository). All system-level software, services, kernel modules, and user environments are defined in `.nix` files and applied atomically via `nixos-rebuild`.
+
+- **No imperative package management**: Do not use `apt`, `brew`, `pip --user`, or manual installations for system-wide tools.
+- **Everything is in the flake**: If a tool or service is needed, it must be declared in this repository and rebuilt.
+- **Home directory is ephemeral**: The root filesystem is tmpfs (impermanence). Persistent data must be explicitly declared in `environment.persistence."/persist"` or it will be lost on reboot.
 
 ## Repository
 Personal NixOS system configuration for host `xps` (x86_64-linux). Flake-based, uses `nixos-unstable`.
@@ -50,6 +58,22 @@ Personal NixOS system configuration for host `xps` (x86_64-linux). Flake-based, 
 - Use `nixpkgs.lib.nixosSystem` modules pattern; no custom overlays or packages defined.
 - Keep host-specific settings in `hosts/xps/`. Keep reusable modules in `modules/`.
 - `.gitignore` ignores `result` and `*.qcow2` (build outputs).
+
+## Working on Other Projects
+
+When an agent works on a project *outside* this repository (e.g., in `~/projects/` or elsewhere) and that project needs:
+
+1. **System packages or global configuration**: Do **not** install imperatively (`apt install`, `pip install --user`, etc.). Instead:
+   - Add the needed package or config declaration to this NixOS flake in the appropriate module under `modules/` (e.g., `modules/programs/...`, `modules/users/cookiegigi.nix`).
+   - Document the requirement in this repository's `docs/` folder (e.g., `docs/<project-name>.md`) so the dependency is tracked.
+   - Rebuild with `sudo nixos-rebuild switch --flake .#xps`.
+
+2. **Project-local tools or language dependencies**: Prefer project-local configuration when possible:
+   - Use `flake.nix` / `shell.nix` within the project itself for development shells.
+   - Use language-specific lockfiles (`package-lock.json`, `Cargo.lock`, `poetry.lock`, etc.) and project-local package managers.
+   - Use container tools (`docker`, `podman`) if the project already supports them.
+
+**Rule of thumb**: If it affects the whole system or needs to persist across reboots, it belongs in *this* repository. If it only matters while working inside a specific project, keep it local to that project.
 
 ## Warnings
 
