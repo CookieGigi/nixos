@@ -13,11 +13,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    import-tree = {
-      url = "github:denful/import-tree";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = {
@@ -26,7 +21,6 @@
     disko,
     impermanence,
     home-manager,
-    import-tree,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
@@ -38,7 +32,14 @@
         impermanence.nixosModules.impermanence
         disko.nixosModules.disko
         home-manager.nixosModules.home-manager
-        (import-tree ./modules)
+        ./modules/core.nix
+        ./modules/clipboard/xclip.nix
+        ./modules/desktop/xfce.nix
+        ./modules/audio.nix
+        ./modules/localization/frenglish.nix
+        ./modules/programs/programs.nix
+        ./modules/users/cookiegigi.nix
+        ./modules/home
       ];
     };
 
