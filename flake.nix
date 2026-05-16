@@ -13,6 +13,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
   };
 
   outputs = {
@@ -21,6 +25,7 @@
     disko,
     impermanence,
     home-manager,
+    nixos-hardware,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
@@ -32,6 +37,7 @@
         impermanence.nixosModules.impermanence
         disko.nixosModules.disko
         home-manager.nixosModules.home-manager
+        nixos-hardware.nixosModules.dell-xps-15-9530
         ./modules/core.nix
         ./modules/clipboard/xclip.nix
         ./modules/desktop/xfce.nix
