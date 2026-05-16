@@ -18,15 +18,13 @@
 | `~/.local/state/opencode/` | Model preferences (`model.json`) | Yes |
 | `~/.cache/opencode/` | Cache, downloaded binaries, logs | No (rebuildable) |
 
-Current persistence is declared in `modules/programs/opencode.nix`:
+Current persistence is declared in `modules/home/cookiegigi/programs/opencode/default.nix`:
 
 ```nix
-environment.persistence."/persist" = {
-  hideMounts = true;
+home.persistence."/persist" = {
   directories = [
-    "/home/cookiegigi/.config/opencode"
-    "/home/cookiegigi/.local/share/opencode"
-    "/home/cookiegigi/.local/state/opencode"
+    ".local/share/opencode"
+    ".local/state/opencode"
   ];
 };
 ```
@@ -92,90 +90,54 @@ See also the upstream schema: `opencode-schema.json` in the [opencode repo](http
 
 ## Managing Config with Nix
 
-### Approach 1: Activation Script (Current, No home-manager)
+This flake uses **home-manager** to manage OpenCode configuration. The module lives at `modules/home/cookiegigi/programs/opencode/`.
 
-Since this flake does **not** use home-manager, the simplest way is to generate the JSON with Nix and copy it into place with a `system.activationScript`. We **copy** rather than symlink because OpenCode may want to mutate the file later (symlinks to the read-only Nix store would cause `EROFS`).
+### Structure
 
-Example `modules/programs/opencode.nix`:
+The module is split into focused files to keep each file small and single-purpose:
 
-```nix
-{
-  pkgs,
-  lib,
-  ...
-}: let
-  opencodeConfig = (pkgs.formats.json {}).generate "opencode.json" {
-    agents = {
-      coder = {
-        model = "claude-3.7-sonnet";
-        maxTokens = 5000;
-      };
-      task = {
-        model = "claude-3.7-sonnet";
-        maxTokens = 5000;
-      };
-      title = {
-        model = "claude-3.7-sonnet";
-        maxTokens = 80;
-      };
-    };
-
-    shell = {
-      path = "${pkgs.bash}/bin/bash";
-      args = ["-l"];
-    };
-
-    autoCompact = true;
-
-    tui.theme = "tokyonight";
-
-    # Example: enable nil LSP for Nix files
-    lsp = {
-      nix = {
-        command = "${pkgs.nil}/bin/nil";
-      };
-    };
-  };
-in {
-  environment.systemPackages = [
-    pkgs.opencode
-  ];
-
-  # Seed the config file only if it does not already exist.
-  # Because ~/.config/opencode is persisted, this is usually a no-op
-  # after the first boot.
-  system.activationScripts.opencode-config = ''
-    mkdir -p /home/cookiegigi/.config/opencode
-    if [ ! -f /home/cookiegigi/.config/opencode/opencode.json ]; then
-      cp ${opencodeConfig} /home/cookiegigi/.config/opencode/opencode.json
-      chown cookiegigi:users /home/cookiegigi/.config/opencode/opencode.json
-      chmod 644 /home/cookiegigi/.config/opencode/opencode.json
-    fi
-  '';
-
-  environment.persistence."/persist" = {
-    hideMounts = true;
-    directories = [
-      "/home/cookiegigi/.config/opencode"
-      "/home/cookiegigi/.local/share/opencode"
-      "/home/cookiegigi/.local/state/opencode"
-    ];
-  };
-}
+```
+modules/home/cookiegigi/programs/opencode/
+├── default.nix        # Entry point: assembles config, wires xdg.configFile
+├── lib.nix            # Shared helpers (e.g. `mkSkill`)
+├── config.nix         # Top-level JSON config (model, tools, LSP, MCP, etc.)
+├── agents.md.nix      # AGENTS.md content
+├── tui.nix            # TUI theme JSON
+├── agents/
+│   ├── default.nix    # Merges all agent files
+│   ├── explaining.nix # Explaining agent
+│   ├── configuration.nix # Configuration agent
+│   └── git-commit.nix # Git commit agent
+└── skills/
+    ├── default.nix    # Imports all skill files
+    ├── impermanence.nix
+    ├── nix-basics.nix
+    └── nixos-rebuild.nix
 ```
 
-**Trade-off:** OpenCode may later rewrite `opencode.json` (e.g. when changing models via the TUI). Because the file is persisted, those mutations survive reboots. If you want to force a reset to the Nix-defined version, delete the file and rebuild.
+### Adding a new agent
 
-### Approach 2: home-manager
+1. Create `agents/<name>.nix` returning `{ <name> = { ... }; }`
+2. Add one line to `agents/default.nix`
 
-If home-manager is added as a flake input (see `docs/TODO.md`), dotfiles can be managed like this:
+### Adding a new skill
+
+1. Create `skills/<name>.nix` using `mkSkill` from `lib.nix`
+2. Add one line to `skills/default.nix`
+
+### home-manager wiring
+
+`default.nix` uses `xdg.configFile` (the canonical home-manager abstraction for `$XDG_CONFIG_HOME`):
 
 ```nix
-xdg.configFile."opencode/opencode.json".source =
-  (pkgs.formats.json {}).generate "opencode.json" { /* ... */ };
+xdg.configFile = {
+  "opencode/opencode.json".source = opencodeJson;
+  "opencode/AGENTS.md".source = agentsMd;
+  "opencode/tui.json".source = tuiJson;
+} // skillFiles;
 ```
 
-**Caveat:** `xdg.configFile` creates a symlink by default. If OpenCode tries to overwrite the file in-place, it will fail. Use a `home.activation` script that copies instead, or check whether OpenCode unlinks before writing.
+**Caveat:** `xdg.configFile` creates a symlink to the Nix store by default. If OpenCode tries to overwrite `opencode.json` in-place (e.g. when changing models via the TUI), it may fail because the Nix store is read-only. Many applications `unlink()` before writing, which "just works" (the symlink breaks and a regular mutable file is created). If OpenCode does not do this, add a `home.activation` script that copies the file instead.
 
 ---
 
@@ -274,5 +236,5 @@ This means:
 
 - Upstream repo (archived): https://github.com/opencode-ai/opencode
 - Successor project: https://github.com/charmbracelet/crush
-- Current module: `modules/programs/opencode.nix`
+- Current module: `modules/home/cookiegigi/programs/opencode/`
 - Persistence module: `modules/core.nix` (defines `environment.persistence`)
