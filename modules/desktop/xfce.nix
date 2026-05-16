@@ -10,7 +10,7 @@
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
-      "/home/cookiegigi/.config/xfce4/xfconf/xfce-perchannel-xml/"
+      "/home/cookiegigi/.config/xfce4/xfconf/"
     ];
   };
 }
