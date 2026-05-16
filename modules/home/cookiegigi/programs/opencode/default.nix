@@ -15,7 +15,10 @@
   skillFiles =
     lib.mapAttrs' (name: skillFile: {
       name = "opencode/skills/${name}/SKILL.md";
-      value = {source = skillFile;};
+      value = {
+        source = skillFile;
+        force = true;
+      };
     })
     skills;
 in {
@@ -27,9 +30,18 @@ in {
 
   xdg.configFile =
     {
-      "opencode/opencode.json".source = opencodeJson;
-      "opencode/AGENTS.md".source = agentsMd.agentsMd;
-      "opencode/tui.json".source = tui.tuiJson;
+      "opencode/opencode.json" = {
+        source = opencodeJson;
+        force = true;
+      };
+      "opencode/AGENTS.md" = {
+        source = agentsMd.agentsMd;
+        force = true;
+      };
+      "opencode/tui.json" = {
+        source = tui.tuiJson;
+        force = true;
+      };
     }
     // skillFiles;
 
