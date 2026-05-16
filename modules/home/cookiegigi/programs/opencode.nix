@@ -1,11 +1,7 @@
 # WARN: This file is the single source of truth for the global OpenCode configuration.
 # Always edit THIS Nix file; the live ~/.config/opencode files are generated from here.
 # Nix is the source of truth for global config.
-{
-  pkgs,
-  lib,
-  ...
-}: let
+{pkgs, ...}: let
   opencodeConfig = (pkgs.formats.json {}).generate "opencode.json" {
     agent = {
       explaining = {
@@ -390,47 +386,25 @@
     - Keep generations so you can roll back if something breaks
   '';
 in {
-  environment.systemPackages = [
+  home.packages = [
     pkgs.opencode
     pkgs.nodejs
     pkgs.nil
   ];
 
-  # Overwrite managed config files on every activation so the live
-  # ~/.config/opencode always matches this Nix declaration.
-  system.activationScripts.opencode-config = ''
-    mkdir -p /home/cookiegigi/.config/opencode
-    mkdir -p /home/cookiegigi/.config/opencode/skills/impermanence
-    mkdir -p /home/cookiegigi/.config/opencode/skills/nix-basics
-    mkdir -p /home/cookiegigi/.config/opencode/skills/nixos-rebuild
+  home.file = {
+    ".config/opencode/opencode.json".source = opencodeConfig;
+    ".config/opencode/AGENTS.md".source = agentsMd;
+    ".config/opencode/tui.json".source = tuiJson;
+    ".config/opencode/skills/impermanence/SKILL.md".source = skillImpermanence;
+    ".config/opencode/skills/nix-basics/SKILL.md".source = skillNixBasics;
+    ".config/opencode/skills/nixos-rebuild/SKILL.md".source = skillNixosRebuild;
+  };
 
-    cp -f ${opencodeConfig} /home/cookiegigi/.config/opencode/opencode.json
-    cp -f ${agentsMd} /home/cookiegigi/.config/opencode/AGENTS.md
-    cp -f ${tuiJson} /home/cookiegigi/.config/opencode/tui.json
-    cp -f ${skillImpermanence} /home/cookiegigi/.config/opencode/skills/impermanence/SKILL.md
-    cp -f ${skillNixBasics} /home/cookiegigi/.config/opencode/skills/nix-basics/SKILL.md
-    cp -f ${skillNixosRebuild} /home/cookiegigi/.config/opencode/skills/nixos-rebuild/SKILL.md
-
-    chown -R cookiegigi:users /home/cookiegigi/.config/opencode
-    chmod 644 /home/cookiegigi/.config/opencode/opencode.json
-    chmod 644 /home/cookiegigi/.config/opencode/AGENTS.md
-    chmod 644 /home/cookiegigi/.config/opencode/tui.json
-    chmod 644 /home/cookiegigi/.config/opencode/skills/impermanence/SKILL.md
-    chmod 644 /home/cookiegigi/.config/opencode/skills/nix-basics/SKILL.md
-    chmod 644 /home/cookiegigi/.config/opencode/skills/nixos-rebuild/SKILL.md
-
-    # Clean up legacy filename if it exists
-    if [ -f /home/cookiegigi/.config/opencode/.opencode.json ]; then
-      rm -f /home/cookiegigi/.config/opencode/.opencode.json
-    fi
-  '';
-
-  environment.persistence."/persist" = {
-    hideMounts = true;
+  home.persistence."/persist" = {
     directories = [
-      "/home/cookiegigi/.config/opencode"
-      "/home/cookiegigi/.local/share/opencode"
-      "/home/cookiegigi/.local/state/opencode"
+      ".local/share/opencode"
+      ".local/state/opencode"
     ];
   };
 }

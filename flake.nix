@@ -9,6 +9,10 @@
       url = "github:nix-community/impermanence";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -16,6 +20,7 @@
     nixpkgs,
     disko,
     impermanence,
+    home-manager,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
@@ -26,6 +31,7 @@
         ./hosts/xps/configuration.nix
         impermanence.nixosModules.impermanence
         disko.nixosModules.disko
+        home-manager.nixosModules.home-manager
         ./modules/core.nix
         ./modules/clipboard/xclip.nix
         ./modules/desktop/xfce.nix
@@ -33,6 +39,7 @@
         ./modules/localization/frenglish.nix
         ./modules/programs/programs.nix
         ./modules/users/cookiegigi.nix
+        ./modules/home
       ];
     };
 

@@ -1,9 +1,6 @@
 {
   imports = [
-    ./firefox.nix
-    ./vim.nix
-    ./git.nix
-    ./wget.nix
-    ./opencode.nix
+    # All user-level program configurations migrated to home-manager
+    # System-level program modules can be added here as needed
   ];
 }

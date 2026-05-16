@@ -1,8 +1,7 @@
-{
-  # Install git
+{...}: {
   programs.git = {
     enable = true;
-    config = {
+    settings = {
       core.hooksPath = ".githooks";
     };
   };
