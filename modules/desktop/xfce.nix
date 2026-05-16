@@ -11,6 +11,7 @@
     hideMounts = true;
     directories = [
       "/home/cookiegigi/.config/xfce4/xfconf/"
+      "/home/cookiegigi/.config/xfce4/panel/"
     ];
   };
 }
