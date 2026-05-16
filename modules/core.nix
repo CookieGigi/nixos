@@ -23,6 +23,9 @@
   # persist
   fileSystems."/persist".neededForBoot = true;
 
+  # Allow proprietary Nvidia drivers
+  nixpkgs.config.allowUnfree = true;
+
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [

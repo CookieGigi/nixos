@@ -38,6 +38,7 @@
         disko.nixosModules.disko
         home-manager.nixosModules.home-manager
         nixos-hardware.nixosModules.dell-xps-15-9530
+        nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
         ./modules/core.nix
         ./modules/clipboard/xclip.nix
         ./modules/desktop/xfce.nix
