@@ -7,7 +7,7 @@
 
     # ── Appearance ───────────────────────────────────────────────
     settings = {
-      theme = "catppuccin-macchiato";
+      theme = "Catppuccin Macchiato";
       font-family = "JetBrains Mono";
       font-size = 12;
     };
