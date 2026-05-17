@@ -62,8 +62,8 @@
       modules = [
         # 1. iso base
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-        # 2. your real config (bring disko with it!)
-        ./hosts/xps/configuration.nix
+        # 2. disko config
+        ./hosts/xps/disko.nix
         # 3. disko module (need for disko.nix to work)
         disko.nixosModules.disko
         # 4. overrides (new file!)
