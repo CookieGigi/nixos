@@ -17,6 +17,11 @@
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
     };
+
+    nur = {
+      url = "github:nix-community/NUR/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -26,6 +31,7 @@
     impermanence,
     home-manager,
     nixos-hardware,
+    nur,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
@@ -39,6 +45,7 @@
         home-manager.nixosModules.home-manager
         nixos-hardware.nixosModules.dell-xps-15-9530
         nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
+        nur.modules.nixos.default
         ./modules/core.nix
         ./modules/clipboard/xclip.nix
         ./modules/desktop/xfce.nix

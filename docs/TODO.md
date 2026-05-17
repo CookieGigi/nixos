@@ -25,6 +25,8 @@
 - [ ] Explicitly set `nixpkgs.config.allowUnfree = true` (or keep `false` intentionally and document why)
 - [ ] Consider adopting `home-manager` as a flake input to declaratively manage dotfiles instead of hand-maintaining `environment.persistence` entries for every new dotfile directory
 
-- [ ] flakes-part
 - [ ] git-hooks in nix
+
+## Style
+- [ ] firefox style
 - 
