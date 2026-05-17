@@ -43,15 +43,45 @@
         "browser.urlbar.suggest.quicksuggest.sponsored" = false;
         "browser.topsites.contile.enabled" = false;
 
-        # Security
+        # Cookies & tracking protection
+        "network.cookie.cookieBehavior" = 1;
+        "privacy.trackingprotection.enabled" = true;
+        "privacy.trackingprotection.socialtracking.enabled" = true;
+        "privacy.trackingprotection.cryptomining.enabled" = true;
+        "privacy.trackingprotection.fingerprinting.enabled" = true;
+
+        # Network hardening
+        "dom.security.https_only_mode" = true;
+        "security.tls.version.min" = 3;
+        "security.ssl.require_safe_negotiation" = true;
         "network.dns.disablePrefetch" = true;
         "network.prefetch-next" = false;
         "privacy.donottrackheader.enabled" = true;
         "privacy.globalprivacycontrol.enabled" = true;
 
+        # Referer headers
+        "network.http.referer.XOriginTrimmingPolicy" = 2;
+
+        # WebRTC (disable — use dedicated apps for calls)
+        "media.peerconnection.enabled" = false;
+
+        # Geolocation & sensors
+        "geo.enabled" = false;
+        "device.sensors.enabled" = false;
+        "dom.battery.enabled" = false;
+        "media.navigator.enabled" = false;
+
+        # Fingerprinting resistance
+        "privacy.resistFingerprinting" = true;
+
         # Password manager (disabled — using Proton Pass)
         "signon.rememberSignons" = false;
         "signon.autofillForms" = false;
+
+        # Misc
+        "beacon.enabled" = false;
+        "dom.event.clipboardevents.enabled" = false;
+        "network.IDN_show_punycode" = true;
 
         # UI
         "browser.tabs.tabmanager.enabled" = false;
