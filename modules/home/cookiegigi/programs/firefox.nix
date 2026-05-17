@@ -49,6 +49,10 @@
         "privacy.donottrackheader.enabled" = true;
         "privacy.globalprivacycontrol.enabled" = true;
 
+        # Password manager (disabled — using Proton Pass)
+        "signon.rememberSignons" = false;
+        "signon.autofillForms" = false;
+
         # UI
         "browser.tabs.tabmanager.enabled" = false;
         "browser.uidensity" = 1;
