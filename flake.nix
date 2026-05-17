@@ -47,6 +47,7 @@
         nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
         nur.modules.nixos.default
         ./modules/core.nix
+        ./modules/tpm.nix
         ./modules/clipboard/xclip.nix
         ./modules/desktop/xfce.nix
         ./modules/audio.nix
