@@ -2,7 +2,9 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    backupFileExtension = "hm-backup";
+    backupCommand = ''
+      mv -f "$1" "$1.$(date +%s).hm-backup"
+    '';
   };
 
   imports = [
