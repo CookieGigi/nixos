@@ -42,12 +42,5 @@
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
     ];
-    files = [
-      "/etc/shadow"
-      "/etc/passwd"
-      "/etc/group"
-      "/etc/subuid"
-      "/etc/subgid"
-    ];
   };
 }
