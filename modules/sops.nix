@@ -34,6 +34,10 @@
     neededForUsers = true;
   };
 
+  sops.secrets."wifi-home-env" = {
+    # The decrypted file will be a valid systemd EnvironmentFile
+  };
+
   # Add more secrets here as needed, e.g.:
   # sops.secrets."github-token" = {};
   # sops.secrets."openai-api-key" = {};

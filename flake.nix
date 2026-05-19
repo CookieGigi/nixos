@@ -63,6 +63,7 @@
         ./modules/programs/programs.nix
         ./modules/users/cookiegigi.nix
         ./modules/home
+        ./modules/networks/wifi-home.nix
       ];
     };
 
