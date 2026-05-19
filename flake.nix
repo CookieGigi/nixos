@@ -57,7 +57,8 @@
         ./modules/core.nix
         ./modules/tpm.nix
         ./modules/clipboard/xclip.nix
-        ./modules/desktop/xfce.nix
+        ./modules/clipboard/wclip.nix
+        ./modules/desktop/niri.nix
         ./modules/audio.nix
         ./modules/localization/frenglish.nix
         ./modules/programs/programs.nix

@@ -5,6 +5,7 @@
     ./firefox.nix
     ./ghostty.nix
     ./zsh.nix
+    ./niri
     ./opencode
   ];
 }
