@@ -5,6 +5,7 @@
       ".ssh"
       "Documents"
       "Downloads"
+      "Pictures"
       "nixos"
     ];
   };

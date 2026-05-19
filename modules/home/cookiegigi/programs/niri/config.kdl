@@ -54,6 +54,7 @@ layout {
 }
 
 spawn-at-startup "waybar"
+spawn-at-startup "swaybg" "-i" "/home/cookiegigi/Pictures/Wallpapers/voyager-4.jpg" "-m" "fill"
 
 hotkey-overlay {
 }
