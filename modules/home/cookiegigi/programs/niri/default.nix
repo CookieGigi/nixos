@@ -195,7 +195,7 @@
       set -euo pipefail
       DIR="$HOME/Pictures/Screenshots"
       mkdir -p "$DIR"
-      FILE="$DIR/Screenshot from $(date +%Y-%m-%d %H-%M-%S).png"
+      FILE="$DIR/Screenshot from $(date "+%Y-%m-%d %H-%M-%S").png"
       grim -g "$(slurp)" "$FILE"
       echo -n "$FILE" | wl-copy
       notify-send "Screenshot copied" "Path saved to clipboard: $FILE"
@@ -205,7 +205,7 @@
       set -euo pipefail
       DIR="$HOME/Pictures/Screenshots"
       mkdir -p "$DIR"
-      FILE="$DIR/Screenshot from $(date +%Y-%m-%d %H-%M-%S).png"
+      FILE="$DIR/Screenshot from $(date "+%Y-%m-%d %H-%M-%S").png"
       grim "$FILE"
       echo -n "$FILE" | wl-copy
       notify-send "Screenshot copied" "Path saved to clipboard: $FILE"
