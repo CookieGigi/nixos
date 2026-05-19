@@ -3,7 +3,7 @@
   services.xserver.enable = true;
 
   # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
+  # Display manager (SDDM) is managed in modules/desktop/niri.nix.
   services.xserver.desktopManager.xfce.enable = true;
 
   # Persist
