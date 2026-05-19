@@ -2,7 +2,7 @@
   catppuccin-sddm-theme = pkgs.catppuccin-sddm.override {
     flavor = "macchiato";
     accent = "teal";
-    background = "/home/cookiegigi/Pictures/Wallpapers/voyager-4.jpg";
+    background = "/home/cookiegigi/nixos/modules/home/cookiegigi/wallpapers/voyager-4.jpg";
   };
 in {
   programs.niri.enable = true;
