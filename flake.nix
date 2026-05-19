@@ -58,7 +58,6 @@
         ./modules/tpm.nix
         ./modules/clipboard/xclip.nix
         ./modules/clipboard/wclip.nix
-        ./modules/desktop/xfce.nix
         ./modules/desktop/niri.nix
         ./modules/audio.nix
         ./modules/localization/frenglish.nix
