@@ -1,6 +1,10 @@
 // Default niri config — adapted for ghostty terminal.
 // Full documentation: https://niri-wm.github.io/niri/Configuration:-Introduction
 
+// Ask windows to omit client-side decorations so niri can draw
+// focus-ring / border around them with proper rounded corners.
+prefer-no-csd
+
 input {
     keyboard {
         xkb {
@@ -40,17 +44,20 @@ layout {
     default-column-width { proportion 0.5; }
 
     focus-ring {
-        width 4
-        active-color "#7fc8ff"
-        inactive-color "#505050"
+        off
     }
 
     border {
-        off
-        width 4
-        active-color "#ffc87f"
-        inactive-color "#505050"
+        width 2
+        active-color "#8bd5ca"
+        inactive-color "#494d64"
     }
+}
+
+// Make borders follow rounded window corners for a modern look.
+window-rule {
+    geometry-corner-radius 12
+    clip-to-geometry true
 }
 
 spawn-at-startup "waybar"

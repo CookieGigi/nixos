@@ -7,5 +7,6 @@
     ./zsh.nix
     ./niri
     ./opencode
+    ./catppuccin.nix
   ];
 }

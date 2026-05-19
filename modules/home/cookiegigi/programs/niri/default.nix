@@ -100,11 +100,11 @@
 
       window#waybar {
         background-color: transparent;
-        color: #cdd6f4;
+        color: #cad3f5;
       }
 
       window#waybar > box {
-        background-color: #1e1e2e;
+        background-color: #24273a;
         border-radius: 12px;
         padding: 0 8px;
         margin: 0;
@@ -112,27 +112,27 @@
 
       #workspaces button {
         padding: 0 10px;
-        color: #cdd6f4;
+        color: #cad3f5;
         background-color: transparent;
         border: none;
         border-radius: 8px;
       }
 
       #workspaces button:hover {
-        background-color: #313244;
+        background-color: #363a4f;
       }
 
       #workspaces button.active {
-        background-color: #45475a;
+        background-color: #494d64;
       }
 
       #workspaces button.urgent {
-        background-color: #f38ba8;
-        color: #1e1e2e;
+        background-color: #ed8796;
+        color: #24273a;
       }
 
       #window {
-        color: #a6adc8;
+        color: #a5adcb;
       }
 
       #clock,
@@ -145,22 +145,22 @@
         padding: 0 10px;
         margin: 4px 0;
         border-radius: 8px;
-        background-color: #313244;
+        background-color: #363a4f;
       }
 
       #clock {
-        background-color: #45475a;
+        background-color: #494d64;
         font-weight: bold;
       }
 
       #battery.critical {
-        background-color: #f38ba8;
-        color: #1e1e2e;
+        background-color: #ed8796;
+        color: #24273a;
       }
 
       #battery.warning {
-        background-color: #f9e2af;
-        color: #1e1e2e;
+        background-color: #eed49f;
+        color: #24273a;
       }
 
       #tray {
@@ -173,7 +173,7 @@
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #f38ba8;
+        background-color: #ed8796;
       }
     '';
   };
