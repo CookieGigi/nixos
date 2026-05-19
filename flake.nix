@@ -92,6 +92,7 @@
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
       in
         toString (pkgs.writeShellScript "sops-edit-secrets" ''
+          export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-/persist/var/lib/sops-nix/key.txt}"
           exec ${pkgs.sops}/bin/sops "''${1:-secrets/secrets.yaml}"
         '');
     };

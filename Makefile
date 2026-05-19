@@ -31,4 +31,4 @@ disko:
 
 # Open the encrypted secrets file for editing (via sops)
 edit-secrets:
-	nix run .#edit-secrets
+	sudo nix run .#edit-secrets
