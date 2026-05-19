@@ -64,7 +64,7 @@ animations {
 }
 
 binds {
-    Mod+Shift+Question { show-hotkey-overlay; }
+    Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Terminal: ghostty
     Mod+T { spawn "ghostty"; }
