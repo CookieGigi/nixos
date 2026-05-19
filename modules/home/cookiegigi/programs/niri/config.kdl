@@ -193,9 +193,11 @@ binds {
 
     Mod+W { toggle-column-tabbed-display; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    // Screenshot tools that save to file AND copy path to clipboard
+    // so you can paste the path directly into OpenCode / terminal apps.
+    Print       { spawn "screenshot-region"; }
+    Ctrl+Print  { spawn "screenshot-full"; }
+    Alt+Print   { spawn "screenshot-region"; }
 
     Mod+Shift+E { quit; }
     Ctrl+Alt+Delete { quit; }
