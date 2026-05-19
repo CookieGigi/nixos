@@ -10,6 +10,7 @@
       theme = "Catppuccin Macchiato";
       font-family = "JetBrains Mono";
       font-size = 12;
+      background-opacity = 0.8;
     };
 
     # ── Behaviour ────────────────────────────────────────────────
