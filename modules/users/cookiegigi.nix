@@ -1,8 +1,7 @@
 {pkgs, ...}: {
-  # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.cookiegigi = {
     isNormalUser = true;
-    initialPassword = "cookiegigi";
+    # Password is set manually with `passwd` after install — not in public config
     description = "cookiegigi";
     extraGroups = ["networkmanager" "wheel"];
     shell = pkgs.zsh;

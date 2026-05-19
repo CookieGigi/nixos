@@ -42,5 +42,7 @@
     plugin = ["@tarquinen/opencode-dcp@latest"];
 
     username = "cookiegigi";
+
+    autoupdate = false;
   };
 }
