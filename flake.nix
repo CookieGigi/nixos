@@ -27,6 +27,11 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    pixie-sddm = {
+      url = "github:xCaptaiN09/pixie-sddm";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -38,12 +43,14 @@
     nixos-hardware,
     nur,
     sops-nix,
+    pixie-sddm,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
 
     nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = {inherit pixie-sddm;};
       modules = [
         ./hosts/xps/configuration.nix
         impermanence.nixosModules.impermanence
