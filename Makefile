@@ -3,7 +3,7 @@
 
 HOST = xps
 
-.PHONY: switch build check fmt iso
+.PHONY: switch build check fmt iso edit-secrets
 
 # Rebuild and activate the system configuration
 switch:
@@ -28,3 +28,7 @@ iso:
 # Run disk partitioning (installation only)
 disko:
 	sudo nix run .#disko -- --mode disko ./hosts/$(HOST)/disko.nix
+
+# Open the encrypted secrets file for editing (via sops)
+edit-secrets:
+	nix run .#edit-secrets

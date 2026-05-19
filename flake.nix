@@ -80,6 +80,20 @@
       ];
     };
 
-    packages.x86_64-linux.disko = disko.packages.x86_64-linux.disko;
+    packages.x86_64-linux = {
+      disko = disko.packages.x86_64-linux.disko;
+      sops = nixpkgs.legacyPackages.x86_64-linux.sops;
+      age = nixpkgs.legacyPackages.x86_64-linux.age;
+    };
+
+    apps.x86_64-linux.edit-secrets = {
+      type = "app";
+      program = let
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      in
+        toString (pkgs.writeShellScript "sops-edit-secrets" ''
+          exec ${pkgs.sops}/bin/sops "''${1:-secrets/secrets.yaml}"
+        '');
+    };
   };
 }
