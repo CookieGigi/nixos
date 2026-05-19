@@ -22,6 +22,11 @@
       url = "github:nix-community/NUR/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -32,6 +37,7 @@
     home-manager,
     nixos-hardware,
     nur,
+    sops-nix,
     ...
   }: {
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
@@ -46,6 +52,8 @@
         nixos-hardware.nixosModules.dell-xps-15-9530
         nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
         nur.modules.nixos.default
+        sops-nix.nixosModules.sops
+        ./modules/sops.nix
         ./modules/core.nix
         ./modules/tpm.nix
         ./modules/clipboard/xclip.nix

@@ -1,0 +1,35 @@
+# =============================================================================
+# .sops.yaml — sops encryption rules
+# =============================================================================
+#
+# 🔑 KEY SETUP (do this ONCE):
+# ──────────────────────────────
+# Step 1 — Primary key (on-machine, auto-decrypt at boot):
+#   mkdir -p /persist/var/lib/sops-nix
+#   nix-shell -p age --run "age-keygen -o /persist/var/lib/sops-nix/key.txt"
+#   nix-shell -p age --run "age-keygen -y /persist/var/lib/sops-nix/key.txt"
+#   → Copy the "age1…" public key and paste it below as &primary
+#
+# Step 2 — Backup key (store in Proton Pass):
+#   nix-shell -p age --run "age-keygen -o ~/backup-sops-key.txt"
+#   nix-shell -p age --run "age-keygen -y ~/backup-sops-key.txt"
+#   → Save ~/backup-sops-key.txt as a secure note in Proton Pass
+#   → Copy the "age1…" public key and paste it below as &backup
+#
+# Step 3 — Encrypt the secrets file:
+#   nix-shell -p sops --run "sops secrets/secrets.yaml"
+#   → Use the template provided in secrets/secrets.yaml.template
+#
+# After setup: rm ~/backup-sops-key.txt
+# (The key lives safely in Proton Pass)
+
+keys:
+  - &primary age1jp0u5u7e99zxvdlusfdjmjq7uhl70hy55j7ghvlec0pu3tycf54swwrx4l  # ← paste primary public key
+  - &backup age1c7rcjqrz8nc3y28a7mjzvtw77py3uyw67sxzpcs50xxyjf0hrf0qung58q  # ← paste backup public key
+
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *primary
+      - *backup

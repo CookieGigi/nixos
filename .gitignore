@@ -1,2 +1,8 @@
 result
 *.qcow2
+
+# sops-nix — never commit decrypted secrets or raw age keys
+secrets/*.dec
+secrets/*.plain
+backup-sops-key.txt
+*-age-key.txt
