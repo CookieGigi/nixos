@@ -44,5 +44,7 @@
     username = "cookiegigi";
 
     autoupdate = false;
+
+    theme = "system";
   };
 }
