@@ -33,6 +33,7 @@
           "network"
           "pulseaudio"
           "battery"
+          "custom/power"
         ];
 
         "niri/workspaces" = {
@@ -88,6 +89,22 @@
         tray = {
           spacing = 10;
         };
+
+        "custom/power" = {
+          format = "⏻";
+          on-click = let
+            menu = pkgs.writeShellScript "power-menu" ''
+              choice=$(printf "Shutdown\nReboot\nSuspend\nLogout\nCancel" | ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt "Power: " --width 20)
+              case "$choice" in
+                Shutdown) systemctl poweroff ;;
+                Reboot) systemctl reboot ;;
+                Suspend) systemctl suspend ;;
+                Logout) ${pkgs.niri}/bin/niri msg action quit ;;
+              esac
+            '';
+          in "${menu}";
+          tooltip = "Power menu";
+        };
       };
     };
 
@@ -141,7 +158,8 @@
       #network,
       #pulseaudio,
       #battery,
-      #tray {
+      #tray,
+      #custom-power {
         padding: 0 10px;
         margin: 4px 0;
         border-radius: 8px;
@@ -174,6 +192,15 @@
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
         background-color: #ed8796;
+      }
+
+      #custom-power {
+        color: #ed8796;
+      }
+
+      #custom-power:hover {
+        background-color: #ed8796;
+        color: #24273a;
       }
     '';
   };
