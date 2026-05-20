@@ -8,5 +8,6 @@
     ./niri
     ./opencode
     ./catppuccin.nix
+    ./quickshell
   ];
 }
