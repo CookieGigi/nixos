@@ -60,7 +60,7 @@ window-rule {
     clip-to-geometry true
 }
 
-spawn-at-startup "waybar"
+spawn-at-startup "qs" "-c" "bar"
 spawn-at-startup "swaybg" "-i" "/home/cookiegigi/nixos/modules/home/cookiegigi/wallpapers/voyager-4.jpg" "-m" "fill"
 
 hotkey-overlay {

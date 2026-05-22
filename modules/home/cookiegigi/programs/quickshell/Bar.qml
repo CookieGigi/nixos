@@ -1,66 +1,106 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Wayland
 
 // A top panel bar that appears on every connected monitor.
-// PanelWindow is Quickshell's type for bars, widgets, and overlays.
+// Fully transparent background; each widget lives in its own
+// rounded pill container.
 Scope {
     id: root
 
-    // Variants creates an instance of its delegate for every item in the model.
-    // Here we use Quickshell.screens so a bar appears on each monitor.
-    // If you plug/unplug monitors, bars are created and destroyed automatically.
+    property color containerBg: "#b324273a"
+    property int containerRadius: 8
+    property int containerPaddingV: 6
+    property int containerPaddingH: 12
+
     Variants {
         model: Quickshell.screens
 
         PanelWindow {
-            // modelData is injected by Variants and contains the screen object.
             required property var modelData
             screen: modelData
 
-            // Anchor the bar to the top of the screen and stretch across it.
             anchors {
                 top: true
                 left: true
                 right: true
             }
 
-            // Reserve space so other windows don't overlap the bar.
             exclusiveZone: implicitHeight
-
             implicitHeight: 36
-            color: "#cc1a1a2e" // semi-transparent dark background
+            color: "transparent"
 
-            // RowLayout arranges children horizontally.
+            // Allow transparency
+            surfaceFormat.opaque: false
+
             RowLayout {
+                id: barRow
                 anchors {
                     fill: parent
-                    leftMargin: 12
-                    rightMargin: 12
+                    leftMargin: 16
+                    rightMargin: 16
                 }
 
-                // Left section: a simple label.
-                Text {
-                    text: "Quickshell Demo"
-                    color: "#89b4fa" // blue-ish accent
-                    font {
-                        family: "monospace"
-                        pixelSize: 14
-                        bold: true
+                // Left: time in rounded container
+                Rectangle {
+                    radius: root.containerRadius
+                    color: root.containerBg
+                    Layout.preferredHeight: timeText.implicitHeight + root.containerPaddingV * 2
+                    Layout.preferredWidth: timeText.implicitWidth + root.containerPaddingH * 2
+
+                    Text {
+                        id: timeText
+                        anchors.centerIn: parent
+                        text: Time.time
+                        color: "#8bd5ca"
+                        font {
+                            family: "monospace"
+                            pixelSize: 14
+                            bold: true
+                        }
                     }
                 }
 
-                // Middle section: spacer that pushes widgets to edges.
+                // Spacer
                 Item {
                     Layout.fillWidth: true
                 }
 
-                // Right section: volume and clock.
-                RowLayout {
-                    spacing: 16
+                // Center: window title in rounded container
+                Rectangle {
+                    radius: root.containerRadius
+                    color: root.containerBg
+                    Layout.preferredHeight: titleText.implicitHeight + root.containerPaddingV * 2
+                    Layout.preferredWidth: titleText.implicitWidth + root.containerPaddingH * 2
+                    Layout.maximumWidth: barRow.width * 0.4
 
-                    VolumeWidget {}
-                    ClockWidget {}
+                    Text {
+                        id: titleText
+                        anchors.centerIn: parent
+                        width: parent.width - root.containerPaddingH * 2
+                        text: ToplevelManager.activeToplevel?.title ?? ""
+                        color: "#8bd5ca"
+                        font {
+                            family: "monospace"
+                            pixelSize: 14
+                        }
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
+                // Spacer
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                // Right: battery + power button (each brings its own container)
+                RowLayout {
+                    spacing: 8
+
+                    BatteryWidget {}
+                    PowerButton {}
                 }
             }
         }

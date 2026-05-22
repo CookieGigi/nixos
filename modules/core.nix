@@ -25,6 +25,9 @@
   programs.ssh.startAgent = true;
   services.gnome.gcr-ssh-agent.enable = false;
 
+  # UPower for battery monitoring
+  services.upower.enable = true;
+
   # NIX flags
   nix.settings.experimental-features = ["nix-command" "flakes"];
 

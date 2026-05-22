@@ -6,7 +6,7 @@
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
 
   programs.waybar = {
-    enable = true;
+    enable = false;
     settings = {
       mainBar = {
         layer = "top";
