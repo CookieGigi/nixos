@@ -18,23 +18,48 @@ Rectangle {
     property string batteryIcon: "🔋"
     property string batteryText: "?%"
 
+    function findBatteryDevice() {
+        const devices = UPower.devices;
+        for (let i = 0; i < devices.count; i++) {
+            const d = devices.get(i);
+            if (d.isLaptopBattery) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     function refresh() {
-        const dev = UPower.displayDevice;
+        let dev = UPower.displayDevice;
+        // displayDevice can be stale or return 0% on some systems;
+        // fall back to the actual laptop battery device from devices.
+        if (!dev || !dev.ready || dev.percentage == null || dev.percentage === 0) {
+            dev = findBatteryDevice();
+        }
+
         if (!dev || !dev.ready) {
             root.batteryIcon = "🔋";
             root.batteryText = "?%";
             return;
         }
+
+        const pct = Math.round(dev.percentage * 100);
+        if (isNaN(pct) || pct < 0) {
+            root.batteryIcon = "🔋";
+            root.batteryText = "?%";
+            return;
+        }
+
         const state = dev.state;
         if (state === UPowerDeviceState.FullyCharged) {
             root.batteryIcon = "🔋";
             root.batteryText = "Full";
         } else if (state === UPowerDeviceState.Charging) {
             root.batteryIcon = "🔌";
-            root.batteryText = Math.round(dev.percentage) + "%";
+            root.batteryText = pct + "%";
         } else {
             root.batteryIcon = "🔋";
-            root.batteryText = Math.round(dev.percentage) + "%";
+            root.batteryText = pct + "%";
         }
     }
 

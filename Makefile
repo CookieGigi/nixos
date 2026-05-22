@@ -3,7 +3,7 @@
 
 HOST = xps
 
-.PHONY: switch build check fmt iso edit-secrets
+.PHONY: switch build check fmt iso disko edit-secrets quickshell-dev
 
 # Rebuild and activate the system configuration
 switch:
@@ -32,3 +32,10 @@ disko:
 # Open the encrypted secrets file for editing (via sops)
 edit-secrets:
 	sudo nix run .#edit-secrets
+
+# Run quickshell bar from repo source for instant hot-reload during development
+quickshell-dev:
+	@echo "Killing any running quickshell…"
+	@pkill qs 2>/dev/null || true
+	@echo "Launching quickshell from repo source (hot-reload enabled)…"
+	qs -p ./modules/home/cookiegigi/programs/quickshell/shell.qml
