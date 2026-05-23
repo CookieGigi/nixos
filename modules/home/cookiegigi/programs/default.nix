@@ -10,5 +10,6 @@
     ./catppuccin.nix
     ./quickshell
     ./lazygit.nix
+    ./nix-direnv.nix
   ];
 }
