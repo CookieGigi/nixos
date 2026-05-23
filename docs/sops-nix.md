@@ -64,8 +64,10 @@ nix-shell -p sops --run "sops updatekeys secrets/secrets.yaml"
 
 ### Run sops directly
 
+`sops` is available in the repo's devShell. Because the age key is root-owned (sops-nix needs it at boot), you must use `sudo` with the key path:
+
 ```bash
-nix run .#sops -- secrets/secrets.yaml
+sudo SOPS_AGE_KEY_FILE=/persist/var/lib/sops-nix/key.txt sops secrets/secrets.yaml
 ```
 
 ---

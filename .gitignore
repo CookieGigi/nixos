@@ -1,5 +1,6 @@
 result
 *.qcow2
+.direnv/
 
 # sops-nix — never commit decrypted secrets or raw age keys
 secrets/*.dec
