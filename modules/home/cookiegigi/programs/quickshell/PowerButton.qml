@@ -3,6 +3,10 @@ import Quickshell
 
 // A clickable power button wrapped in a rounded pill container.
 Rectangle {
+    id: root
+
+    property var powerMenuRef: null
+
     radius: 8
     color: "#b324273a"
     implicitHeight: powerText.implicitHeight + 12
@@ -16,7 +20,7 @@ Rectangle {
             id: powerText
             anchors.centerIn: parent
             text: "⏻"
-            color: "#8bd5ca"
+            color: "#ffffff"
             font {
                 family: "monospace"
                 pixelSize: 14
@@ -25,7 +29,9 @@ Rectangle {
         }
 
         onClicked: {
-            Quickshell.execDetached(["sh", "-c", "power-menu"]);
+            if (root.powerMenuRef) {
+                root.powerMenuRef.visible = true;
+            }
         }
     }
 }

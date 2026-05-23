@@ -76,8 +76,8 @@ binds {
 
     // Terminal: ghostty
     Mod+T { spawn "ghostty"; }
-    // App launcher: fuzzel
-    Mod+D { spawn "fuzzel"; }
+    // App launcher: quickshell
+    Mod+D { spawn "show-app-launcher"; }
     // Screen locker: swaylock
     Super+Alt+L { spawn "swaylock"; }
 

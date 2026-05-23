@@ -79,30 +79,6 @@ in {
     catppuccin-kvantum
   ];
 
-  # ── Fuzzel (app launcher) ────────────────────────────────────
-  programs.fuzzel = {
-    settings = {
-      main = {
-        width = 40;
-        lines = 10;
-        font = "JetBrainsMono Nerd Font:size=11";
-      };
-      colors = {
-        background = "${c.base}f2";
-        text = "${c.text}ff";
-        match = "${c.teal}ff";
-        selection = "${c.surface1}ff";
-        selection-text = "${c.text}ff";
-        selection-match = "${c.teal}ff";
-        border = "${c.teal}ff";
-      };
-      border = {
-        width = 2;
-        radius = 12;
-      };
-    };
-  };
-
   # ── Mako (notifications) ─────────────────────────────────────
   services.mako.settings = {
     background-color = "${c.base}ee";
@@ -146,7 +122,6 @@ in {
     directories = [
       ".config/gtk-3.0"
       ".config/gtk-4.0"
-      ".config/fuzzel"
       ".config/mako"
     ];
   };
