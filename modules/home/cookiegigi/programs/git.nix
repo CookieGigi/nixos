@@ -5,7 +5,6 @@ _: {
     ignores = [".direnv/" "*.swp" ".DS_Store"];
 
     settings = {
-      core.hooksPath = ".githooks";
       init.defaultBranch = "main";
       pull.rebase = true;
       extraConfig.core.editor = "vi";
