@@ -127,7 +127,21 @@
       inherit (self.checks.x86_64-linux.pre-commit-check) shellHook enabledPackages;
     in
       pkgs.mkShell {
-        inherit shellHook;
+        shellHook = ''
+          # Guard against global core.hooksPath which breaks pre-commit hook installation.
+          # git-hooks.nix only unsets the local config; a global setting still blocks it.
+          _global_hooksPath="$(${pkgs.git}/bin/git config --global core.hooksPath 2>/dev/null || true)"
+          if [ -n "$_global_hooksPath" ]; then
+            echo ""
+            echo "WARNING: core.hooksPath is set globally ('$_global_hooksPath')."
+            echo "This prevents pre-commit hooks from being installed by the Nix devShell."
+            echo "Remove it with: git config --global --unset-all core.hooksPath"
+            echo ""
+          fi
+          unset _global_hooksPath
+
+          ${shellHook}
+        '';
         buildInputs =
           enabledPackages
           ++ (with pkgs; [
