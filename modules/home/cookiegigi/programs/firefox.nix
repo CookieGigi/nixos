@@ -87,9 +87,13 @@
         "browser.tabs.tabmanager.enabled" = false;
         "browser.uidensity" = 1;
 
-        # Dark mode
+        # Dark mode (UI)
         "browser.theme.content-theme" = 0;
         "browser.theme.toolbar-theme" = 0;
+
+        # Dark mode (preferred color scheme for websites)
+        # Required because privacy.resistFingerprinting forces light
+        "layout.css.prefers-color-scheme.content-override" = 1;
       };
 
       # -- Search engine defaults --------------------------------------
