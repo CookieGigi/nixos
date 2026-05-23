@@ -1,22 +1,25 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.configurationLimit = 10;
+  boot = {
+    loader.systemd-boot = {
+      enable = true;
+      configurationLimit = 10;
+    };
+    loader.efi.canTouchEfiVariables = true;
+    kernelPackages = pkgs.linuxPackages_latest;
+  };
 
-  # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  # Garbage collection
-  nix.gc.automatic = true;
-  nix.gc.options = "--delete-older-than 30d";
-
-  # nix store optimization
-  nix.settings.auto-optimise-store = true;
+  # Nix settings
+  nix = {
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 30d";
+    };
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = ["nix-command" "flakes"];
+    };
+  };
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -27,9 +30,6 @@
 
   # UPower for battery monitoring
   services.upower.enable = true;
-
-  # NIX flags
-  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # persist
   fileSystems."/persist".neededForBoot = true;

@@ -1,4 +1,4 @@
-{...}: {
+_: {
   configuration = {
     model = "opencode-go/deepseek-v4-pro";
     mode = "primary";

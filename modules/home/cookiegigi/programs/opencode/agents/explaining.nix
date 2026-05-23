@@ -1,4 +1,4 @@
-{...}: {
+_: {
   explaining = {
     model = "opencode-go/kimi-k2.6";
     mode = "primary";

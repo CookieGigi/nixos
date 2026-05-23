@@ -23,9 +23,13 @@
 
   # Symlink quickshell QML config into ~/.config/quickshell/
   # The directory name "bar" allows running it with `qs -c bar`.
-  xdg.configFile."quickshell/bar/shell.qml".source = ./shell.qml;
-  xdg.configFile."quickshell/bar/Bar.qml".source = ./Bar.qml;
-  xdg.configFile."quickshell/bar/Time.qml".source = ./Time.qml;
-  xdg.configFile."quickshell/bar/BatteryWidget.qml".source = ./BatteryWidget.qml;
-  xdg.configFile."quickshell/bar/PowerButton.qml".source = ./PowerButton.qml;
+  xdg = {
+    configFile = {
+      "quickshell/bar/shell.qml".source = ./shell.qml;
+      "quickshell/bar/Bar.qml".source = ./Bar.qml;
+      "quickshell/bar/Time.qml".source = ./Time.qml;
+      "quickshell/bar/BatteryWidget.qml".source = ./BatteryWidget.qml;
+      "quickshell/bar/PowerButton.qml".source = ./PowerButton.qml;
+    };
+  };
 }

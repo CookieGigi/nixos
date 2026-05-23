@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
 
   programs.waybar = {
@@ -204,10 +200,16 @@
       }
     '';
   };
-  programs.fuzzel.enable = true;
-  services.mako.enable = true;
-  programs.swaylock.enable = true;
-  services.swayidle.enable = true;
+
+  programs = {
+    fuzzel.enable = true;
+    swaylock.enable = true;
+  };
+
+  services = {
+    mako.enable = true;
+    swayidle.enable = true;
+  };
 
   home.packages = with pkgs; [
     brightnessctl

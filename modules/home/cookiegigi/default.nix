@@ -1,4 +1,4 @@
-{...}: {
+_: {
   home-manager.users.cookiegigi = {
     imports = [
       ./packages.nix

@@ -32,6 +32,11 @@
       url = "github:xCaptaiN09/pixie-sddm";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -44,9 +49,33 @@
     nur,
     sops-nix,
     pixie-sddm,
+    git-hooks,
     ...
   }: {
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
+    checks.x86_64-linux.pre-commit-check = git-hooks.lib.x86_64-linux.run {
+      src = ./.;
+      hooks = {
+        alejandra.enable = true;
+        statix.enable = true;
+        deadnix = {
+          enable = true;
+          excludes = ["hardware-configuration"];
+        };
+        flake-checker.enable = true;
+        end-of-file-fixer.enable = true;
+        trim-trailing-whitespace.enable = true;
+        check-merge-conflicts.enable = true;
+      };
+    };
+
+    formatter.x86_64-linux = let
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      config = self.checks.x86_64-linux.pre-commit-check.config;
+      inherit (config) package configFile;
+    in
+      pkgs.writeShellScriptBin "pre-commit-run" ''
+        ${pkgs.lib.getExe package} run --all-files --config ${configFile}
+      '';
 
     nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
@@ -93,14 +122,20 @@
       disko = disko.packages.x86_64-linux.disko;
     };
 
-    devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
-      packages = with nixpkgs.legacyPackages.x86_64-linux; [
-        alejandra
-        git
-        sops
-        age
-      ];
-    };
+    devShells.x86_64-linux.default = let
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      inherit (self.checks.x86_64-linux.pre-commit-check) shellHook enabledPackages;
+    in
+      pkgs.mkShell {
+        inherit shellHook;
+        buildInputs =
+          enabledPackages
+          ++ (with pkgs; [
+            git
+            sops
+            age
+          ]);
+      };
 
     apps.x86_64-linux.edit-secrets = {
       type = "app";

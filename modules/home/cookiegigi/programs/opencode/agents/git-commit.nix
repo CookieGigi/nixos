@@ -1,4 +1,4 @@
-{...}: {
+_: {
   git-commit = {
     model = "opencode-go/deepseek-v4-flash";
     mode = "subagent";

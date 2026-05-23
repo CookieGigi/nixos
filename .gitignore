@@ -1,6 +1,7 @@
 result
 *.qcow2
 .direnv/
+/.pre-commit-config.yaml
 
 # sops-nix — never commit decrypted secrets or raw age keys
 secrets/*.dec
