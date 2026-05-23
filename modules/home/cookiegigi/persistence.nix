@@ -8,6 +8,7 @@
       "Downloads"
       "Pictures"
       "nixos"
+      "Projects"
     ];
   };
 }
