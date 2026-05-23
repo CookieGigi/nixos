@@ -86,6 +86,10 @@
         # UI
         "browser.tabs.tabmanager.enabled" = false;
         "browser.uidensity" = 1;
+
+        # Dark mode
+        "browser.theme.content-theme" = 0;
+        "browser.theme.toolbar-theme" = 0;
       };
 
       # -- Search engine defaults --------------------------------------
