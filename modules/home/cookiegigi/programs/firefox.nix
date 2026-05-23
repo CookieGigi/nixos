@@ -88,6 +88,8 @@
         "browser.uidensity" = 1;
 
         # Dark mode (UI)
+        # Force dark theme on Linux regardless of GTK theme
+        "ui.systemUsesDarkTheme" = 1;
         "browser.theme.content-theme" = 0;
         "browser.theme.toolbar-theme" = 0;
 
