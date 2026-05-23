@@ -9,5 +9,6 @@
     ./opencode
     ./catppuccin.nix
     ./quickshell
+    ./lazygit.nix
   ];
 }
