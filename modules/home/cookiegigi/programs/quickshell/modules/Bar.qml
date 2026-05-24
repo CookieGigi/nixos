@@ -45,16 +45,12 @@ Scope {
         // Popups
         AppLauncher {
             visibilities: root.visibilities
-            anchor.window: barWindow
-            anchor.rect.x: barWindow.width / 2 - width / 2
-            anchor.rect.y: barWindow.height
+            screen: modelData
         }
 
         PowerMenu {
             visibilities: root.visibilities
-            anchor.window: barWindow
-            anchor.rect.x: barWindow.width - width - 16
-            anchor.rect.y: barWindow.height
+            screen: modelData
         }
 
         RowLayout {

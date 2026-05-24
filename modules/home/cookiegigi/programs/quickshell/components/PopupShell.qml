@@ -4,10 +4,10 @@ import "../theme"
 
 // Shared popup frame:
 //   - Styled background + border
-//   - Escape key closes (handled by parent PopupWindow)
+//   - Escape key closes (handled by parent window)
 //
-// Parent PopupWindow should set grabFocus: true and
-// wire visible to a Visibilities property.
+// Parent window should grab keyboard focus and wire visible
+// to a Visibilities property.
 Rectangle {
     id: root
 

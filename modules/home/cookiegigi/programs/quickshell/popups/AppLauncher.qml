@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Wayland
 import "../components"
 import "../theme"
 
 // App launcher popup with search and keyboard navigation.
-PopupWindow {
+// Uses PanelWindow with Overlay layer so it works on compositors
+// (e.g. niri) where xdg_popup cannot attach to a layer-shell parent.
+PanelWindow {
     id: root
 
     property var visibilities: null
@@ -19,7 +22,11 @@ PopupWindow {
     property var denylist: ["kvantum", "gvim"]
 
     visible: visibilities ? visibilities.launcher : false
-    grabFocus: true
+
+    // Overlay layer-shell surface: floats above everything, grabs keyboard.
+    layer: WlrLayer.Overlay
+    keyboardFocus: WlrKeyboardFocus.Exclusive
+    exclusiveZone: 0
 
     implicitWidth: 500
     implicitHeight: Math.min(400, selectionList.count * 36 + searchBox.implicitHeight + 48)
@@ -33,12 +40,6 @@ PopupWindow {
             searchInput.forceActiveFocus();
             focusTimer.start();
         } else {
-            closeLauncher();
-        }
-    }
-
-    onGrabFocusChanged: {
-        if (!grabFocus && visible) {
             closeLauncher();
         }
     }

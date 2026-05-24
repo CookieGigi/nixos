@@ -1,16 +1,23 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import "../components"
 import "../theme"
 
 // Power menu popup with keyboard-navigable actions.
-PopupWindow {
+// Uses PanelWindow with Overlay layer so it works on compositors
+// (e.g. niri) where xdg_popup cannot attach to a layer-shell parent.
+PanelWindow {
     id: root
 
     property var visibilities: null
 
     visible: visibilities ? visibilities.power : false
-    grabFocus: true
+
+    // Overlay layer-shell surface: floats above everything, grabs keyboard.
+    layer: WlrLayer.Overlay
+    keyboardFocus: WlrKeyboardFocus.Exclusive
+    exclusiveZone: 0
 
     implicitWidth: 200
     implicitHeight: menuList.count * 36 + 48
@@ -22,12 +29,6 @@ PopupWindow {
             menuList.forceActiveFocus();
             focusTimer.start();
         } else {
-            closePower();
-        }
-    }
-
-    onGrabFocusChanged: {
-        if (!grabFocus && visible) {
             closePower();
         }
     }
