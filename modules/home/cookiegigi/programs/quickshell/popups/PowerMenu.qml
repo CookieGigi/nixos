@@ -19,8 +19,10 @@ PopupWindow {
     onVisibleChanged: {
         if (visible) {
             menuList.currentIndex = 0;
-            menuList.focus = true;
+            menuList.forceActiveFocus();
             focusTimer.start();
+        } else {
+            closePower();
         }
     }
 
@@ -55,6 +57,8 @@ PopupWindow {
             focus: true
             items: root.actions.map(a => ({ label: a.label }))
 
+            onEscapePressed: root.closePower()
+
             onItemActivated: (index) => {
                 const action = root.actions[index];
                 if (action && action.cmd) {
@@ -67,8 +71,8 @@ PopupWindow {
 
     Timer {
         id: focusTimer
-        interval: 50
+        interval: 100
         repeat: false
-        onTriggered: menuList.focus = true
+        onTriggered: menuList.forceActiveFocus()
     }
 }

@@ -12,7 +12,16 @@ Scope {
     id: root
 
     required property var modelData
-    property var visibilities: ({ launcher: false, power: false })
+
+    // Observable state object for popup visibility.
+    // Using QtObject with property bool ensures QML bindings
+    // re-evaluate when launcher/power are toggled.
+    QtObject {
+        id: _visibilities
+        property bool launcher: false
+        property bool power: false
+    }
+    property var visibilities: _visibilities
 
     Component.onCompleted: {
         Visibilities.register(modelData, visibilities);

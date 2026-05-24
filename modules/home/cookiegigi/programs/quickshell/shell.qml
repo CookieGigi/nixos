@@ -26,5 +26,10 @@ ShellRoot {
         }
     }
 
-    Bar {}
+    Variants {
+        model: Quickshell.screens
+        Bar {
+            modelData: modelData
+        }
+    }
 }

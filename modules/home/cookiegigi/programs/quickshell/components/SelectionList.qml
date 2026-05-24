@@ -18,6 +18,7 @@ ListView {
     property var items: []
 
     signal itemActivated(int index)
+    signal escapePressed()
 
     clip: true
     spacing: 2
@@ -51,6 +52,9 @@ ListView {
             event.accepted = true;
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             root.activateCurrent();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Escape) {
+            root.escapePressed();
             event.accepted = true;
         }
     }

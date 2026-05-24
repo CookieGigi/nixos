@@ -32,6 +32,8 @@ PopupWindow {
             searchInput.text = "";
             searchInput.forceActiveFocus();
             focusTimer.start();
+        } else {
+            closeLauncher();
         }
     }
 
@@ -144,6 +146,8 @@ PopupWindow {
                 Layout.fillHeight: true
                 items: root.listItems
 
+                onEscapePressed: root.closeLauncher()
+
                 onItemActivated: (index) => {
                     if (index >= 0 && index < root.filteredApps.length) {
                         root.filteredApps[index].execute();
@@ -169,7 +173,7 @@ PopupWindow {
     // Delay focus request slightly so the window is fully shown first
     Timer {
         id: focusTimer
-        interval: 50
+        interval: 100
         repeat: false
         onTriggered: searchInput.forceActiveFocus()
     }
