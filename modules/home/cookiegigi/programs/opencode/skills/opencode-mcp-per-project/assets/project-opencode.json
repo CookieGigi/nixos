@@ -1,0 +1,44 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "_comment": "Project-local OpenCode configuration. Place this file in the project root as .opencode.json",
+
+  "mcp": {
+    "_comment_local_example": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
+      "enabled": true,
+      "environment": {
+        "OPTIONAL_VAR": "value"
+      }
+    },
+
+    "_comment_remote_example": {
+      "type": "remote",
+      "url": "https://mcp.example.com",
+      "enabled": true,
+      "headers": {
+        "Authorization": "Bearer {env:EXAMPLE_API_KEY}"
+      }
+    },
+
+    "_comment_oauth_example": {
+      "type": "remote",
+      "url": "https://mcp.github.com",
+      "oauth": {}
+    }
+  },
+
+  "tools": {
+    "_comment": "Optionally disable specific MCP tools or use glob patterns",
+    "example_server_*": false
+  },
+
+  "agent": {
+    "_comment": "Optionally enable MCP tools only for specific agents",
+    "example_agent": {
+      "tools": {
+        "example_server_*": true
+      }
+    }
+  }
+}
