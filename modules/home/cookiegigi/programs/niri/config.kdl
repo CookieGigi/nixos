@@ -77,8 +77,8 @@ binds {
     // Terminal: ghostty
     Mod+T { spawn "ghostty"; }
     // App launcher: quickshell
-    Mod+D       { spawn "qs" "-c" "bar" "ipc" "launcher" "toggle"; }
-    Mod+Shift+X { spawn "qs" "-c" "bar" "ipc" "power" "toggle"; }
+    Mod+D       { spawn "qs" "-c" "bar" "ipc" "call" "launcher" "toggle"; }
+    Mod+Shift+X { spawn "qs" "-c" "bar" "ipc" "call" "power" "toggle"; }
     // Screen locker: swaylock
     Super+Alt+L { spawn "swaylock"; }
 
