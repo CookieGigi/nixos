@@ -86,6 +86,21 @@ in
       };
     ```
 
+    ## Tailor hooks to the project
+
+    Only enable hooks relevant to the language and tooling of the project. Do **not** copy Nix-specific hooks into a Python API, a web app, or a Go project.
+
+    | Project type | Relevant hooks |
+    |---|---|
+    | **Nix flake / NixOS config** | `alejandra`, `statix`, `deadnix`, `flake-checker` |
+    | **Python** | `black`, `ruff`, `mypy`, `flake8`, `isort` |
+    | **JavaScript / TypeScript** | `eslint`, `prettier`, `tsc` (type-check) |
+    | **Rust** | `rustfmt`, `clippy`, `cargo-check` |
+    | **Go** | `gofmt`, `golint`, `go vet` |
+    | **Any repo** | `end-of-file-fixer`, `trim-trailing-whitespace`, `check-merge-conflicts` |
+
+    Keep the project-specific hooks minimal; adding too many slows commits and creates noise.
+
     ## Key points
 
     - `git-hooks.lib.<system>.run` takes `src` (usually `./.`) and a `hooks` attrset.
