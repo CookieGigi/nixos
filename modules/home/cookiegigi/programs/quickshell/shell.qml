@@ -1,17 +1,30 @@
-import QtQuick
+//@ pragma DefaultEnv QS_NO_RELOAD_POPUP=1
+//@ pragma DefaultEnv QS_DROP_EXPENSIVE_FONTS=1
 import Quickshell
+import Quickshell.Io
+import "modules"
+import "services"
 
-// This is the entry point of the quickshell configuration.
-// Quickshell looks for a file named `shell.qml` as the root.
-//
-// You can run this example with:
-//   qs -p shell.qml
-//
-// Or, if you copy this folder to ~/.config/quickshell/my-widget/,
-// you can run it with:
-//   qs -c my-widget
+// Shell entry point.
+// Exposes IPC targets so niri keybinds can control popups.
+ShellRoot {
+    settings.watchFiles: true
 
-Scope {
-    // Load the top bar (creates one per monitor).
+    IpcHandler {
+        target: "launcher"
+        function toggle(): void {
+            const v = Visibilities.getForActive();
+            if (v) v.launcher = !v.launcher;
+        }
+    }
+
+    IpcHandler {
+        target: "power"
+        function toggle(): void {
+            const v = Visibilities.getForActive();
+            if (v) v.power = !v.power;
+        }
+    }
+
     Bar {}
 }
