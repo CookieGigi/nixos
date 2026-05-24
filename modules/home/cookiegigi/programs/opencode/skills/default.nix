@@ -1,5 +1,3 @@
-{pkgs, ...}: let
-  githooksFlake = import ./githooks-flake.nix {inherit pkgs;};
-in {
-  githooks-flake = githooksFlake;
+_: {
+  githooks-flake = ./githooks-flake;
 }

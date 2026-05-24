@@ -12,11 +12,11 @@
   finalConfig = baseConfig.config // {agent = agents;};
   opencodeJson = (pkgs.formats.json {}).generate "opencode.json" finalConfig;
 
-  skillFiles =
-    lib.mapAttrs' (name: skillFile: {
-      name = "opencode/skills/${name}/SKILL.md";
+  skillDirs =
+    lib.mapAttrs' (name: skillPath: {
+      name = "opencode/skills/${name}";
       value = {
-        source = skillFile;
+        source = skillPath;
         force = true;
       };
     })
@@ -43,7 +43,7 @@ in {
         force = true;
       };
     }
-    // skillFiles;
+    // skillDirs;
 
   home.persistence."/persist" = {
     directories = [
