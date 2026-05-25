@@ -64,9 +64,9 @@ Item {
             anchors {
                 verticalCenter: parent.verticalCenter
                 left: parent.left
-                right: parent.right
+                right: closeBtn.left
                 leftMargin: Theme.paddingH
-                rightMargin: Theme.paddingH
+                rightMargin: 4
             }
             text: visibilities ? visibilities.launcherFilter : ""
             color: "#ffffff"
@@ -113,6 +113,42 @@ Item {
             onVisibleChanged: {
                 if (visible) {
                     focusDelay.start();
+                }
+            }
+        }
+
+        // Close button for the app launcher
+        Text {
+            id: closeBtn
+            visible: root.isLauncherOpen
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: Theme.paddingH
+            }
+            text: "✕"
+            color: Theme.overlay1
+            font {
+                family: Theme.fontFamily
+                pixelSize: Theme.pixelSize
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                hoverEnabled: true
+
+                onEntered: {
+                    closeBtn.color = Theme.red;
+                }
+                onExited: {
+                    closeBtn.color = Theme.overlay1;
+                }
+                onClicked: {
+                    if (root.visibilities) {
+                        root.visibilities.launcher = false;
+                        root.visibilities.launcherFilter = "";
+                    }
                 }
             }
         }
