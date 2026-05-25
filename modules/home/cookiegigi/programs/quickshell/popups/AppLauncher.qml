@@ -1,27 +1,15 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import "../components"
 import "../theme"
 
 // App launcher popup with search and keyboard navigation.
-// Uses PanelWindow with Overlay layer so it works on compositors
-// (e.g. niri) where xdg_popup cannot attach to a layer-shell parent.
-PanelWindow {
+PopupBase {
     id: root
 
-    anchors {
-	top: true
-	left: true
-	right: true
-    }
-    margins {
-    	left: (screen.width - implicitWidth) / 2
-    	right: (screen.width - implicitWidth) / 2
-    }
-
-    property var visibilities: null
+    visibilityProperty: "launcher"
+    popupWidth: 500
 
     property string filterText: visibilities ? visibilities.launcherFilter : ""
     onFilterTextChanged: applyFilter()
@@ -33,23 +21,17 @@ PanelWindow {
     // Denylist: hide these apps.
     property var denylist: ["kvantum", "gvim"]
 
-    visible: visibilities ? visibilities.launcher : false
-
-    // Overlay layer-shell surface: floats above everything, grabs keyboard.
-    WlrLayershell.layer: WlrLayer.Overlay
-    exclusiveZone: 0
-
-    implicitWidth: 500
     implicitHeight: Math.min(400, selectionList.count * 36 + 48)
-    color: "transparent"
 
-    onVisibleChanged: {
-        if (visible) {
-            refreshApps();
-            if (visibilities) visibilities.launcherFilter = "";
-            focusTimer.start();
-        } else {
-            closeLauncher();
+    onOpened: {
+        refreshApps();
+        if (visibilities) visibilities.launcherFilter = "";
+        focusTimer.start();
+    }
+
+    onClosing: {
+        if (visibilities) {
+            visibilities.launcherFilter = "";
         }
     }
 
@@ -76,58 +58,46 @@ PanelWindow {
         listItems = filteredApps.map(entry => ({ label: entry.name || "" }));
     }
 
-    function closeLauncher() {
-        if (visibilities) {
-            visibilities.launcher = false;
-            visibilities.launcherFilter = "";
+    focusTimer.onTriggered: selectionList.forceActiveFocus()
+
+    content: ColumnLayout {
+        anchors {
+            fill: parent
+            margins: 12
         }
-    }
+        spacing: 8
 
-    PopupShell {
-        anchors.fill: parent
+        // App list
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        onCloseRequested: root.closeLauncher()
+            SelectionList {
+                id: selectionList
+                anchors.fill: parent
+                anchors.margins: 10
+                items: root.listItems
 
-        ColumnLayout {
-            id: popupContent
-            anchors {
-                fill: parent
-                margins: 12
-            }
-            spacing: 8
+                onEscapePressed: root.closePopup()
 
-            // App list
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                SelectionList {
-                    id: selectionList
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    items: root.listItems
-
-                    onEscapePressed: root.closeLauncher()
-
-                    onItemActivated: (index) => {
-                        if (index >= 0 && index < root.filteredApps.length) {
-                            root.filteredApps[index].execute();
-                            root.closeLauncher();
-                        }
+                onItemActivated: (index) => {
+                    if (index >= 0 && index < root.filteredApps.length) {
+                        root.filteredApps[index].execute();
+                        root.closePopup();
                     }
                 }
             }
+        }
 
-            // No results message
-            Text {
-                visible: root.filteredApps.length === 0 && root.filterText.length > 0
-                Layout.alignment: Qt.AlignHCenter
-                text: "No apps found"
-                color: Theme.overlay0
-                font {
-                    family: Theme.fontFamily
-                    pixelSize: 13
-                }
+        // No results message
+        Text {
+            visible: root.filteredApps.length === 0 && root.filterText.length > 0
+            Layout.alignment: Qt.AlignHCenter
+            text: "No apps found"
+            color: Theme.overlay0
+            font {
+                family: Theme.fontFamily
+                pixelSize: 13
             }
         }
     }
@@ -146,13 +116,5 @@ PanelWindow {
         function onLauncherDecrement() {
             selectionList.decrementCurrent();
         }
-    }
-
-    // Delay focus request slightly so the window is fully shown first
-    Timer {
-        id: focusTimer
-        interval: 100
-        repeat: false
-        onTriggered: selectionList.forceActiveFocus()
     }
 }

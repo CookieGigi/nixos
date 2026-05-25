@@ -16,6 +16,7 @@
       "quickshell/bar/components/Icon.qml".source = ./components/Icon.qml;
       "quickshell/bar/components/Percentage.qml".source = ./components/Percentage.qml;
       "quickshell/bar/components/Button.qml".source = ./components/Button.qml;
+      "quickshell/bar/components/PopupBase.qml".source = ./components/PopupBase.qml;
       "quickshell/bar/components/PopupShell.qml".source = ./components/PopupShell.qml;
       "quickshell/bar/components/SelectionList.qml".source = ./components/SelectionList.qml;
       "quickshell/bar/widgets/ClockWidget.qml".source = ./widgets/ClockWidget.qml;

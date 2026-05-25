@@ -1,37 +1,27 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "../components"
 import "../theme"
 
 // Power menu popup with keyboard-navigable actions.
-// Uses PanelWindow with Overlay layer so it works on compositors
-// (e.g. niri) where xdg_popup cannot attach to a layer-shell parent.
-PanelWindow {
+// Positioned under the power button in the top-right bar area.
+PopupBase {
     id: root
 
-    property var visibilities: null
+    visibilityProperty: "power"
+    popupWidth: 200
 
-    visible: visibilities ? visibilities.power : false
+    // Position under the power button (top-right of bar)
+    anchorLeft: false
+    anchorRight: true
+    marginRight: 16 // match bar right margin
+    marginLeft: 0
 
-    // Overlay layer-shell surface: floats above everything, grabs keyboard.
-    WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-    exclusiveZone: 0
 
-    implicitWidth: 200
-    implicitHeight: menuList.count * 36 + 48
-    color: "transparent"
-
-    onVisibleChanged: {
-        if (visible) {
-            menuList.currentIndex = 0;
-            menuList.forceActiveFocus();
-            focusTimer.start();
-        } else {
-            closePower();
-        }
-    }
+    implicitHeight: Math.min(400, menuList.count * 36 + 48)
 
     property var actions: [
         { label: "Shutdown", cmd: ["systemctl", "poweroff"] },
@@ -41,39 +31,42 @@ PanelWindow {
         { label: "Cancel",   cmd: null }
     ]
 
-    function closePower() {
-        if (visibilities) {
-            visibilities.power = false;
-        }
+    onOpened: {
+        menuList.currentIndex = 0;
+        menuList.forceActiveFocus();
+        focusTimer.start();
     }
 
-    PopupShell {
-        anchors.fill: parent
+    focusTimer.onTriggered: menuList.forceActiveFocus()
 
-        onCloseRequested: root.closePower()
+    content: ColumnLayout {
+        anchors {
+            fill: parent
+            margins: 12
+        }
+        spacing: 8
 
-        SelectionList {
-            id: menuList
-            anchors.fill: parent
-            focus: true
-            items: root.actions.map(a => ({ label: a.label }))
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            onEscapePressed: root.closePower()
+            SelectionList {
+                id: menuList
+                anchors.fill: parent
+                anchors.margins: 10
+                focus: true
+                items: root.actions.map(a => ({ label: a.label }))
 
-            onItemActivated: (index) => {
-                const action = root.actions[index];
-                if (action && action.cmd) {
-                    Quickshell.execDetached(action.cmd);
+                onEscapePressed: root.closePopup()
+
+                onItemActivated: (index) => {
+                    const action = root.actions[index];
+                    if (action && action.cmd) {
+                        Quickshell.execDetached(action.cmd);
+                    }
+                    root.closePopup();
                 }
-                root.closePower();
             }
         }
-    }
-
-    Timer {
-        id: focusTimer
-        interval: 100
-        repeat: false
-        onTriggered: menuList.forceActiveFocus()
     }
 }
