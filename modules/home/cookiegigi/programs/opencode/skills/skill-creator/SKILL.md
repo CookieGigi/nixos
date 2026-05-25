@@ -84,6 +84,36 @@ Skills use a three-level loading system to manage context efficiently:
 
 *Unlimited because scripts can be executed without reading into context window.
 
+## Skill Placement on This NixOS Host
+
+On this NixOS host, skills are deployed declaratively via home-manager. When creating a new **global** skill (one that should be available system-wide), place it in the following location:
+
+```
+modules/home/cookiegigi/programs/opencode/skills/<skill-name>/
+```
+
+After creating the skill directory, register it in:
+
+```
+modules/home/cookiegigi/programs/opencode/skills/default.nix
+```
+
+Add an entry to the attribute set:
+
+```nix
+_: {
+  existing-skill = ./existing-skill;
+  new-skill = ./new-skill;
+}
+```
+
+The home-manager module at `modules/home/cookiegigi/programs/opencode/default.nix` automatically picks up all skills listed in `default.nix` and deploys them to `~/.config/opencode/skills/` on the next `nixos-rebuild switch`.
+
+**Important distinctions:**
+
+- **Global skills** live in `modules/home/cookiegigi/programs/opencode/skills/` and are managed by NixOS. They are available in all projects.
+- **Project-local skills** live in the project directory itself (e.g., `./.opencode/skills/my-skill/`). These are ephemeral, not tracked by NixOS, and must be added to the project's `.opencode.json` `skills.paths` configuration manually. Use project-local skills only when a workflow is specific to a single project and should not be global.
+
 ## Skill Creation Process
 
 To create a skill, follow the "Skill Creation Process" in order, skipping steps only if there is a clear reason why they are not applicable.
