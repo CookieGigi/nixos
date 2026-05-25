@@ -5,28 +5,123 @@ import "../theme"
 import "../components"
 import "../services"
 
-// Center widget: shows the active window title.
-// Clicking it opens the app launcher on this monitor.
-Button {
+// Center widget: shows the active window title, or a search input when
+// the app launcher is active on this monitor.
+Item {
     id: root
 
     property var screen: null
+    property var visibilities: null
 
-    implicitWidth: Math.min(titleText.implicitWidth + Theme.paddingH * 2, 400)
-    implicitHeight: titleText.implicitHeight + Theme.paddingV * 2
+    property bool isLauncherOpen: visibilities ? visibilities.launcher : false
 
-    StyledText {
-        id: titleText
-        anchors.centerIn: parent
-        width: parent.width - Theme.paddingH * 2
-        text: ToplevelManager.activeToplevel?.title ?? ""
-        elide: Text.ElideRight
-        horizontalAlignment: Text.AlignHCenter
+    implicitWidth: Math.min(
+        (root.isLauncherOpen ? 200 : titleText.implicitWidth) + Theme.paddingH * 2,
+        400
+    )
+    implicitHeight: Math.max(
+        titleText.implicitHeight,
+        searchInput.implicitHeight
+    ) + Theme.paddingV * 2
+
+    Pill {
+        id: bg
+        anchors.fill: parent
+
+        StyledText {
+            id: titleText
+            visible: !root.isLauncherOpen
+            anchors.centerIn: parent
+            width: parent.width - Theme.paddingH * 2
+            text: ToplevelManager.activeToplevel?.title ?? ""
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignHCenter
+        }
+
+        MouseArea {
+            id: clickArea
+            anchors.fill: parent
+            visible: !root.isLauncherOpen
+            cursorShape: Qt.PointingHandCursor
+            hoverEnabled: true
+
+            onEntered: {
+                bg.color = Theme.surface1;
+            }
+            onExited: {
+                bg.color = Theme.containerAlpha;
+            }
+            onClicked: {
+                if (root.screen) {
+                    Visibilities.toggleLauncher(root.screen);
+                }
+            }
+        }
+
+        TextInput {
+            id: searchInput
+            visible: root.isLauncherOpen
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                right: parent.right
+                leftMargin: Theme.paddingH
+                rightMargin: Theme.paddingH
+            }
+            text: visibilities ? visibilities.launcherFilter : ""
+            color: "#ffffff"
+            font {
+                family: Theme.fontFamily
+                pixelSize: Theme.pixelSize
+            }
+            focus: visible
+            activeFocusOnTab: true
+            cursorVisible: true
+            horizontalAlignment: Text.AlignHCenter
+
+            onTextChanged: {
+                if (visibilities) {
+                    visibilities.launcherFilter = text;
+                }
+            }
+
+            Keys.onPressed: (event) => {
+                if (event.key === Qt.Key_Escape) {
+                    if (visibilities) {
+                        visibilities.launcher = false;
+                        visibilities.launcherFilter = "";
+                    }
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    if (visibilities) {
+                        visibilities.launcherActivate();
+                    }
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Down) {
+                    if (visibilities) {
+                        visibilities.launcherIncrement();
+                    }
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Up) {
+                    if (visibilities) {
+                        visibilities.launcherDecrement();
+                    }
+                    event.accepted = true;
+                }
+            }
+
+            onVisibleChanged: {
+                if (visible) {
+                    focusDelay.start();
+                }
+            }
+        }
     }
 
-    onClicked: {
-        if (root.screen) {
-            Visibilities.toggleLauncher(root.screen);
-        }
+    Timer {
+        id: focusDelay
+        interval: 100
+        repeat: false
+        onTriggered: searchInput.forceActiveFocus()
     }
 }

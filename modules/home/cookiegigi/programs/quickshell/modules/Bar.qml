@@ -20,6 +20,11 @@ Scope {
         id: _visibilities
         property bool launcher: false
         property bool power: false
+        property string launcherFilter: ""
+
+        signal launcherActivate()
+        signal launcherIncrement()
+        signal launcherDecrement()
     }
     property var visibilities: _visibilities
 
@@ -30,6 +35,8 @@ Scope {
     PanelWindow {
         id: barWindow
         screen: modelData
+
+        WlrLayershell.keyboardFocus: root.visibilities.launcher ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         anchors {
             top: true
@@ -69,9 +76,10 @@ Scope {
                 Layout.fillWidth: true
             }
 
-            // Center: window title (clickable → launcher)
+            // Center: window title (clickable → launcher, or search input when open)
             WindowTitleWidget {
                 screen: modelData
+                visibilities: root.visibilities
             }
 
             // Spacer

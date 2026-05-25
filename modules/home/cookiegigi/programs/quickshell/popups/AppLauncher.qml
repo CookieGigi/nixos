@@ -13,7 +13,9 @@ PanelWindow {
 
     property var visibilities: null
 
-    property string filterText: ""
+    property string filterText: visibilities ? visibilities.launcherFilter : ""
+    onFilterTextChanged: applyFilter()
+
     property var allApps: []
     property var filteredApps: []
     property var listItems: []
@@ -25,19 +27,16 @@ PanelWindow {
 
     // Overlay layer-shell surface: floats above everything, grabs keyboard.
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
     exclusiveZone: 0
 
     implicitWidth: 500
-    implicitHeight: Math.min(400, selectionList.count * 36 + searchBox.implicitHeight + 48)
+    implicitHeight: Math.min(400, selectionList.count * 36 + 48)
     color: "transparent"
 
     onVisibleChanged: {
         if (visible) {
             refreshApps();
-            filterText = "";
-            searchInput.text = "";
-            searchInput.forceActiveFocus();
+            if (visibilities) visibilities.launcherFilter = "";
             focusTimer.start();
         } else {
             closeLauncher();
@@ -70,9 +69,8 @@ PanelWindow {
     function closeLauncher() {
         if (visibilities) {
             visibilities.launcher = false;
+            visibilities.launcherFilter = "";
         }
-        filterText = "";
-        searchInput.text = "";
     }
 
     PopupShell {
@@ -88,71 +86,24 @@ PanelWindow {
             }
             spacing: 8
 
-            // Search input
-            Rectangle {
-                id: searchBox
-                Layout.fillWidth: true
-                implicitHeight: searchInput.implicitHeight + 12
-                color: Theme.surface0
-                radius: 8
-                border.width: searchInput.activeFocus ? 2 : 0
-                border.color: Theme.teal
-
-                TextInput {
-                    id: searchInput
-                    anchors {
-                        fill: parent
-                        leftMargin: 12
-                        rightMargin: 12
-                        topMargin: 6
-                        bottomMargin: 6
-                    }
-                    text: root.filterText
-                    color: "#ffffff"
-                    font {
-                        family: Theme.fontFamily
-                        pixelSize: Theme.pixelSize
-                    }
-                    focus: true
-                    activeFocusOnTab: true
-                    cursorVisible: true
-
-                    onTextChanged: {
-                        root.filterText = text;
-                        root.applyFilter();
-                    }
-
-                    Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape) {
-                            root.closeLauncher();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            selectionList.activateCurrent();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Down) {
-                            selectionList.incrementCurrent();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Up) {
-                            selectionList.decrementCurrent();
-                            event.accepted = true;
-                        }
-                    }
-                }
-            }
-
             // App list
-            SelectionList {
-                id: selectionList
+            Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                items: root.listItems
 
-                onEscapePressed: root.closeLauncher()
+                SelectionList {
+                    id: selectionList
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    items: root.listItems
 
-                onItemActivated: (index) => {
-                    if (index >= 0 && index < root.filteredApps.length) {
-                        root.filteredApps[index].execute();
-                        root.closeLauncher();
+                    onEscapePressed: root.closeLauncher()
+
+                    onItemActivated: (index) => {
+                        if (index >= 0 && index < root.filteredApps.length) {
+                            root.filteredApps[index].execute();
+                            root.closeLauncher();
+                        }
                     }
                 }
             }
@@ -171,11 +122,27 @@ PanelWindow {
         }
     }
 
+    // Connect to shared navigation signals from the bar's search input.
+    Connections {
+        target: root.visibilities || null
+        enabled: root.visibilities !== null
+
+        function onLauncherActivate() {
+            selectionList.activateCurrent();
+        }
+        function onLauncherIncrement() {
+            selectionList.incrementCurrent();
+        }
+        function onLauncherDecrement() {
+            selectionList.decrementCurrent();
+        }
+    }
+
     // Delay focus request slightly so the window is fully shown first
     Timer {
         id: focusTimer
         interval: 100
         repeat: false
-        onTriggered: searchInput.forceActiveFocus()
+        onTriggered: selectionList.forceActiveFocus()
     }
 }
