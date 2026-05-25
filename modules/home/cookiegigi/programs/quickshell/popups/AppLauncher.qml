@@ -11,6 +11,16 @@ import "../theme"
 PanelWindow {
     id: root
 
+    anchors {
+	top: true
+	left: true
+	right: true
+    }
+    margins {
+    	left: (screen.width - implicitWidth) / 2
+    	right: (screen.width - implicitWidth) / 2
+    }
+
     property var visibilities: null
 
     property string filterText: visibilities ? visibilities.launcherFilter : ""

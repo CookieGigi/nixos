@@ -60,7 +60,7 @@ Scope {
             screen: modelData
         }
 
-        RowLayout {
+        Item {
             id: barRow
             anchors {
                 fill: parent
@@ -69,26 +69,29 @@ Scope {
             }
 
             // Left: clock
-            ClockWidget {}
-
-            // Spacer
-            Item {
-                Layout.fillWidth: true
+            ClockWidget {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                }
             }
 
             // Center: window title (clickable → launcher, or search input when open)
             WindowTitleWidget {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    horizontalCenter: parent.horizontalCenter
+                }
                 screen: modelData
                 visibilities: root.visibilities
             }
 
-            // Spacer
-            Item {
-                Layout.fillWidth: true
-            }
-
             // Right: system info widgets
             RowLayout {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    right: parent.right
+                }
                 spacing: 8
 
                 BatteryWidget {}
