@@ -20,6 +20,8 @@ ListView {
     signal itemActivated(int index)
     signal escapePressed()
 
+    anchors.fill: parent
+    anchors.margins: 10
     clip: true
     spacing: 2
     model: items
