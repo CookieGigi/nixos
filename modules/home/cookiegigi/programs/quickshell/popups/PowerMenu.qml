@@ -15,8 +15,8 @@ PanelWindow {
     visible: visibilities ? visibilities.power : false
 
     // Overlay layer-shell surface: floats above everything, grabs keyboard.
-    layer: WlrLayer.Overlay
-    keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
     exclusiveZone: 0
 
     implicitWidth: 200
