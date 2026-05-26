@@ -13,6 +13,6 @@ Percentage {
         objects: [Pipewire.defaultAudioSink]
     }
 
-    icon: Pipewire.defaultAudioSink?.audio.muted ? "\ud83d\udd07" : "\ud83d\udd0a"
+    icon: Pipewire.defaultAudioSink?.audio.muted ? "󰝟" : ""
     value: Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100) + "%"
 }

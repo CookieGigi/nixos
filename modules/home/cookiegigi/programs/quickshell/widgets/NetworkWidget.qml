@@ -67,7 +67,7 @@ Pill {
         spacing: 6
 
         Icon {
-            text: root.connectionType === "wifi" ? "\ud83d\udcf6" : "\ud83d\udda7"
+            text: root.connectionType === "wifi" ? "" : ""
         }
     }
 }

@@ -36,18 +36,39 @@ Percentage {
         if (isNaN(pct) || pct < 0) {
             root.icon = "";
             root.value = "?%";
+	    root.accentColor = Theme.red
             return;
         }
 
         const state = dev.state;
         if (state === UPowerDeviceState.FullyCharged) {
-            root.icon = "";
+            root.icon = "";
             root.value = "Full";
+	    root.accentColor = Theme.green
         } else if (state === UPowerDeviceState.Charging) {
             root.icon = "";
             root.value = pct + "%";
         } else {
-            root.icon = "";
+	    if (pct <= 0){
+        	root.icon = "";
+	    	root.accentColor = Theme.red
+	    }
+	    else if (pct <= 25){
+        	root.icon = "";
+	    	root.accentColor = Theme.peach
+	    }
+	    else if (pct <= 50){
+        	root.icon = "";
+	    	root.accentColor = Theme.yellow
+	    }
+	    else if (pct <= 75){
+        	root.icon = "";
+	    	root.accentColor = Theme.green
+	    }
+	    else {
+        	root.icon = "";
+	    	root.accentColor = Theme.green
+	    }
             root.value = pct + "%";
         }
     }

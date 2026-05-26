@@ -28,7 +28,6 @@ Pill {
         StyledText {
             text: root.value
             styledBold: true
-            color: root.accentColor
         }
     }
 }

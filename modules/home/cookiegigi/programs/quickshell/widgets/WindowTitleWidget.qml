@@ -36,6 +36,7 @@ Item {
             text: ToplevelManager.activeToplevel?.title ?? ""
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
+            styledBold: true
         }
 
         MouseArea {
@@ -126,7 +127,7 @@ Item {
                 right: parent.right
                 rightMargin: Theme.paddingH
             }
-            text: "✕"
+            text: ""
             color: Theme.overlay1
 
             MouseArea {

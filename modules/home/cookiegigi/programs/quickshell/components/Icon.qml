@@ -5,10 +5,11 @@ import "../theme"
 // Set text to the desired emoji or symbol.
 Text {
     property int iconSize: 14
+    property color accentColor: Theme.text
 
     font {
         family: Theme.fontFamily
         pixelSize: iconSize
     }
-    color: Theme.text
+    color: root.accentColor
 }

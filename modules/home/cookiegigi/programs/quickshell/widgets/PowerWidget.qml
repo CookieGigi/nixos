@@ -15,7 +15,8 @@ Button {
     Icon {
         id: iconText
         anchors.centerIn: parent
-        text: "\u23fb"
+        text: "⏻"
+	accentColor: Theme.red
     }
 
     onClicked: {
