@@ -10,6 +10,7 @@ import "../theme"
 PopupBase {
     id: root
 
+    title: "Power Menu"
     visibilityProperty: "power"
     popupWidth: 200
 

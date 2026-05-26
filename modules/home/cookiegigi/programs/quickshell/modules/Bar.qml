@@ -21,6 +21,7 @@ Scope {
         property bool launcher: false
         property bool power: false
         property string launcherFilter: ""
+        property string popupTitle: ""
 
         signal launcherActivate()
         signal launcherIncrement()

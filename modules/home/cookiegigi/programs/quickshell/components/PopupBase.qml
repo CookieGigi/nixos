@@ -33,6 +33,7 @@ PanelWindow {
 
     property alias content: popupShell.children
     property alias focusTimer: focusTimer
+    property string title: ""
 
     anchors {
         top: anchorTop
@@ -66,8 +67,10 @@ PanelWindow {
 
     onVisibleChanged: {
         if (visible) {
+            if (title && visibilities) visibilities.popupTitle = title;
             root.opened();
         } else {
+            if (visibilities) visibilities.popupTitle = "";
             root.closing();
         }
     }

@@ -16,11 +16,12 @@ Item {
     property bool isLauncherOpen: visibilities ? visibilities.launcher : false
 
     implicitWidth: Math.min(
-        (root.isLauncherOpen ? 200 : titleText.implicitWidth) + Theme.paddingH * 2,
+        (root.isLauncherOpen ? 200 : (root.visibilities && root.visibilities.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2,
         400
     )
     implicitHeight: Math.max(
         titleText.implicitHeight,
+        popupTitleText.implicitHeight,
         searchInput.implicitHeight
     ) + Theme.paddingV * 2
 
@@ -30,10 +31,21 @@ Item {
 
         StyledText {
             id: titleText
-            visible: !root.isLauncherOpen
+            visible: !root.isLauncherOpen && (!root.visibilities || root.visibilities.popupTitle === "")
             anchors.centerIn: parent
             width: parent.width - Theme.paddingH * 2
             text: ToplevelManager.activeToplevel?.title ?? ""
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignHCenter
+            styledBold: true
+        }
+
+        StyledText {
+            id: popupTitleText
+            visible: !root.isLauncherOpen && root.visibilities && root.visibilities.popupTitle !== ""
+            anchors.centerIn: parent
+            width: parent.width - Theme.paddingH * 2
+            text: root.visibilities ? root.visibilities.popupTitle : ""
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             styledBold: true

@@ -13,16 +13,16 @@ ShellRoot {
     IpcHandler {
         target: "launcher"
         function toggle(): void {
-            const v = Visibilities.getForActive();
-            if (v) v.launcher = !v.launcher;
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            Visibilities.toggleLauncher(screen);
         }
     }
 
     IpcHandler {
         target: "power"
         function toggle(): void {
-            const v = Visibilities.getForActive();
-            if (v) v.power = !v.power;
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            Visibilities.togglePower(screen);
         }
     }
 

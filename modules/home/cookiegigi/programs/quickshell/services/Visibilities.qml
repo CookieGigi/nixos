@@ -26,11 +26,22 @@ Singleton {
 
     function toggleLauncher(screen) {
         const v = states.get(screen);
-        if (v) v.launcher = !v.launcher;
+        if (!v) return;
+        v.power = false;
+        v.launcher = !v.launcher;
     }
 
     function togglePower(screen) {
         const v = states.get(screen);
-        if (v) v.power = !v.power;
+        if (!v) return;
+        v.launcher = false;
+        v.power = !v.power;
+    }
+
+    function closeAllPopups(screen) {
+        const v = states.get(screen);
+        if (!v) return;
+        v.launcher = false;
+        v.power = false;
     }
 }
