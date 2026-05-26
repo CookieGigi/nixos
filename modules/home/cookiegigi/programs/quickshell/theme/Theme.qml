@@ -41,7 +41,7 @@ Singleton {
     readonly property int   containerRadius:  8
     readonly property int   paddingV:         6
     readonly property int   paddingH:         12
-    readonly property string fontFamily:    "monospace"
+    readonly property string fontFamily:    "JetBrainsMono Nerd Font"
     readonly property int   pixelSize:      14
     readonly property color popupBorder:    root.teal
     readonly property color popupBg:        root.base

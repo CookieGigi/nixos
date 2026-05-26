@@ -118,7 +118,7 @@ Item {
         }
 
         // Close button for the app launcher
-        Text {
+        StyledText {
             id: closeBtn
             visible: root.isLauncherOpen
             anchors {
@@ -128,10 +128,6 @@ Item {
             }
             text: "✕"
             color: Theme.overlay1
-            font {
-                family: Theme.fontFamily
-                pixelSize: Theme.pixelSize
-            }
 
             MouseArea {
                 anchors.fill: parent

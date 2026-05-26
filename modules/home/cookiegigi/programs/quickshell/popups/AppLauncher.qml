@@ -90,15 +90,12 @@ PopupBase {
         }
 
         // No results message
-        Text {
+        StyledText {
             visible: root.filteredApps.length === 0 && root.filterText.length > 0
             Layout.alignment: Qt.AlignHCenter
             text: "No apps found"
-            color: Theme.overlay0
-            font {
-                family: Theme.fontFamily
-                pixelSize: 13
-            }
+            styledColor: Theme.overlay0
+            styledSize: 13
         }
     }
 

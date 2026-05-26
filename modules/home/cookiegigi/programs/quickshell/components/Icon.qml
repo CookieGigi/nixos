@@ -7,7 +7,7 @@ Text {
     property int iconSize: 14
 
     font {
-        family: "monospace"
+        family: Theme.fontFamily
         pixelSize: iconSize
     }
     color: Theme.text

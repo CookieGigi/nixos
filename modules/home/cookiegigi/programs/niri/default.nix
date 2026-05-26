@@ -10,6 +10,10 @@
     swayidle.enable = true;
   };
 
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
+
   home.packages = with pkgs; [
     brightnessctl
     playerctl

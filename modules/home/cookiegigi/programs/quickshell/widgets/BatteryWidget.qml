@@ -27,27 +27,27 @@ Percentage {
         }
 
         if (!dev || !dev.ready) {
-            root.icon = "\ud83d\udd0b";
+            root.icon = "";
             root.value = "?%";
             return;
         }
 
         const pct = Math.round(dev.percentage * 100);
         if (isNaN(pct) || pct < 0) {
-            root.icon = "\ud83d\udd0b";
+            root.icon = "";
             root.value = "?%";
             return;
         }
 
         const state = dev.state;
         if (state === UPowerDeviceState.FullyCharged) {
-            root.icon = "\ud83d\udd0b";
+            root.icon = "";
             root.value = "Full";
         } else if (state === UPowerDeviceState.Charging) {
-            root.icon = "\ud83d\udd0c";
+            root.icon = "";
             root.value = pct + "%";
         } else {
-            root.icon = "\ud83d\udd0b";
+            root.icon = "";
             root.value = pct + "%";
         }
     }
