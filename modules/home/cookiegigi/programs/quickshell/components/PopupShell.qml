@@ -15,7 +15,9 @@ Rectangle {
     signal closeRequested()
 
     anchors.fill: parent
-    color: Theme.popupBg
+
+    color: Theme.containerAlpha
+
     radius: 12
     border.width: 2
     border.color: Theme.popupBorder
