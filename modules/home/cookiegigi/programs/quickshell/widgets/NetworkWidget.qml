@@ -67,6 +67,7 @@ Pill {
         spacing: 6
 
         Icon {
+	    accentColor: Theme.text
             text: root.connectionType === "wifi" ? "" : ""
         }
     }

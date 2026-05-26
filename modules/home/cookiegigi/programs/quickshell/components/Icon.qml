@@ -11,5 +11,5 @@ Text {
         family: Theme.fontFamily
         pixelSize: iconSize
     }
-    color: root.accentColor
+    color: accentColor
 }
