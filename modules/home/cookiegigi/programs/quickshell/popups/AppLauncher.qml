@@ -45,7 +45,7 @@ PopupBase {
         });
         filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         allApps = filtered;
-        applyFilter();
+	applyFilter();
     }
 
     function applyFilter() {
@@ -89,6 +89,7 @@ PopupBase {
             }
         }
 
+
         // No results message
         StyledText {
             visible: root.filteredApps.length === 0 && root.filterText.length > 0
@@ -114,4 +115,11 @@ PopupBase {
             selectionList.decrementCurrent();
         }
     }
+
+    Connections {
+	target: DesktopEntries
+    	function onApplicationsChanged() {
+        	refreshApps()  // data here now, refresh!
+    	}
+}
 }
