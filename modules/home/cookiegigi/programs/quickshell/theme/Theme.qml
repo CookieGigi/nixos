@@ -37,7 +37,7 @@ Singleton {
 
     // ── Convenience aliases ──────────────────────────────────
     readonly property color containerBg:    root.base
-    readonly property color containerAlpha: "#b324273a"
+    readonly property color containerAlpha: "#cc1a2235"
     readonly property int   containerRadius:  8
     readonly property int   paddingV:         6
     readonly property int   paddingH:         12
