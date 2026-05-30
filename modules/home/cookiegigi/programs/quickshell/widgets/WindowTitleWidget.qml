@@ -29,6 +29,9 @@ Item {
         id: bg
         anchors.fill: parent
 
+	visible: (ToplevelManager.activeToplevel?.title ?? "") != "" ||  (root.visibilities ? root.visibilities.popupTitle : "") != "" || root.isLauncherOpen
+
+
         StyledText {
             id: titleText
             visible: !root.isLauncherOpen && (!root.visibilities || root.visibilities.popupTitle === "")
