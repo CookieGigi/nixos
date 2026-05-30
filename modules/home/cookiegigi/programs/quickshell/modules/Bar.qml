@@ -72,7 +72,8 @@ Scope {
             // Left: clock
             ClockWidget {
                 anchors {
-                    verticalCenter: parent.verticalCenter
+                    top: parent.top
+                    bottom: parent.bottom
                     left: parent.left
                 }
             }
@@ -80,7 +81,8 @@ Scope {
             // Center: window title (clickable → launcher, or search input when open)
             WindowTitleWidget {
                 anchors {
-                    verticalCenter: parent.verticalCenter
+                    top: parent.top
+                    bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
                 }
                 screen: modelData
@@ -90,16 +92,24 @@ Scope {
             // Right: system info widgets
             RowLayout {
                 anchors {
-                    verticalCenter: parent.verticalCenter
+                    top: parent.top
+                    bottom: parent.bottom
                     right: parent.right
                 }
                 spacing: 8
 
-                BatteryWidget {}
-                VolumeWidget {}
-                NetworkWidget {}
+                BatteryWidget {
+                    Layout.fillHeight: true
+                }
+                VolumeWidget {
+                    Layout.fillHeight: true
+                }
+                NetworkWidget {
+                    Layout.fillHeight: true
+                }
                 PowerWidget {
                     screen: modelData
+                    Layout.fillHeight: true
                 }
             }
         }

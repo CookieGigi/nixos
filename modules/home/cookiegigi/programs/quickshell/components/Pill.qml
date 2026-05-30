@@ -9,6 +9,9 @@ Rectangle {
     property int paddingV: Theme.paddingV
     property int paddingH: Theme.paddingH
 
-    radius: Theme.containerRadius
+    topLeftRadius: 0
+    topRightRadius: 0
+    bottomLeftRadius: Theme.containerRadius
+    bottomRightRadius: Theme.containerRadius
     color: Theme.containerAlpha
 }
