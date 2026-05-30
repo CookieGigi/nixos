@@ -26,7 +26,7 @@ PanelWindow {
     property bool anchorLeft: true
     property bool anchorRight: true
 
-    property int marginTop: 0
+    property int marginTop: 15
     property int marginBottom: 0
     property int marginLeft: (screen.width - popupWidth) / 2
     property int marginRight: (screen.width - popupWidth) / 2

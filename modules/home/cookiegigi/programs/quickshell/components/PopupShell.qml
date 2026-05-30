@@ -19,8 +19,6 @@ Rectangle {
     color: Theme.containerAlpha
 
     radius: 12
-    border.width: 2
-    border.color: Theme.popupBorder
 
     // Fallback Escape handler (parent PopupWindow should also handle it).
     Keys.onPressed: (event) => {
