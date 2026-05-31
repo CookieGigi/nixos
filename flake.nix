@@ -65,6 +65,13 @@
         end-of-file-fixer.enable = true;
         trim-trailing-whitespace.enable = true;
         check-merge-conflicts.enable = true;
+        qmlformat = {
+          enable = true;
+          name = "qmlformat";
+          entry = "${nixpkgs.legacyPackages.x86_64-linux.kdePackages.qtdeclarative}/bin/qmlformat --inplace";
+          types = ["file"];
+          files = "\\.qml$";
+        };
       };
     };
 
@@ -148,6 +155,7 @@
             git
             sops
             age
+            kdePackages.qtdeclarative
           ]);
       };
 
