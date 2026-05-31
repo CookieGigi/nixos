@@ -19,7 +19,7 @@ PopupBase {
     property var listItems: []
 
     // Denylist: hide these apps.
-    property var denylist: ["kvantum", "gvim"]
+    property var denylist: ["kvantum", "gvim", "nvidia"]
 
     implicitHeight: Math.min(400, selectionList.count * 36 + 48)
 
