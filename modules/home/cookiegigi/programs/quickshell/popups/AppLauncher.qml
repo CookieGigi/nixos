@@ -25,7 +25,8 @@ PopupBase {
 
     onOpened: {
         refreshApps();
-        if (visibilities) visibilities.launcherFilter = "";
+        if (visibilities)
+            visibilities.launcherFilter = "";
         focusTimer.start();
     }
 
@@ -45,7 +46,7 @@ PopupBase {
         });
         filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         allApps = filtered;
-	applyFilter();
+        applyFilter();
     }
 
     function applyFilter() {
@@ -55,7 +56,10 @@ PopupBase {
             return name.includes(q);
         });
         // Normalize items for SelectionList
-        listItems = filteredApps.map(entry => ({ label: entry.name || "" }));
+        listItems = filteredApps.map(entry => ({
+                    label: entry.name || "",
+                    icon: entry.icon || ""
+                }));
     }
 
     focusTimer.onTriggered: selectionList.forceActiveFocus()
@@ -80,7 +84,7 @@ PopupBase {
 
                 onEscapePressed: root.closePopup()
 
-                onItemActivated: (index) => {
+                onItemActivated: index => {
                     if (index >= 0 && index < root.filteredApps.length) {
                         root.filteredApps[index].execute();
                         root.closePopup();
@@ -88,7 +92,6 @@ PopupBase {
                 }
             }
         }
-
 
         // No results message
         StyledText {
@@ -117,9 +120,9 @@ PopupBase {
     }
 
     Connections {
-	target: DesktopEntries
-    	function onApplicationsChanged() {
-        	refreshApps()  // data here now, refresh!
-    	}
-}
+        target: DesktopEntries
+        function onApplicationsChanged() {
+            refreshApps();  // data here now, refresh!
+        }
+    }
 }
