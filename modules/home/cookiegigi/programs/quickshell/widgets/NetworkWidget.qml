@@ -23,30 +23,28 @@ Pill {
 
     Component.onCompleted: root.refresh()
 
-    Timer {
-        interval: 5000
+    Process {
+        id: nmMonitor
+        command: ["nmcli", "monitor"]
+        stdout: StdioCollector {
+            onStreamFinished: root.refresh()
+        }
         running: true
-        repeat: true
-        onTriggered: root.refresh()
     }
 
     Process {
         id: nmProcess
-        command: ["nmcli", "-t", "-f", "TYPE,STATE", "device"]
+        command: ["nmcli", "-t", "-f", "TYPE", "connection", "show", "--active"]
         stdout: StdioCollector {
             onStreamFinished: {
                 const lines = text.split("\n");
                 let wifiConnected = false;
                 let ethernetConnected = false;
                 for (const line of lines) {
-                    const parts = line.split(":");
-                    if (parts.length < 2) continue;
-                    const type = parts[0];
-                    const state = parts[1];
-                    if (state.startsWith("connected")) {
-                        if (type === "wifi") wifiConnected = true;
-                        else if (type === "ethernet") ethernetConnected = true;
-                    }
+                    if (line.includes("wireless"))
+                        wifiConnected = true;
+                    else if (line.includes("eth"))
+                        ethernetConnected = true;
                 }
                 if (ethernetConnected) {
                     root.connectionType = "ethernet";
@@ -67,7 +65,7 @@ Pill {
         spacing: 6
 
         Icon {
-	    accentColor: Theme.text
+            accentColor: Theme.text
             text: root.connectionType === "wifi" ? "" : ""
         }
     }
