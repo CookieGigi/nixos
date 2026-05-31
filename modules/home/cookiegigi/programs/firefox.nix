@@ -95,7 +95,7 @@
 
         # Dark mode (preferred color scheme for websites)
         # Required because privacy.resistFingerprinting forces light
-        "layout.css.prefers-color-scheme.content-override" = 1;
+        "layout.css.prefers-color-scheme.content-override" = 0;
       };
 
       # -- Search engine defaults --------------------------------------
