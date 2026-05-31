@@ -98,7 +98,7 @@ PopupBase {
             visible: root.filteredApps.length === 0 && root.filterText.length > 0
             Layout.alignment: Qt.AlignHCenter
             text: "No apps found"
-            styledColor: Theme.overlay0
+            styledColor: Theme.text
             styledSize: 13
         }
     }
