@@ -90,6 +90,7 @@ ListView {
                 width: 20
                 height: 20
                 source: modelData.icon ? "image://icon/" + modelData.icon : ""
+                visible: modelData.icon ? true : false
 
                 Layout.fillWidth: true
                 Layout.maximumWidth: 25
