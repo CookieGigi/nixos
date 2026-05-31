@@ -8,5 +8,7 @@ _: {
     ];
 
     home.stateVersion = "25.11";
+
+    home.shell.enableZshIntegration = true;
   };
 }
