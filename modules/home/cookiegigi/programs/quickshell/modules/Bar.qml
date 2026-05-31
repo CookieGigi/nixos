@@ -23,9 +23,9 @@ Scope {
         property string launcherFilter: ""
         property string popupTitle: ""
 
-        signal launcherActivate()
-        signal launcherIncrement()
-        signal launcherDecrement()
+        signal launcherActivate
+        signal launcherIncrement
+        signal launcherDecrement
     }
     property var visibilities: _visibilities
 
@@ -70,11 +70,19 @@ Scope {
             }
 
             // Left: clock
-            ClockWidget {
+            RowLayout {
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
                     left: parent.left
+                }
+                spacing: 8
+                ClockWidget {
+                    Layout.fillHeight: true
+                }
+
+                MusicWidget {
+                    Layout.fillHeight: true
                 }
             }
 

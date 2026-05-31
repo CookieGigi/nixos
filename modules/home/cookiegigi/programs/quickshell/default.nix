@@ -25,6 +25,7 @@
       "quickshell/bar/widgets/BatteryWidget.qml".source = ./widgets/BatteryWidget.qml;
       "quickshell/bar/widgets/NetworkWidget.qml".source = ./widgets/NetworkWidget.qml;
       "quickshell/bar/widgets/PowerWidget.qml".source = ./widgets/PowerWidget.qml;
+      "quickshell/bar/widgets/MusicWidget.qml".source = ./widgets/MusicWidget.qml;
       "quickshell/bar/popups/AppLauncher.qml".source = ./popups/AppLauncher.qml;
       "quickshell/bar/popups/PowerMenu.qml".source = ./popups/PowerMenu.qml;
       "quickshell/bar/modules/Bar.qml".source = ./modules/Bar.qml;
