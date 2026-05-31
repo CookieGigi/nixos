@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+{config, ...}: {
   users.users.cookiegigi = {
     isNormalUser = true;
     # Password is stored encrypted in secrets/secrets.yaml (via sops-nix).
@@ -10,8 +6,5 @@
     hashedPasswordFile = config.sops.secrets."user-password".path;
     description = "cookiegigi";
     extraGroups = ["networkmanager" "wheel"];
-    shell = pkgs.zsh;
   };
-
-  programs.zsh.enable = true;
 }
