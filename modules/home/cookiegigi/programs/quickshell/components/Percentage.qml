@@ -22,12 +22,12 @@ Pill {
 
         Icon {
             text: root.icon
-            color: root.accentColor
         }
 
         StyledText {
             text: root.value
             styledBold: true
+            color: root.accentColor
         }
     }
 }

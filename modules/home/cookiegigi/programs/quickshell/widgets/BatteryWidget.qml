@@ -36,7 +36,7 @@ Percentage {
         if (isNaN(pct) || pct < 0) {
             root.icon = "";
             root.value = "?%";
-	    root.accentColor = Theme.red
+            root.accentColor = Theme.red;
             return;
         }
 
@@ -44,31 +44,27 @@ Percentage {
         if (state === UPowerDeviceState.FullyCharged) {
             root.icon = "";
             root.value = "Full";
-	    root.accentColor = Theme.green
+            root.accentColor = Theme.green;
         } else if (state === UPowerDeviceState.Charging) {
             root.icon = "";
             root.value = pct + "%";
         } else {
-	    if (pct <= 0){
-        	root.icon = "";
-	    	root.accentColor = Theme.red
-	    }
-	    else if (pct <= 25){
-        	root.icon = "";
-	    	root.accentColor = Theme.peach
-	    }
-	    else if (pct <= 50){
-        	root.icon = "";
-	    	root.accentColor = Theme.yellow
-	    }
-	    else if (pct <= 75){
-        	root.icon = "";
-	    	root.accentColor = Theme.green
-	    }
-	    else {
-        	root.icon = "";
-	    	root.accentColor = Theme.green
-	    }
+            if (pct <= 10) {
+                root.icon = "";
+                root.accentColor = Theme.red;
+            } else if (pct <= 25) {
+                root.icon = "";
+                root.accentColor = Theme.peach;
+            } else if (pct <= 50) {
+                root.icon = "";
+                root.accentColor = Theme.yellow;
+            } else if (pct <= 75) {
+                root.icon = "";
+                root.accentColor = Theme.teal;
+            } else {
+                root.icon = "";
+                root.accentColor = Theme.teal;
+            }
             root.value = pct + "%";
         }
     }
