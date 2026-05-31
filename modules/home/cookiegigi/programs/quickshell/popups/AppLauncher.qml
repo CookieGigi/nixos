@@ -18,10 +18,12 @@ PopupBase {
     property var filteredApps: []
     property var listItems: []
 
+    property int maxItems: 10
+
     // Denylist: hide these apps.
     property var denylist: ["kvantum", "gvim", "nvidia"]
 
-    implicitHeight: Math.min(400, selectionList.count * 36 + 48)
+    implicitHeight: Math.min(400, (selectionList.count < maxItems ? selectionList.count : maxItems) * 36 + 48)
 
     onOpened: {
         refreshApps();
