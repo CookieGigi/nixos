@@ -15,22 +15,20 @@ Item {
 
     property bool isLauncherOpen: visibilities ? visibilities.launcher : false
 
-    implicitWidth: Math.min(
-        (root.isLauncherOpen ? 200 : (root.visibilities && root.visibilities.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2,
-        400
-    )
-    implicitHeight: Math.max(
-        titleText.implicitHeight,
-        popupTitleText.implicitHeight,
-        searchInput.implicitHeight
-    ) + Theme.paddingV * 2
+    implicitWidth: Math.min((root.isLauncherOpen ? 200 : (root.visibilities && root.visibilities.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2, 400)
+    implicitHeight: Math.max(titleText.implicitHeight, popupTitleText.implicitHeight, searchInput.implicitHeight) + Theme.paddingV * 2
 
-    Pill {
+    Button {
         id: bg
         anchors.fill: parent
 
-	visible: (ToplevelManager.activeToplevel?.title ?? "") != "" ||  (root.visibilities ? root.visibilities.popupTitle : "") != "" || root.isLauncherOpen
+        visible: (ToplevelManager.activeToplevel?.title ?? "") != "" || (root.visibilities ? root.visibilities.popupTitle : "") != "" || root.isLauncherOpen
 
+        onClicked: {
+            if (root.screen && !root.isLauncherOpen) {
+                Visibilities.toggleLauncher(root.screen);
+            }
+        }
 
         StyledText {
             id: titleText
@@ -41,6 +39,7 @@ Item {
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             styledBold: true
+            color: bg.isHover ? Theme.accentColor : Theme.text
         }
 
         StyledText {
@@ -54,26 +53,6 @@ Item {
             styledBold: true
         }
 
-        MouseArea {
-            id: clickArea
-            anchors.fill: parent
-            visible: !root.isLauncherOpen
-            cursorShape: Qt.PointingHandCursor
-            hoverEnabled: true
-
-            onEntered: {
-                bg.color = Theme.surface1;
-            }
-            onExited: {
-                bg.color = Theme.containerAlpha;
-            }
-            onClicked: {
-                if (root.screen) {
-                    Visibilities.toggleLauncher(root.screen);
-                }
-            }
-        }
-
         TextInput {
             id: searchInput
             visible: root.isLauncherOpen
@@ -85,7 +64,7 @@ Item {
                 rightMargin: 4
             }
             text: visibilities ? visibilities.launcherFilter : ""
-            color: "#ffffff"
+            color: Theme.text
             font {
                 family: Theme.fontFamily
                 pixelSize: Theme.pixelSize
@@ -101,7 +80,7 @@ Item {
                 }
             }
 
-            Keys.onPressed: (event) => {
+            Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
                     if (visibilities) {
                         visibilities.launcher = false;
@@ -143,7 +122,7 @@ Item {
                 rightMargin: Theme.paddingH
             }
             text: ""
-            color: Theme.overlay1
+            color: Theme.text
 
             MouseArea {
                 anchors.fill: parent
@@ -151,10 +130,10 @@ Item {
                 hoverEnabled: true
 
                 onEntered: {
-                    closeBtn.color = Theme.red;
+                    closeBtn.color = Theme.accentColor;
                 }
                 onExited: {
-                    closeBtn.color = Theme.overlay1;
+                    closeBtn.color = Theme.text;
                 }
                 onClicked: {
                     if (root.visibilities) {

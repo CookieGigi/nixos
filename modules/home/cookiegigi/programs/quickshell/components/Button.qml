@@ -8,19 +8,10 @@ Pill {
 
     signal clicked
 
-    property bool isHover: false
-
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        hoverEnabled: true
 
-        onEntered: {
-            isHover = true;
-        }
-        onExited: {
-            isHover = false;
-        }
         onClicked: {
             root.clicked();
         }
