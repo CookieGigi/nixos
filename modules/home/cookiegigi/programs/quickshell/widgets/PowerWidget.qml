@@ -16,7 +16,7 @@ Button {
         id: iconText
         anchors.centerIn: parent
         text: "⏻"
-	accentColor: Theme.red
+        accentColor: root.isHover ? Theme.accentColor : Theme.text
     }
 
     onClicked: {

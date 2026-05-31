@@ -6,8 +6,9 @@ import "../theme"
 Pill {
     id: root
 
-    property color hoverBg: Theme.surface1
-    signal clicked()
+    signal clicked
+
+    property bool isHover: false
 
     MouseArea {
         anchors.fill: parent
@@ -15,10 +16,10 @@ Pill {
         hoverEnabled: true
 
         onEntered: {
-            root.color = root.hoverBg;
+            isHover = true;
         }
         onExited: {
-            root.color = Theme.containerAlpha;
+            isHover = false;
         }
         onClicked: {
             root.clicked();
