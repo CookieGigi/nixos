@@ -11,5 +11,6 @@
     ./quickshell
     ./lazygit.nix
     ./nix-direnv.nix
+    ./tidal.nix
   ];
 }
