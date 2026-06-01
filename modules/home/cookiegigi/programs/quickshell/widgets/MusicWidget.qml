@@ -4,8 +4,8 @@ import "../components"
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 
-Pill {
-    property var player: Mpris.players.count > 0 ? Mpris.players.get(0) : null
+Button {
+    property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
 
     visible: player != null && player.playbackState != MprisPlaybackState.Stopping
 
@@ -21,7 +21,13 @@ Pill {
 
         StyledText {
             id: musicText
-            text: player != null && player.trackTitle ? player.trackTitle : "no music"
+            text: player != null ? (player.trackTitle != "" ? player.trackTitle : player.identity) : "no music"
+        }
+    }
+
+    onClicked: {
+        if (player != null) {
+            player.togglePlaying();
         }
     }
 }
