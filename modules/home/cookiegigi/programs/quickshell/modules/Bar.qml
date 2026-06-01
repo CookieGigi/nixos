@@ -80,10 +80,6 @@ Scope {
                 ClockWidget {
                     Layout.fillHeight: true
                 }
-
-                MusicWidget {
-                    Layout.fillHeight: true
-                }
             }
 
             // Center: window title (clickable → launcher, or search input when open)
@@ -106,13 +102,16 @@ Scope {
                 }
                 spacing: 8
 
-                BatteryWidget {
+                MusicWidget {
                     Layout.fillHeight: true
                 }
                 VolumeWidget {
                     Layout.fillHeight: true
                 }
                 NetworkWidget {
+                    Layout.fillHeight: true
+                }
+                BatteryWidget {
                     Layout.fillHeight: true
                 }
                 PowerWidget {
