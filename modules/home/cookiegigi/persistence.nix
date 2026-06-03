@@ -9,6 +9,7 @@ _: {
       "Pictures"
       "nixos"
       "Projects"
+      ".cache/uad/backups/"
     ];
   };
 }
