@@ -49,7 +49,7 @@ layout {
 
     border {
         width 2
-        active-color "#8bd5ca"
+        active-color "#494d64"
         inactive-color "#494d64"
     }
 }
@@ -64,6 +64,7 @@ spawn-at-startup "qs" "-c" "bar"
 spawn-at-startup "swaybg" "-i" "/home/cookiegigi/nixos/modules/home/cookiegigi/wallpapers/voyager-4.jpg" "-m" "fill"
 
 hotkey-overlay {
+	skip-at-startup
 }
 
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
@@ -75,10 +76,10 @@ binds {
     Mod+Shift+Comma { show-hotkey-overlay; }
 
     // Terminal: ghostty
-    Mod+T { spawn "ghostty"; }
+    Mod+T hotkey-overlay-title="Terminal" {  spawn "ghostty"; }
     // App launcher: quickshell
-    Mod+D       { spawn "qs" "-c" "bar" "ipc" "call" "launcher" "toggle"; }
-    Mod+Shift+X { spawn "qs" "-c" "bar" "ipc" "call" "power" "toggle"; }
+    Mod+D  hotkey-overlay-title="App launcher"  {  spawn "qs" "-c" "bar" "ipc" "call" "launcher" "toggle"; }
+    Mod+Shift+X hotkey-overlay-title="Power Menu" { spawn "qs" "-c" "bar" "ipc" "call" "power" "toggle"; }
     // Screen locker: swaylock
     Super+Alt+L { spawn "swaylock"; }
 
