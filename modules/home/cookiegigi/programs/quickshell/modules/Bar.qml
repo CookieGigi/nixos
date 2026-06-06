@@ -17,7 +17,9 @@ Scope {
     VisibilitiesState {
         id: _visibilities
     }
-    property var visibilities: _visibilities
+    property VisibilitiesState visibilities: _visibilities
+
+    readonly property real columnWidth: barRow.width / 3 - 16
 
     Component.onCompleted: {
         Visibilities.register(modelData, visibilities);
@@ -26,8 +28,6 @@ Scope {
     PanelWindow {
         id: barWindow
         screen: modelData
-
-        WlrLayershell.keyboardFocus: root.visibilities.isOpen("launcher") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         anchors {
             top: true
@@ -61,8 +61,12 @@ Scope {
             anchorWidget: networkWidget
             alignment: "center"
         }
-        Item {
+        FlexboxLayout {
             id: barRow
+            direction: FlexboxLayout.Row
+            justifyContent: FlexboxLayout.JustifySpaceBetween
+            alignItems: FlexboxLayout.AlignCenter
+            columnGap: 16
             anchors {
                 fill: parent
                 leftMargin: 16
@@ -70,40 +74,42 @@ Scope {
             }
 
             // Left: clock
-            RowLayout {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-                }
-                spacing: 8
+            FlexboxLayout {
+                justifyContent: FlexboxLayout.JustifyStart
+                Layout.preferredWidth: columnWidth
+                Layout.maximumWidth: columnWidth
+                Layout.fillHeight: true
                 ClockWidget {
                     Layout.fillHeight: true
                 }
             }
 
             // Center: window title (clickable → launcher, or search input when open)
-            WindowTitleWidget {
-                id: titleWidget
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
+            FlexboxLayout {
+                justifyContent: FlexboxLayout.JustifyCenter
+                Layout.preferredWidth: columnWidth
+                Layout.maximumWidth: columnWidth
+                Layout.fillHeight: true
+                WindowTitleWidget {
+                    id: titleWidget
+                    Layout.fillHeight: true
+                    screen: modelData
+                    visibilities: root.visibilities
                 }
-                screen: modelData
-                visibilities: root.visibilities
             }
 
             // Right: system info widgets
-            RowLayout {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    right: parent.right
-                }
-                spacing: 8
+            FlexboxLayout {
+                id: rightLayout
+                columnGap: 8
+                justifyContent: FlexboxLayout.JustifyEnd
+                clip: true
+                Layout.maximumWidth: columnWidth
+                Layout.preferredWidth: columnWidth
+                Layout.fillHeight: true
 
                 MusicWidget {
+                    Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
                 VolumeWidget {

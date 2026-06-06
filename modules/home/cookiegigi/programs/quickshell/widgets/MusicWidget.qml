@@ -9,19 +9,27 @@ Button {
 
     visible: player != null && player.playbackState != MprisPlaybackState.Stopping
 
-    implicitWidth: musicText.implicitWidth + Theme.paddingH * 2
-    implicitHeight: musicText.implicitHeight + Theme.paddingV * 2
+    FlexboxLayout {
+        id: container
+        anchors.fill: parent
+        anchors.leftMargin: Theme.paddingH
+        anchors.rightMargin: Theme.paddingH
+        anchors.topMargin: Theme.paddingV
+        anchors.bottomMargin: Theme.paddingV
 
-    RowLayout {
-        anchors.centerIn: parent
-        spacing: 6
+        columnGap: 6
+        justifyContent: FlexboxLayout.JustifySpaceAround
+        alignItems: FlexboxLayout.AlignCenter
         Icon {
             text: player != null && player.playbackState == MprisPlaybackState.Playing ? "" : (player && player.playbackState == MprisPlaybackState.Paused ? "󰏤" : "󰓛")
         }
 
         StyledText {
-            id: musicText
             text: player != null ? (player.trackTitle != "" ? player.trackTitle : player.identity) : "no music"
+            elide: Text.ElideRight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            verticalAlignment: Text.AlignVCenter
         }
     }
 
