@@ -11,25 +11,37 @@ PopupBase {
     id: root
 
     title: "Power Menu"
-    visibilityProperty: "power"
+    popupId: "power"
     popupWidth: 200
 
-    // Position under the power button (top-right of bar)
     anchorLeft: false
     anchorRight: true
-    marginRight: 16 // match bar right margin
-    marginLeft: 0
 
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     implicitHeight: Math.min(400, menuList.count * 36 + 48)
 
     property var actions: [
-        { label: "Shutdown", cmd: ["systemctl", "poweroff"] },
-        { label: "Reboot",   cmd: ["systemctl", "reboot"] },
-        { label: "Suspend",  cmd: ["systemctl", "suspend"] },
-        { label: "Logout",   cmd: ["niri", "msg", "action", "quit"] },
-        { label: "Cancel",   cmd: null }
+        {
+            label: "Shutdown",
+            cmd: ["systemctl", "poweroff"]
+        },
+        {
+            label: "Reboot",
+            cmd: ["systemctl", "reboot"]
+        },
+        {
+            label: "Suspend",
+            cmd: ["systemctl", "suspend"]
+        },
+        {
+            label: "Logout",
+            cmd: ["niri", "msg", "action", "quit"]
+        },
+        {
+            label: "Cancel",
+            cmd: null
+        }
     ]
 
     onOpened: {
@@ -56,11 +68,13 @@ PopupBase {
                 anchors.fill: parent
                 anchors.margins: 10
                 focus: true
-                items: root.actions.map(a => ({ label: a.label }))
+                items: root.actions.map(a => ({
+                            label: a.label
+                        }))
 
                 onEscapePressed: root.closePopup()
 
-                onItemActivated: (index) => {
+                onItemActivated: index => {
                     const action = root.actions[index];
                     if (action && action.cmd) {
                         Quickshell.execDetached(action.cmd);

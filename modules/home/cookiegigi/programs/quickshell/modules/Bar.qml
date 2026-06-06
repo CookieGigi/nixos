@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import "../services"
 import "../widgets"
 import "../popups"
+import "../models"
 
 // Per-monitor bar: transparent top panel with pill widgets.
 // Each monitor gets its own instance via Variants.
@@ -13,19 +14,8 @@ Scope {
 
     required property var modelData
 
-    // Observable state object for popup visibility.
-    // Using QtObject with property bool ensures QML bindings
-    // re-evaluate when launcher/power are toggled.
-    QtObject {
+    VisibilitiesState {
         id: _visibilities
-        property bool launcher: false
-        property bool power: false
-        property string launcherFilter: ""
-        property string popupTitle: ""
-
-        signal launcherActivate
-        signal launcherIncrement
-        signal launcherDecrement
     }
     property var visibilities: _visibilities
 
@@ -37,7 +27,7 @@ Scope {
         id: barWindow
         screen: modelData
 
-        WlrLayershell.keyboardFocus: root.visibilities.launcher ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.visibilities.isOpen("launcher") ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         anchors {
             top: true
@@ -54,13 +44,23 @@ Scope {
         AppLauncher {
             visibilities: root.visibilities
             screen: modelData
+            anchorWidget: titleWidget
+            alignment: "center"
         }
 
         PowerMenu {
             visibilities: root.visibilities
             screen: modelData
+            anchorWidget: powerWidget
+            alignment: "right"
         }
 
+        NetworkMenu {
+            visibilities: root.visibilities
+            screen: modelData
+            anchorWidget: networkWidget
+            alignment: "center"
+        }
         Item {
             id: barRow
             anchors {
@@ -84,6 +84,7 @@ Scope {
 
             // Center: window title (clickable → launcher, or search input when open)
             WindowTitleWidget {
+                id: titleWidget
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -109,12 +110,15 @@ Scope {
                     Layout.fillHeight: true
                 }
                 NetworkWidget {
+                    id: networkWidget
+                    screen: modelData
                     Layout.fillHeight: true
                 }
                 BatteryWidget {
                     Layout.fillHeight: true
                 }
                 PowerWidget {
+                    id: powerWidget
                     screen: modelData
                     Layout.fillHeight: true
                 }

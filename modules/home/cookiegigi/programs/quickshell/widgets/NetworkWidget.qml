@@ -4,13 +4,15 @@ import Quickshell
 import Quickshell.Io
 import "../theme"
 import "../components"
+import "../services"
 
 // Network widget: shows a WiFi or Ethernet icon based on the active connection.
-Pill {
+Button {
     id: root
 
     visible: root.hasConnection
 
+    property var screen: null
     property bool hasConnection: false
     property string connectionType: ""
 
@@ -65,8 +67,14 @@ Pill {
         spacing: 6
 
         Icon {
-            accentColor: Theme.text
+            accentColor: root.isHover ? Theme.accentColor : Theme.text
             text: root.connectionType === "wifi" ? "" : ""
+        }
+    }
+
+    onClicked: {
+        if (root.screen) {
+            Visibilities.toggle("networkMenu", root.screen);
         }
     }
 }

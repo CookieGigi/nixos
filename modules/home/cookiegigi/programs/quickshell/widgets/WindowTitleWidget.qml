@@ -13,7 +13,7 @@ Item {
     property var screen: null
     property var visibilities: null
 
-    property bool isLauncherOpen: visibilities ? visibilities.launcher : false
+    property bool isLauncherOpen: visibilities ? visibilities.isOpen("launcher") : false
 
     implicitWidth: Math.min((root.isLauncherOpen ? 200 : (root.visibilities && root.visibilities.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2, 400)
     implicitHeight: Math.max(titleText.implicitHeight, popupTitleText.implicitHeight, searchInput.implicitHeight) + Theme.paddingV * 2
@@ -83,7 +83,7 @@ Item {
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
                     if (visibilities) {
-                        visibilities.launcher = false;
+                        visibilities.close("launcher");
                         visibilities.launcherFilter = "";
                     }
                     event.accepted = true;
@@ -112,7 +112,6 @@ Item {
             }
         }
 
-        // Close button for the app launcher
         StyledText {
             id: closeBtn
             visible: root.isLauncherOpen
@@ -137,7 +136,7 @@ Item {
                 }
                 onClicked: {
                     if (root.visibilities) {
-                        root.visibilities.launcher = false;
+                        root.visibilities.close("launcher");
                         root.visibilities.launcherFilter = "";
                     }
                 }

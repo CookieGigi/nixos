@@ -49,22 +49,6 @@ ListView {
         }
     }
 
-    Keys.onPressed: event => {
-        if (event.key === Qt.Key_Down) {
-            root.incrementCurrent();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Up) {
-            root.decrementCurrent();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            root.activateCurrent();
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Escape) {
-            root.escapePressed();
-            event.accepted = true;
-        }
-    }
-
     delegate: Rectangle {
         required property var modelData
         required property int index

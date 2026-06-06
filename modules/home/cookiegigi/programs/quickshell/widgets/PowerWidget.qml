@@ -21,7 +21,7 @@ Button {
 
     onClicked: {
         if (root.screen) {
-            Visibilities.togglePower(root.screen);
+            Visibilities.toggle("power", root.screen);
         }
     }
 }

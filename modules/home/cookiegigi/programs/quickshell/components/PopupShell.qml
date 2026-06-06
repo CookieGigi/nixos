@@ -4,15 +4,8 @@ import "../theme"
 
 // Shared popup frame:
 //   - Styled background + border
-//   - Escape key closes (handled by parent window)
-//
-// Parent window should grab keyboard focus and wire visible
-// to a Visibilities property.
 Rectangle {
     id: root
-
-    // Emitted when user presses Escape.
-    signal closeRequested()
 
     anchors.fill: parent
 
@@ -20,10 +13,15 @@ Rectangle {
 
     radius: 12
 
-    // Fallback Escape handler (parent PopupWindow should also handle it).
-    Keys.onPressed: (event) => {
+    signal closeRequested
+    signal keyPressed(var event)  // ← forward all keys up
+
+    Keys.onPressed: event => {
         if (event.key === Qt.Key_Escape) {
             root.closeRequested();
+            event.accepted = true;
+        } else {
+            root.keyPressed(event);
             event.accepted = true;
         }
     }

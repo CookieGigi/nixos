@@ -8,7 +8,7 @@ import "../theme"
 PopupBase {
     id: root
 
-    visibilityProperty: "launcher"
+    popupId: "launcher"
     popupWidth: 500
 
     property string filterText: visibilities ? visibilities.launcherFilter : ""
@@ -29,7 +29,6 @@ PopupBase {
         refreshApps();
         if (visibilities)
             visibilities.launcherFilter = "";
-        focusTimer.start();
     }
 
     onClosing: {
@@ -57,14 +56,11 @@ PopupBase {
             const name = (entry.name || "").toLowerCase();
             return name.includes(q);
         });
-        // Normalize items for SelectionList
         listItems = filteredApps.map(entry => ({
                     label: entry.name || "",
                     icon: entry.icon || ""
                 }));
     }
-
-    focusTimer.onTriggered: selectionList.forceActiveFocus()
 
     content: ColumnLayout {
         anchors {
@@ -73,7 +69,6 @@ PopupBase {
         }
         spacing: 8
 
-        // App list
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -95,7 +90,6 @@ PopupBase {
             }
         }
 
-        // No results message
         StyledText {
             visible: root.filteredApps.length === 0 && root.filterText.length > 0
             Layout.alignment: Qt.AlignHCenter
@@ -105,7 +99,6 @@ PopupBase {
         }
     }
 
-    // Connect to shared navigation signals from the bar's search input.
     Connections {
         target: root.visibilities || null
         enabled: root.visibilities !== null
@@ -124,7 +117,16 @@ PopupBase {
     Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
-            refreshApps();  // data here now, refresh!
+            refreshApps();
         }
+    }
+
+    onKeyPressed: event => {
+        if (event.key === Qt.Key_Down)
+            selectionList.incrementCurrent();
+        if (event.key === Qt.Key_Up)
+            selectionList.decrementCurrent();
+        if (event.key === Qt.Key_Return)
+            selectionList.activateCurrent();
     }
 }
