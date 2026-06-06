@@ -72,6 +72,13 @@
           types = ["file"];
           files = "\\.qml$";
         };
+        niri-validate = {
+          enable = true;
+          name = "niri-validate";
+          entry = "${nixpkgs.legacyPackages.x86_64-linux.niri}/bin/niri validate --config";
+          types = ["file"];
+          files = "\\.kdl$";
+        };
       };
     };
 
