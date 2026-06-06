@@ -6,7 +6,7 @@ import "../services"
 PopupBase {
     id: root
     title: "Network Menu"
-    popupId: "networkMenu"
+    popupId: "network"
     popupWidth: 250
 
     anchorLeft: false

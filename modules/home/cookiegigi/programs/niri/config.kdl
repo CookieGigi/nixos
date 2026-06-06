@@ -79,6 +79,7 @@ binds {
     Mod+T hotkey-overlay-title="Terminal" {  spawn "ghostty"; }
     // App launcher: quickshell
     Mod+D  hotkey-overlay-title="App launcher"  {  spawn "qs" "-c" "bar" "ipc" "call" "launcher" "toggle"; }
+    Mod+Shift+W  hotkey-overlay-title="Network Menu"  {  spawn "qs" "-c" "bar" "ipc" "call" "network" "toggle"; }
     Mod+Shift+X hotkey-overlay-title="Power Menu" { spawn "qs" "-c" "bar" "ipc" "call" "power" "toggle"; }
     // Screen locker: swaylock
     Super+Alt+L { spawn "swaylock"; }

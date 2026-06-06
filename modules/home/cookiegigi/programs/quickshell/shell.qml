@@ -26,6 +26,14 @@ ShellRoot {
         }
     }
 
+    IpcHandler {
+        target: "network"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            Visibilities.toggleNetwork(screen);
+        }
+    }
+
     Variants {
         model: Quickshell.screens
         Bar {

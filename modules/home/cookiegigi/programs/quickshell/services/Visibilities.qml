@@ -51,4 +51,7 @@ Singleton {
     function togglePower(screen) {
         toggle("power", screen);
     }
+    function toggleNetwork(screen) {
+        toggle("network", screen);
+    }
 }
