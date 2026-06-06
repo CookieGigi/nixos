@@ -1,80 +1,66 @@
 import QtQuick
 import Quickshell
-import Quickshell.Services.UPower
 import "../theme"
 import "../components"
+import "../services"
 
 // Battery widget: shows battery level and charging state.
 // Polls every 5s as a fallback when UPower displayDevice is stale.
 Percentage {
     id: root
 
-    function findBatteryDevice() {
-        const devices = UPower.devices;
-        for (let i = 0; i < devices.count; i++) {
-            const d = devices.get(i);
-            if (d.isLaptopBattery) {
-                return d;
-            }
+    Connections {
+
+        target: BatteryStatus
+        function onUpdated(): void {
+            root.update();
         }
-        return null;
     }
 
-    function refresh() {
-        let dev = UPower.displayDevice;
-        if (!dev || !dev.ready || dev.percentage == null || dev.percentage === 0) {
-            dev = findBatteryDevice();
-        }
+    Component.onCompleted: {
+        root.update();
+    }
 
-        if (!dev || !dev.ready) {
+    function update(): void {
+        if (!BatteryStatus.ready) {
             root.icon = "";
             root.value = "?%";
             return;
         }
 
-        const pct = Math.round(dev.percentage * 100);
-        if (isNaN(pct) || pct < 0) {
+        if (isNaN(BatteryStatus.percentage) || BatteryStatus.percentage < 0) {
             root.icon = "";
             root.value = "?%";
             root.accentColor = Theme.red;
             return;
         }
 
-        const state = dev.state;
-        if (state === UPowerDeviceState.FullyCharged) {
+        if (BatteryStatus.full) {
             root.icon = "";
             root.value = "Full";
             root.accentColor = Theme.green;
-        } else if (state === UPowerDeviceState.Charging) {
+        } else if (BatteryStatus.charging) {
             root.icon = "";
-            root.value = pct + "%";
+            root.value = BatteryStatus.percentage + "%";
+            root.accentColor = Theme.text;
         } else {
-            if (pct <= 10) {
+            if (BatteryStatus.percentage <= 10) {
                 root.icon = "";
                 root.accentColor = Theme.red;
-            } else if (pct <= 25) {
+            } else if (BatteryStatus.percentage <= 25) {
                 root.icon = "";
                 root.accentColor = Theme.peach;
-            } else if (pct <= 50) {
+            } else if (BatteryStatus.percentage <= 50) {
                 root.icon = "";
                 root.accentColor = Theme.yellow;
-            } else if (pct <= 75) {
+            } else if (BatteryStatus.percentage <= 75) {
                 root.icon = "";
                 root.accentColor = Theme.teal;
             } else {
                 root.icon = "";
                 root.accentColor = Theme.teal;
             }
-            root.value = pct + "%";
+            root.value = BatteryStatus.percentage + "%";
         }
-    }
-
-    Component.onCompleted: root.refresh()
-
-    Timer {
-        interval: 5000
-        running: true
-        repeat: true
-        onTriggered: root.refresh()
     }
 }
