@@ -10,8 +10,7 @@ import "../services"
 Button {
     id: root
 
-    visible: root.hasConnection
-
+    visible: NetworkStatus.hasConnection
     property var screen: null
     property bool hasConnection: false
     property string connectionType: ""
