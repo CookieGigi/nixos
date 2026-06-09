@@ -48,21 +48,16 @@ PopupBase {
         }
 
         // Scrollable list of active MPRIS players (max 3 visible by default)
-        // Using ListView for built-in currentIndex / isCurrentItem visual feedback
-        ListView {
+        SelectionList {
             id: playerList
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
+            wrapNavigation: true
+            items: activePlayers
             spacing: 8
-            model: activePlayers
-            currentIndex: root.selectedIndex
+            anchors.margins: 0
 
-            onCurrentIndexChanged: {
-                root.selectedIndex = currentIndex;
-            }
-
-            delegate: Rectangle {
+            itemDelegate: Rectangle {
                 required property var modelData
                 required property int index
                 readonly property bool isCurrent: ListView.isCurrentItem
@@ -141,6 +136,16 @@ PopupBase {
                     }
                 }
             }
+
+            onItemActivated: index => {
+                if (index >= 0 && index < activePlayers.length) {
+                    const player = activePlayers[index];
+                    console.log("MediaPopup itemActivated:", player.identity);
+                    player.togglePlaying();
+                }
+            }
+
+            onEscapePressed: root.closePopup()
         }
     }
 
@@ -151,48 +156,23 @@ PopupBase {
             console.log("  player", i, ":", p.identity, "state:", p.playbackState);
         }
         if (activePlayers.length > 0) {
-            selectedIndex = 0;
+            playerList.currentIndex = 0;
         } else {
-            selectedIndex = -1;
+            playerList.currentIndex = -1;
         }
-        console.log("MediaPopup onOpened selectedIndex:", selectedIndex);
+        console.log("MediaPopup onOpened currentIndex:", playerList.currentIndex);
     }
 
     onClosing: {
         console.log("MediaPopup onClosing");
-        selectedIndex = -1;
+        playerList.currentIndex = -1;
     }
 
-    // Wire PopupKeyController signals to drive ListView.currentIndex
+    // Wire PopupKeyController signals to drive SelectionList
     Component.onCompleted: {
         console.log("MediaPopup Component.onCompleted wiring controller signals");
-        controller.navigateUp.connect(() => {
-            console.log("MediaPopup controller.navigateUp");
-            if (activePlayers.length === 0)
-                return;
-            if (playerList.currentIndex > 0) {
-                playerList.currentIndex--;
-            } else {
-                playerList.currentIndex = activePlayers.length - 1;
-            }
-            playerList.positionViewAtIndex(playerList.currentIndex, ListView.Contain);
-        });
-        controller.navigateDown.connect(() => {
-            console.log("MediaPopup controller.navigateDown");
-            if (activePlayers.length === 0)
-                return;
-            if (playerList.currentIndex < activePlayers.length - 1) {
-                playerList.currentIndex++;
-            } else {
-                playerList.currentIndex = 0;
-            }
-            playerList.positionViewAtIndex(playerList.currentIndex, ListView.Contain);
-        });
-        controller.activate.connect(() => {
-            console.log("MediaPopup controller.activate");
-            if (playerList.currentIndex >= 0 && playerList.currentIndex < activePlayers.length) {
-                activePlayers[playerList.currentIndex].togglePlaying();
-            }
-        });
+        controller.navigateUp.connect(playerList.decrementCurrent);
+        controller.navigateDown.connect(playerList.incrementCurrent);
+        controller.activate.connect(playerList.activateCurrent);
     }
 }
