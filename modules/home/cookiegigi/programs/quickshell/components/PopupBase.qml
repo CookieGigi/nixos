@@ -8,18 +8,17 @@ import "../services"
 //   - Overlay layer-shell surface
 //   - Styled PopupShell frame
 //   - Emits opened() / closing() signals for per-popup setup/teardown
+//   - Self-contained visibility (isOpen) and keyboard controller (PopupKeyController)
 //
 // Usage: set popupId to a unique string. Add content children.
-// No need to touch Visibilities when adding a new popup.
+// Register with PopupRegistry in Bar.qml.
 //
 // Positioning is configurable via anchor*/margin* properties.
 // Default setup centers the popup horizontally at the top of the screen.
 PanelWindow {
     id: root
 
-    property var visibilities: null
-
-    // Unique id for this popup. Must match what you pass to Visibilities.toggle().
+    // Unique id for this popup. Must match what you pass to PopupRegistry.register().
     property string popupId: ""
 
     property int popupWidth: 500
@@ -36,11 +35,14 @@ PanelWindow {
     property int marginRight: screen.width - marginLeft - popupWidth
 
     property alias content: popupShell.children
-    property alias focusTimer: focusTimer
+    property alias controller: keyController
     property string title: ""
 
     property var anchorWidget: null
     property string alignment: "center" // "left", "center", "right"
+
+    // Self-contained visibility state
+    property bool isOpen: false
 
     anchors {
         top: anchorTop
@@ -55,8 +57,7 @@ PanelWindow {
         right: marginRight
     }
 
-    // Depends on _rev so binding re-evaluates when any popup opens/closes
-    visible: visibilities ? visibilities.isOpen(popupId) : false
+    visible: isOpen
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -81,21 +82,35 @@ PanelWindow {
         return pos.x + anchorWidget.width / 2 - popupWidth / 2;
     }
     function closePopup() {
-        if (visibilities) {
-            visibilities.close(popupId);
-        }
+        isOpen = false;
     }
 
     onVisibleChanged: {
         if (visible) {
-            popupShell.forceActiveFocus();
-            if (title && visibilities)
-                visibilities.popupTitle = title;
+            hiddenInput.forceActiveFocus();
             root.opened();
         } else {
-            if (visibilities)
-                visibilities.popupTitle = "";
             root.closing();
+        }
+    }
+
+    PopupKeyController {
+        id: keyController
+        popupTitle: root.title
+        onClose: root.closePopup()
+    }
+
+    // Hidden TextInput that receives real keyboard events when popup is focused.
+    // This preserves native typing, copy/paste, cursor movement, IME, etc.
+    TextInput {
+        id: hiddenInput
+        visible: false
+        text: keyController.searchText
+        onTextChanged: {
+            if (keyController.searchText !== text) {
+                keyController.searchText = text;
+                keyController.searchTextChanged();
+            }
         }
     }
 
@@ -103,14 +118,12 @@ PanelWindow {
         id: popupShell
         anchors.fill: parent
         onCloseRequested: root.closePopup()
-        onKeyPressed: event => root.keyPressed(event)
+        onKeyPressed: event => {
+            keyController.handleKey(event);
+            // If handleKey didn't accept it, fall through to hiddenInput
+            if (!event.accepted) {
+                // Pass the key to hiddenInput by letting it propagate
+            }
+        }
     }
-
-    Timer {
-        id: focusTimer
-        interval: 100
-        repeat: false
-    }
-
-    signal keyPressed(var event)
 }

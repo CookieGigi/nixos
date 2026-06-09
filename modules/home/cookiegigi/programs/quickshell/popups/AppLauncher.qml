@@ -11,7 +11,7 @@ PopupBase {
     popupId: "launcher"
     popupWidth: 500
 
-    property string filterText: visibilities ? visibilities.launcherFilter : ""
+    property string filterText: controller.searchText
     onFilterTextChanged: applyFilter()
 
     property var allApps: []
@@ -27,14 +27,17 @@ PopupBase {
 
     onOpened: {
         refreshApps();
-        if (visibilities)
-            visibilities.launcherFilter = "";
+        controller.searchText = "";
     }
 
     onClosing: {
-        if (visibilities) {
-            visibilities.launcherFilter = "";
-        }
+        controller.searchText = "";
+    }
+
+    Component.onCompleted: {
+        controller.navigateDown.connect(selectionList.incrementCurrent);
+        controller.navigateUp.connect(selectionList.decrementCurrent);
+        controller.activate.connect(selectionList.activateCurrent);
     }
 
     function refreshApps() {
@@ -100,33 +103,9 @@ PopupBase {
     }
 
     Connections {
-        target: root.visibilities || null
-        enabled: root.visibilities !== null
-
-        function onLauncherActivate() {
-            selectionList.activateCurrent();
-        }
-        function onLauncherIncrement() {
-            selectionList.incrementCurrent();
-        }
-        function onLauncherDecrement() {
-            selectionList.decrementCurrent();
-        }
-    }
-
-    Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
             refreshApps();
         }
-    }
-
-    onKeyPressed: event => {
-        if (event.key === Qt.Key_Down)
-            selectionList.incrementCurrent();
-        if (event.key === Qt.Key_Up)
-            selectionList.decrementCurrent();
-        if (event.key === Qt.Key_Return)
-            selectionList.activateCurrent();
     }
 }

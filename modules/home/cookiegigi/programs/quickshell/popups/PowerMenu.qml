@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import "../components"
 import "../theme"
 
@@ -16,8 +15,6 @@ PopupBase {
 
     anchorLeft: false
     anchorRight: true
-
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     implicitHeight: Math.min(400, menuList.count * 36 + 48)
 
@@ -46,11 +43,13 @@ PopupBase {
 
     onOpened: {
         menuList.currentIndex = 0;
-        menuList.forceActiveFocus();
-        focusTimer.start();
     }
 
-    focusTimer.onTriggered: menuList.forceActiveFocus()
+    Component.onCompleted: {
+        controller.navigateDown.connect(menuList.incrementCurrent);
+        controller.navigateUp.connect(menuList.decrementCurrent);
+        controller.activate.connect(menuList.activateCurrent);
+    }
 
     content: ColumnLayout {
         anchors {
@@ -67,7 +66,6 @@ PopupBase {
                 id: menuList
                 anchors.fill: parent
                 anchors.margins: 10
-                focus: true
                 items: root.actions.map(a => ({
                             label: a.label
                         }))

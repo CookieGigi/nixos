@@ -14,7 +14,7 @@ ShellRoot {
         target: "launcher"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
-            Visibilities.toggleLauncher(screen);
+            PopupRegistry.toggleLauncher(screen);
         }
     }
 
@@ -22,7 +22,7 @@ ShellRoot {
         target: "power"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
-            Visibilities.togglePower(screen);
+            PopupRegistry.togglePower(screen);
         }
     }
 
@@ -30,7 +30,7 @@ ShellRoot {
         target: "network"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
-            Visibilities.toggleNetwork(screen);
+            PopupRegistry.toggleNetwork(screen);
         }
     }
 

@@ -11,28 +11,45 @@ Item {
     id: root
 
     property var screen: null
-    property var visibilities: null
+    property var popups: []  // Array of popup instances passed from Bar.qml
 
-    property bool isLauncherOpen: visibilities ? visibilities.isOpen("launcher") : false
+    // Find the active popup (isOpen === true) from the popups array
+    property var activePopup: {
+        for (let i = 0; i < popups.length; i++) {
+            if (popups[i].isOpen)
+                return popups[i];
+        }
+        return null;
+    }
 
-    implicitWidth: Math.min((root.isLauncherOpen ? 200 : (root.visibilities && root.visibilities.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2, 400)
+    property bool isLauncherOpen: {
+        for (let i = 0; i < popups.length; i++) {
+            if (popups[i].popupId === "launcher" && popups[i].isOpen)
+                return true;
+        }
+        return false;
+    }
+
+    property string popupTitle: PopupRegistry.getActivePopupTitle(screen)
+
+    implicitWidth: Math.min((root.isLauncherOpen ? 200 : (root.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2, 400)
     implicitHeight: Math.max(titleText.implicitHeight, popupTitleText.implicitHeight, searchInput.implicitHeight) + Theme.paddingV * 2
 
     Button {
         id: bg
         anchors.fill: parent
 
-        visible: (ToplevelManager.activeToplevel?.title ?? "") != "" || (root.visibilities ? root.visibilities.popupTitle : "") != "" || root.isLauncherOpen
+        visible: (ToplevelManager.activeToplevel?.title ?? "") != "" || root.popupTitle !== "" || root.isLauncherOpen
 
         onClicked: {
             if (root.screen && !root.isLauncherOpen) {
-                Visibilities.toggleLauncher(root.screen);
+                PopupRegistry.toggleLauncher(root.screen);
             }
         }
 
         StyledText {
             id: titleText
-            visible: !root.isLauncherOpen && (!root.visibilities || root.visibilities.popupTitle === "")
+            visible: !root.isLauncherOpen && root.popupTitle === ""
             anchors.centerIn: parent
             width: parent.width - Theme.paddingH * 2
             text: ToplevelManager.activeToplevel?.title ?? ""
@@ -44,10 +61,10 @@ Item {
 
         StyledText {
             id: popupTitleText
-            visible: !root.isLauncherOpen && root.visibilities && root.visibilities.popupTitle !== ""
+            visible: !root.isLauncherOpen && root.popupTitle !== ""
             anchors.centerIn: parent
             width: parent.width - Theme.paddingH * 2
-            text: root.visibilities ? root.visibilities.popupTitle : ""
+            text: root.popupTitle
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             styledBold: true
@@ -63,7 +80,7 @@ Item {
                 leftMargin: Theme.paddingH
                 rightMargin: 4
             }
-            text: visibilities ? visibilities.launcherFilter : ""
+            text: root.activePopup ? root.activePopup.controller.searchText : ""
             color: Theme.text
             font {
                 family: Theme.fontFamily
@@ -75,41 +92,13 @@ Item {
             horizontalAlignment: Text.AlignHCenter
 
             onTextChanged: {
-                if (visibilities) {
-                    visibilities.launcherFilter = text;
+                if (root.activePopup && root.activePopup.controller.searchText !== text) {
+                    root.activePopup.controller.searchText = text;
                 }
             }
 
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Escape) {
-                    if (visibilities) {
-                        visibilities.close("launcher");
-                        visibilities.launcherFilter = "";
-                    }
-                    event.accepted = true;
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                    if (visibilities) {
-                        visibilities.launcherActivate();
-                    }
-                    event.accepted = true;
-                } else if (event.key === Qt.Key_Down) {
-                    if (visibilities) {
-                        visibilities.launcherIncrement();
-                    }
-                    event.accepted = true;
-                } else if (event.key === Qt.Key_Up) {
-                    if (visibilities) {
-                        visibilities.launcherDecrement();
-                    }
-                    event.accepted = true;
-                }
-            }
-
-            onVisibleChanged: {
-                if (visible) {
-                    focusDelay.start();
-                }
-            }
+            // No Keys.onPressed here — keyboard is handled by the popup's hidden
+            // TextInput and PopupKeyController. This TextInput is display-only.
         }
 
         StyledText {
@@ -135,19 +124,12 @@ Item {
                     closeBtn.color = Theme.text;
                 }
                 onClicked: {
-                    if (root.visibilities) {
-                        root.visibilities.close("launcher");
-                        root.visibilities.launcherFilter = "";
+                    PopupRegistry.closeAll(root.screen);
+                    if (root.activePopup) {
+                        root.activePopup.controller.searchText = "";
                     }
                 }
             }
         }
-    }
-
-    Timer {
-        id: focusDelay
-        interval: 100
-        repeat: false
-        onTriggered: searchInput.forceActiveFocus()
     }
 }

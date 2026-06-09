@@ -29,7 +29,7 @@ Button {
 
     onClicked: {
         if (root.screen) {
-            Visibilities.toggle("network", root.screen);
+            PopupRegistry.toggle("network", root.screen);
         }
     }
 }

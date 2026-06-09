@@ -5,7 +5,6 @@ import Quickshell.Wayland
 import "../services"
 import "../widgets"
 import "../popups"
-import "../models"
 
 // Per-monitor bar: transparent top panel with pill widgets.
 // Each monitor gets its own instance via Variants.
@@ -14,16 +13,7 @@ Scope {
 
     required property var modelData
 
-    VisibilitiesState {
-        id: _visibilities
-    }
-    property VisibilitiesState visibilities: _visibilities
-
     readonly property real columnWidth: barRow.width / 3 - 16
-
-    Component.onCompleted: {
-        Visibilities.register(modelData, visibilities);
-    }
 
     PanelWindow {
         id: barWindow
@@ -42,25 +32,26 @@ Scope {
 
         // Popups
         AppLauncher {
-            visibilities: root.visibilities
+            id: appLauncher
             screen: modelData
             anchorWidget: titleWidget
             alignment: "center"
         }
 
         PowerMenu {
-            visibilities: root.visibilities
+            id: powerMenu
             screen: modelData
             anchorWidget: powerWidget
             alignment: "right"
         }
 
         NetworkMenu {
-            visibilities: root.visibilities
+            id: networkMenu
             screen: modelData
             anchorWidget: networkWidget
             alignment: "center"
         }
+
         FlexboxLayout {
             id: barRow
             direction: FlexboxLayout.Row
@@ -94,7 +85,7 @@ Scope {
                     id: titleWidget
                     Layout.fillHeight: true
                     screen: modelData
-                    visibilities: root.visibilities
+                    popups: [appLauncher, powerMenu, networkMenu]
                 }
             }
 
@@ -130,5 +121,11 @@ Scope {
                 }
             }
         }
+    }
+
+    Component.onCompleted: {
+        PopupRegistry.register(modelData, "launcher", appLauncher);
+        PopupRegistry.register(modelData, "power", powerMenu);
+        PopupRegistry.register(modelData, "network", networkMenu);
     }
 }
