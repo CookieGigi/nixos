@@ -21,14 +21,11 @@ PopupBase {
             const isStopped = state === MprisPlaybackState.Stopped;
             const id = (p.identity || "").toLowerCase().replace(/[^a-z0-9]/g, "");
             if (isStopped || seen.has(id)) {
-                console.log("MediaPopup skip player:", p.identity, "state:", state, "dup:", seen.has(id));
                 return false;
             }
             seen.add(id);
-            console.log("MediaPopup keep player:", p.identity, "desktopEntry:", p.desktopEntry, "state:", state);
             return true;
         });
-        console.log("MediaPopup activePlayers count:", players.length);
         return players;
     }
 
@@ -55,7 +52,6 @@ PopupBase {
             wrapNavigation: true
             items: activePlayers
             spacing: 8
-            anchors.margins: 0
 
             itemDelegate: Rectangle {
                 required property var modelData
@@ -139,9 +135,7 @@ PopupBase {
 
             onItemActivated: index => {
                 if (index >= 0 && index < activePlayers.length) {
-                    const player = activePlayers[index];
-                    console.log("MediaPopup itemActivated:", player.identity);
-                    player.togglePlaying();
+                    activePlayers[index].togglePlaying();
                 }
             }
 
@@ -150,27 +144,19 @@ PopupBase {
     }
 
     onOpened: {
-        console.log("MediaPopup onOpened activePlayers:", activePlayers.length);
-        for (let i = 0; i < activePlayers.length; i++) {
-            const p = activePlayers[i];
-            console.log("  player", i, ":", p.identity, "state:", p.playbackState);
-        }
         if (activePlayers.length > 0) {
             playerList.currentIndex = 0;
         } else {
             playerList.currentIndex = -1;
         }
-        console.log("MediaPopup onOpened currentIndex:", playerList.currentIndex);
     }
 
     onClosing: {
-        console.log("MediaPopup onClosing");
         playerList.currentIndex = -1;
     }
 
     // Wire PopupKeyController signals to drive SelectionList
     Component.onCompleted: {
-        console.log("MediaPopup Component.onCompleted wiring controller signals");
         controller.navigateUp.connect(playerList.decrementCurrent);
         controller.navigateDown.connect(playerList.incrementCurrent);
         controller.activate.connect(playerList.activateCurrent);
