@@ -9,7 +9,7 @@ Button {
     property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
     property var screen: null
 
-    visible: player != null && player.playbackState != MprisPlaybackState.Stopping
+    visible: player != null && player.playbackState != MprisPlaybackState.Stopped
 
     FlexboxLayout {
         id: container
@@ -27,7 +27,7 @@ Button {
         }
 
         StyledText {
-            text: player != null ? (player.trackTitle != "" ? player.trackTitle : player.identity) : "no music"
+            text: player != null ? (player.trackTitle != "" ? player.trackTitle : player.identity) : "no media"
             elide: Text.ElideRight
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -37,7 +37,7 @@ Button {
 
     onClicked: {
         if (screen) {
-            PopupRegistry.toggleMusic(screen);
+            PopupRegistry.toggleMedia(screen);
         }
     }
 }

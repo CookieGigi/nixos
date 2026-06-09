@@ -97,8 +97,8 @@ Singleton {
     function toggleCalendar(screen) {
         toggle(screen, "calendar");
     }
-    function toggleMusic(screen) {
-        toggle(screen, "music");
+    function toggleMedia(screen) {
+        toggle(screen, "media");
     }
     function toggleVolume(screen) {
         toggle(screen, "volume");

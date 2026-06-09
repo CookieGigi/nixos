@@ -43,10 +43,10 @@ ShellRoot {
     }
 
     IpcHandler {
-        target: "music"
+        target: "media"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
-            PopupRegistry.toggleMusic(screen);
+            PopupRegistry.toggleMedia(screen);
         }
     }
 

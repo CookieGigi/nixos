@@ -59,10 +59,10 @@ Scope {
             alignment: "left"
         }
 
-        MusicPopup {
-            id: musicPopup
+        MediaPopup {
+            id: mediaPopup
             screen: modelData
-            anchorWidget: musicWidget
+            anchorWidget: mediaWidget
             alignment: "center"
         }
 
@@ -128,8 +128,8 @@ Scope {
                 Layout.preferredWidth: columnWidth
                 Layout.fillHeight: true
 
-                MusicWidget {
-                    id: musicWidget
+                MediaWidget {
+                    id: mediaWidget
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     screen: modelData
@@ -163,7 +163,7 @@ Scope {
         PopupRegistry.register(modelData, "power", powerMenu);
         PopupRegistry.register(modelData, "network", networkMenu);
         PopupRegistry.register(modelData, "calendar", calendarPopup);
-        PopupRegistry.register(modelData, "music", musicPopup);
+        PopupRegistry.register(modelData, "media", mediaPopup);
         PopupRegistry.register(modelData, "volume", volumePopup);
         PopupRegistry.register(modelData, "battery", batteryPopup);
     }

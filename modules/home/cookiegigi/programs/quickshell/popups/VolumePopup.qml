@@ -22,20 +22,6 @@ PopupBase {
         }
         spacing: 12
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Icon {
-                text: Pipewire.defaultAudioSink?.audio.muted ? "󰝟" : ""
-            }
-
-            StyledText {
-                text: Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100) + "%"
-                styledBold: true
-            }
-        }
-
         // Volume slider track
         Rectangle {
             id: track
