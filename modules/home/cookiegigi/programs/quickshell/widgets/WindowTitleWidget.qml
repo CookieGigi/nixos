@@ -30,7 +30,7 @@ Item {
         return false;
     }
 
-    property string popupTitle: PopupRegistry.getActivePopupTitle(screen)
+    property string popupTitle: root.activePopup ? root.activePopup.title : ""
 
     implicitWidth: Math.min((root.isLauncherOpen ? 200 : (root.popupTitle !== "" ? popupTitleText.implicitWidth : titleText.implicitWidth)) + Theme.paddingH * 2, 400)
     implicitHeight: Math.max(titleText.implicitHeight, popupTitleText.implicitHeight, searchInput.implicitHeight) + Theme.paddingV * 2

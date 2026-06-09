@@ -102,6 +102,7 @@ PanelWindow {
 
     // Hidden TextInput that receives real keyboard events when popup is focused.
     // This preserves native typing, copy/paste, cursor movement, IME, etc.
+    // Navigation keys (Escape, Enter, Up, Down) are intercepted by handleKey().
     TextInput {
         id: hiddenInput
         visible: false
@@ -111,6 +112,9 @@ PanelWindow {
                 keyController.searchText = text;
                 keyController.searchTextChanged();
             }
+        }
+        Keys.onPressed: event => {
+            keyController.handleKey(event);
         }
     }
 
