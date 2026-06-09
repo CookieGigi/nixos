@@ -13,6 +13,18 @@ PopupBase {
     property var today: new Date()
     property var selectedDate: new Date(today)
 
+    onOpened: {
+        controller.handleLeftRight = true;
+        controller.navigateLeft.connect(monthView.previousMonth);
+        controller.navigateRight.connect(monthView.nextMonth);
+    }
+
+    onClosing: {
+        controller.navigateLeft.disconnect(monthView.previousMonth);
+        controller.navigateRight.disconnect(monthView.nextMonth);
+        controller.handleLeftRight = false;
+    }
+
     content: ColumnLayout {
         anchors {
             fill: parent

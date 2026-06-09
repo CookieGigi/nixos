@@ -14,9 +14,12 @@ QtObject {
 
     property string searchText: ""
     property string popupTitle: ""
+    property bool handleLeftRight: false
 
     signal navigateDown
     signal navigateUp
+    signal navigateLeft
+    signal navigateRight
     signal activate
     signal close
 
@@ -32,6 +35,12 @@ QtObject {
             event.accepted = true;
         } else if (event.key === Qt.Key_Up) {
             root.navigateUp();
+            event.accepted = true;
+        } else if (root.handleLeftRight && event.key === Qt.Key_Left) {
+            root.navigateLeft();
+            event.accepted = true;
+        } else if (root.handleLeftRight && event.key === Qt.Key_Right) {
+            root.navigateRight();
             event.accepted = true;
         }
         // All other keys (typing, copy/paste, etc.) fall through to native TextInput.
