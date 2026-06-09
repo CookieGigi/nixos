@@ -9,6 +9,8 @@ import "../services"
 Percentage {
     id: root
 
+    property var screen: null
+
     Connections {
 
         target: BatteryStatus
@@ -61,6 +63,12 @@ Percentage {
                 root.accentColor = Theme.teal;
             }
             root.value = BatteryStatus.percentage + "%";
+        }
+    }
+
+    onClicked: {
+        if (screen) {
+            PopupRegistry.toggleBattery(screen);
         }
     }
 }

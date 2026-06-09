@@ -6,8 +6,6 @@ import "../theme"
 Pill {
     id: root
 
-    signal clicked
-
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor

@@ -52,6 +52,34 @@ Scope {
             alignment: "center"
         }
 
+        CalendarPopup {
+            id: calendarPopup
+            screen: modelData
+            anchorWidget: clockWidget
+            alignment: "left"
+        }
+
+        MusicPopup {
+            id: musicPopup
+            screen: modelData
+            anchorWidget: musicWidget
+            alignment: "center"
+        }
+
+        VolumePopup {
+            id: volumePopup
+            screen: modelData
+            anchorWidget: volumeWidget
+            alignment: "center"
+        }
+
+        BatteryPopup {
+            id: batteryPopup
+            screen: modelData
+            anchorWidget: batteryWidget
+            alignment: "right"
+        }
+
         FlexboxLayout {
             id: barRow
             direction: FlexboxLayout.Row
@@ -71,7 +99,9 @@ Scope {
                 Layout.maximumWidth: columnWidth
                 Layout.fillHeight: true
                 ClockWidget {
+                    id: clockWidget
                     Layout.fillHeight: true
+                    screen: modelData
                 }
             }
 
@@ -85,7 +115,6 @@ Scope {
                     id: titleWidget
                     Layout.fillHeight: true
                     screen: modelData
-                    popups: [appLauncher, powerMenu, networkMenu]
                 }
             }
 
@@ -100,11 +129,15 @@ Scope {
                 Layout.fillHeight: true
 
                 MusicWidget {
+                    id: musicWidget
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    screen: modelData
                 }
                 VolumeWidget {
+                    id: volumeWidget
                     Layout.fillHeight: true
+                    screen: modelData
                 }
                 NetworkWidget {
                     id: networkWidget
@@ -112,7 +145,9 @@ Scope {
                     Layout.fillHeight: true
                 }
                 BatteryWidget {
+                    id: batteryWidget
                     Layout.fillHeight: true
+                    screen: modelData
                 }
                 PowerWidget {
                     id: powerWidget
@@ -127,5 +162,9 @@ Scope {
         PopupRegistry.register(modelData, "launcher", appLauncher);
         PopupRegistry.register(modelData, "power", powerMenu);
         PopupRegistry.register(modelData, "network", networkMenu);
+        PopupRegistry.register(modelData, "calendar", calendarPopup);
+        PopupRegistry.register(modelData, "music", musicPopup);
+        PopupRegistry.register(modelData, "volume", volumePopup);
+        PopupRegistry.register(modelData, "battery", batteryPopup);
     }
 }

@@ -34,6 +34,38 @@ ShellRoot {
         }
     }
 
+    IpcHandler {
+        target: "calendar"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleCalendar(screen);
+        }
+    }
+
+    IpcHandler {
+        target: "music"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleMusic(screen);
+        }
+    }
+
+    IpcHandler {
+        target: "volume"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleVolume(screen);
+        }
+    }
+
+    IpcHandler {
+        target: "battery"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleBattery(screen);
+        }
+    }
+
     Variants {
         model: Quickshell.screens
         Bar {

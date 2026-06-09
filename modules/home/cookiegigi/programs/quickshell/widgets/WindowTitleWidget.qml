@@ -11,23 +11,14 @@ Item {
     id: root
 
     property var screen: null
-    property var popups: []  // Array of popup instances passed from Bar.qml
 
-    // Find the active popup (isOpen === true) from the popups array
     property var activePopup: {
-        for (let i = 0; i < popups.length; i++) {
-            if (popups[i].isOpen)
-                return popups[i];
-        }
-        return null;
+        var _ = PopupRegistry._activePopupId;
+        return PopupRegistry.getActivePopup(screen);
     }
-
     property bool isLauncherOpen: {
-        for (let i = 0; i < popups.length; i++) {
-            if (popups[i].popupId === "launcher" && popups[i].isOpen)
-                return true;
-        }
-        return false;
+        var _ = PopupRegistry._activePopupId;
+        return PopupRegistry.isLauncherOpen(screen);
     }
 
     property string popupTitle: root.activePopup ? root.activePopup.title : ""

@@ -11,6 +11,8 @@ Rectangle {
 
     property bool isHover: false
 
+    signal clicked
+
     topLeftRadius: 0
     topRightRadius: 0
     bottomLeftRadius: Theme.containerRadius
@@ -27,6 +29,9 @@ Rectangle {
         }
         onExited: {
             isHover = false;
+        }
+        onClicked: {
+            root.clicked();
         }
     }
 }

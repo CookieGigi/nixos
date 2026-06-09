@@ -6,12 +6,29 @@ Singleton {
     id: root
 
     property var _registries: ({})
+    property string _activePopupId: ""
+
+    function _refreshActivePopupId(screen) {
+        var reg = _registries[screen];
+        if (reg) {
+            for (var key in reg) {
+                if (reg[key].isOpen) {
+                    root._activePopupId = key;
+                    return;
+                }
+            }
+        }
+        root._activePopupId = "";
+    }
 
     function register(screen, id, popupInstance) {
         if (!_registries[screen]) {
             _registries[screen] = {};
         }
         _registries[screen][id] = popupInstance;
+        popupInstance.isOpenChanged.connect(function () {
+            _refreshActivePopupId(screen);
+        });
     }
 
     function _getPopup(screen, id) {
@@ -33,6 +50,7 @@ Singleton {
             }
         }
         popup.isOpen = !wasOpen;
+        _refreshActivePopupId(screen);
     }
 
     function closeAll(screen) {
@@ -43,17 +61,28 @@ Singleton {
                     reg[key].isOpen = false;
             }
         }
+        _refreshActivePopupId(screen);
+    }
+
+    function getActivePopup(screen) {
+        var reg = _registries[screen];
+        if (!reg)
+            return null;
+        for (var key in reg) {
+            if (reg[key].isOpen)
+                return reg[key];
+        }
+        return null;
     }
 
     function getActivePopupTitle(screen) {
-        var reg = _registries[screen];
-        if (!reg)
-            return "";
-        for (var key in reg) {
-            if (reg[key].isOpen && reg[key].title)
-                return reg[key].title;
-        }
-        return "";
+        var popup = getActivePopup(screen);
+        return popup ? popup.title : "";
+    }
+
+    function isLauncherOpen(screen) {
+        var popup = _getPopup(screen, "launcher");
+        return popup ? popup.isOpen : false;
     }
 
     function toggleLauncher(screen) {
@@ -64,5 +93,17 @@ Singleton {
     }
     function toggleNetwork(screen) {
         toggle(screen, "network");
+    }
+    function toggleCalendar(screen) {
+        toggle(screen, "calendar");
+    }
+    function toggleMusic(screen) {
+        toggle(screen, "music");
+    }
+    function toggleVolume(screen) {
+        toggle(screen, "volume");
+    }
+    function toggleBattery(screen) {
+        toggle(screen, "battery");
     }
 }

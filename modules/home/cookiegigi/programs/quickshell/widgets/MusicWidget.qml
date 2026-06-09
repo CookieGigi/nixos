@@ -1,11 +1,13 @@
 import QtQuick
 import "../theme"
 import "../components"
+import "../services"
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 
 Button {
     property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
+    property var screen: null
 
     visible: player != null && player.playbackState != MprisPlaybackState.Stopping
 
@@ -34,8 +36,8 @@ Button {
     }
 
     onClicked: {
-        if (player != null) {
-            player.togglePlaying();
+        if (screen) {
+            PopupRegistry.toggleMusic(screen);
         }
     }
 }
