@@ -68,6 +68,7 @@ PanelWindow {
 
     signal opened
     signal closing
+    signal unhandledKeyPressed(var event)
 
     function computeLeft(w) {
         if (!anchorWidget)
@@ -115,6 +116,9 @@ PanelWindow {
         }
         Keys.onPressed: event => {
             keyController.handleKey(event);
+            if (!event.accepted) {
+                root.unhandledKeyPressed(event);
+            }
         }
     }
 
@@ -123,11 +127,10 @@ PanelWindow {
         anchors.fill: parent
         onCloseRequested: root.closePopup()
         onKeyPressed: event => {
-            keyController.handleKey(event);
-            // If handleKey didn't accept it, fall through to hiddenInput
-            if (!event.accepted) {
-                // Pass the key to hiddenInput by letting it propagate
-            }
+        // hiddenInput.Keys.onPressed already fires first and handles the key.
+        // If the event is not accepted by the time it reaches here, it means
+        // neither PopupKeyController nor the popup's unhandledKeyPressed handler
+        // consumed it. Let it propagate further if needed.
         }
     }
 }

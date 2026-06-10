@@ -5,8 +5,10 @@ import "../services"
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 
+// Media widget: shows the primary active MPRIS player.
+// Uses MprisService so all player filtering and control logic lives in one place.
 Button {
-    property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
+    property var player: MprisService.primaryPlayer
     property var screen: null
 
     visible: player != null && player.playbackState != MprisPlaybackState.Stopped
@@ -23,7 +25,7 @@ Button {
         justifyContent: FlexboxLayout.JustifySpaceAround
         alignItems: FlexboxLayout.AlignCenter
         Icon {
-            text: player != null && player.playbackState == MprisPlaybackState.Playing ? "" : (player && player.playbackState == MprisPlaybackState.Paused ? "󰏤" : "󰓛")
+            text: MprisService.playbackStateIcon(player)
         }
 
         StyledText {
