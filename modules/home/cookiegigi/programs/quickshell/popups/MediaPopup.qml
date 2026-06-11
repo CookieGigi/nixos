@@ -257,6 +257,27 @@ PopupBase {
                             Layout.fillWidth: true
                         } // spacer
 
+                        // Mute toggle
+                        Button {
+                            implicitWidth: 28
+                            implicitHeight: 28
+                            visible: player.canControl
+                            onClicked: {
+                                if (player.volume > 0) {
+                                    MprisService.setVolume(player, 0);
+                                } else {
+                                    MprisService.setVolume(player, 0.5);
+                                }
+                            }
+
+                            Icon {
+                                anchors.centerIn: parent
+                                text: player.volume > 0 ? "󰕿" : "󰖁"
+                                iconSize: 12
+                                accentColor: player.volume > 0 ? (parent.isHover ? Theme.accentColor : Theme.text) : Theme.accentColor
+                            }
+                        }
+
                         // Volume slider
                         Rectangle {
                             id: volTrack
@@ -406,6 +427,15 @@ PopupBase {
         } else if (event.key === Qt.Key_S) {
             if (player.shuffleSupported) {
                 MprisService.toggleShuffle(player);
+                event.accepted = true;
+            }
+        } else if (event.key === Qt.Key_M) {
+            if (player.canControl) {
+                if (player.volume > 0) {
+                    MprisService.setVolume(player, 0);
+                } else {
+                    MprisService.setVolume(player, 0.5);
+                }
                 event.accepted = true;
             }
         }
