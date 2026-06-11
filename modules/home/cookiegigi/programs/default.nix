@@ -12,5 +12,6 @@
     ./lazygit.nix
     ./nix-direnv.nix
     ./tidal.nix
+    ./yazi.nix
   ];
 }

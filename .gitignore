@@ -8,3 +8,4 @@ secrets/*.dec
 secrets/*.plain
 backup-sops-key.txt
 *-age-key.txt
+/.opencode/plans
