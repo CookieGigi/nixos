@@ -11,6 +11,19 @@
     "colors-dark" = {
       alpha = 0.8;
     };
+    cursor = {
+      style = "beam";
+      blink = "yes";
+      blink-rate = 500;
+      beam-thickness = 1.5;
+    };
+    mouse = {
+      hide-when-typing = "yes";
+    };
+    url = {
+      launch = "xdg-open \${url}";
+      osc8-underline = "url-mode";
+    };
   };
 in {
   programs.foot = {
