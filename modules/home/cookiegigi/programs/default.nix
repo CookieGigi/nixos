@@ -13,5 +13,6 @@
     ./nix-direnv.nix
     ./tidal.nix
     ./yazi.nix
+    ./foot.nix
   ];
 }
