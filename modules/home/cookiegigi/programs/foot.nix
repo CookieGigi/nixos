@@ -17,7 +17,7 @@ in {
   };
 
   xdg.configFile."foot/foot.ini".text = lib.concatStrings [
-    "include = ${pkgs.foot}/share/foot/themes/catppuccin-macchiato\n\n"
+    "include = ${pkgs.foot.themes}/share/foot/themes/catppuccin-macchiato\n\n"
     (lib.readFile (ini.generate "foot-base.ini" settings))
   ];
 
