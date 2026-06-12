@@ -75,8 +75,8 @@ animations {
 binds {
     Mod+Shift+Comma { show-hotkey-overlay; }
 
-    // Terminal: ghostty
-    Mod+T hotkey-overlay-title="Terminal" {  spawn "ghostty"; }
+    // Terminal: foot
+    Mod+T hotkey-overlay-title="Terminal" {  spawn "foot"; }
     // App launcher: quickshell
     Mod+D  hotkey-overlay-title="App launcher"  {  spawn "qs" "-c" "bar" "ipc" "call" "launcher" "toggle"; }
     Mod+Shift+W  hotkey-overlay-title="Network Menu"  {  spawn "qs" "-c" "bar" "ipc" "call" "network" "toggle"; }
