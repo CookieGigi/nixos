@@ -1,16 +1,25 @@
-{pkgs, ...}: {
-  programs.foot = {
-    enable = true;
-
-    settings = {
-      main = {
-        font = "JetBrains Mono:size=12";
-        alpha = 0.8;
-      };
-
-      include = "${pkgs.foot}/share/foot/themes/catppuccin-macchiato";
+{
+  pkgs,
+  lib,
+  ...
+}: let
+  ini = pkgs.formats.ini {listsAsDuplicateKeys = true;};
+  settings = {
+    main = {
+      font = "JetBrains Mono:size=12";
+      alpha = 0.8;
     };
   };
+in {
+  programs.foot = {
+    enable = true;
+    settings = {}; # Disable auto-generation so we can prepend `include`
+  };
+
+  xdg.configFile."foot/foot.ini".text = lib.concatStrings [
+    "include = ${pkgs.foot}/share/foot/themes/catppuccin-macchiato\n\n"
+    (lib.readFile (ini.generate "foot-base.ini" settings))
+  ];
 
   # ── Font dependency ────────────────────────────────────────────
   home.packages = [
