@@ -39,7 +39,10 @@
       paths = ["/home/cookiegigi/.config/opencode/skills"];
     };
 
-    plugin = ["@tarquinen/opencode-dcp@latest"];
+    plugin = [
+      "@tarquinen/opencode-dcp@latest"
+      "cc-safety-net"
+    ];
 
     username = "cookiegigi";
 
