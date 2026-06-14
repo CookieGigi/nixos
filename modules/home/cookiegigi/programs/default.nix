@@ -13,5 +13,6 @@
     ./tidal.nix
     ./yazi.nix
     ./foot.nix
+    ./chromium.nix
   ];
 }
