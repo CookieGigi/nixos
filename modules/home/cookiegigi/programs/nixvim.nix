@@ -20,6 +20,19 @@
       };
     };
 
+    # ── Diagnostics ───────────────────────────────────────────────
+    diagnostic.settings = {
+      virtual_text = true;
+      signs = true;
+      underline = true;
+      update_in_insert = false;
+      severity_sort = true;
+      float = {
+        border = "rounded";
+        source = "if_many";
+      };
+    };
+
     # ── Plugins ─────────────────────────────────────────────────
     plugins = {
       # LSP
@@ -32,8 +45,70 @@
             package = pkgs.kdePackages.qttools;
           };
         };
+        keymaps = {
+          silent = true;
+          diagnostic = {
+            "<leader>d" = {
+              action = "open_float";
+              desc = "Open diagnostic float";
+            };
+            "[d" = {
+              action = "goto_prev";
+              desc = "Previous diagnostic";
+            };
+            "]d" = {
+              action = "goto_next";
+              desc = "Next diagnostic";
+            };
+          };
+          lspBuf = {
+            "gd" = {
+              action = "definition";
+              desc = "Go to definition";
+            };
+            "gr" = {
+              action = "references";
+              desc = "Go to references";
+            };
+            "gI" = {
+              action = "implementation";
+              desc = "Go to implementation";
+            };
+            "K" = {
+              action = "hover";
+              desc = "Hover documentation";
+            };
+            "<leader>rn" = {
+              action = "rename";
+              desc = "Rename symbol";
+            };
+            "<leader>ca" = {
+              action = "code_action";
+              desc = "Code action";
+            };
+          };
+        };
       };
       lsp-format.enable = true;
+
+      # Autocompletion (blink-cmp)
+      blink-cmp = {
+        enable = true;
+        setupLspCapabilities = true;
+        settings = {
+          keymap.preset = "super-tab";
+          completion = {
+            accept.auto_brackets.enabled = true;
+            documentation.auto_show = true;
+            ghost_text.enabled = true;
+          };
+          signature.enabled = true;
+          appearance = {
+            use_nvim_cmp_as_default = true;
+            nerd_font_variant = "normal";
+          };
+        };
+      };
 
       # Treesitter
       treesitter = {
