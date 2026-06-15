@@ -6,8 +6,8 @@
     viAlias = true;
 
     # ── Leader key ──────────────────────────────────────────────
-    globals.mapleader = ",";
-    globals.maplocalleader = ",";
+    globals.mapleader = " ";
+    globals.maplocalleader = " ";
 
     # ── Line numbers ──────────────────────────────────────────────
     opts = {
