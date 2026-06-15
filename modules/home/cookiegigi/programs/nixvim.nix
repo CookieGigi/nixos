@@ -5,6 +5,10 @@
     vimAlias = true;
     viAlias = true;
 
+    # ── Leader key ──────────────────────────────────────────────
+    globals.mapleader = ",";
+    globals.maplocalleader = ",";
+
     # ── Line numbers ──────────────────────────────────────────────
     opts = {
       number = true;
@@ -35,6 +39,9 @@
 
     # ── Plugins ─────────────────────────────────────────────────
     plugins = {
+      # Which-key (show available keymaps after leader)
+      which-key.enable = true;
+
       # LSP
       lsp = {
         enable = true;
