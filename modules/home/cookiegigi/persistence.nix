@@ -8,6 +8,10 @@ _: {
       "nixos"
       "Projects"
       ".cache/uad/backups/"
+      # Neovim state
+      ".local/share/nvim"
+      ".local/state/nvim"
+      ".cache/nvim"
     ];
   };
 }

@@ -37,6 +37,10 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+    };
   };
 
   outputs = {
@@ -50,6 +54,7 @@
     sops-nix,
     pixie-sddm,
     git-hooks,
+    nixvim,
     ...
   }: {
     checks.x86_64-linux.pre-commit-check = git-hooks.lib.x86_64-linux.run {
@@ -93,7 +98,7 @@
 
     nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = {inherit pixie-sddm;};
+      specialArgs = {inherit pixie-sddm nixvim;};
       modules = [
         ./hosts/xps/configuration.nix
         impermanence.nixosModules.impermanence

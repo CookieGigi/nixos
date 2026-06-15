@@ -1,7 +1,7 @@
 {
   imports = [
     ./git.nix
-    ./vim.nix
+    ./nixvim.nix
     ./firefox.nix
     ./zsh.nix
     ./niri

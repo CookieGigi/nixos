@@ -1,6 +1,7 @@
-_: {
+{nixvim, ...}: {
   home-manager.users.cookiegigi = {
     imports = [
+      nixvim.homeModules.nixvim
       ./packages.nix
       ./persistence.nix
       ./programs
