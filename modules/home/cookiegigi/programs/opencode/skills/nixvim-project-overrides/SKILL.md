@@ -159,6 +159,36 @@ projectNvim = nixvim.legacyPackages.x86_64-linux.makeNixvim {
 };
 ```
 
+### Adding Project-Specific Formatters and Linters
+
+Use `plugins.conform-nvim` for formatting and `plugins.lint` for linting in project overrides.
+
+**Important:** The base config should use `conform-nvim` instead of `lsp-format` to avoid conflicts. Set `autoInstall.enable = false` if you prefer manual package management.
+
+**Example: Adding qmlformat for QML files:**
+
+```nix
+projectNvim = nixvim.legacyPackages.x86_64-linux.makeNixvim {
+  imports = [ ./modules/home/cookiegigi/programs/nixvim/base.nix ];
+  plugins = {
+    lsp.servers.qmlls = {
+      enable = true;
+      package = pkgs.kdePackages.qttools;
+    };
+    conform-nvim.settings.formatters_by_ft.qml = ["qmlformat"];
+  };
+};
+```
+
+**Example: Adding a project-specific linter:**
+
+```nix
+projectNvim = nixvim.legacyPackages.x86_64-linux.makeNixvim {
+  imports = [ ./modules/home/cookiegigi/programs/nixvim/base.nix ];
+  plugins.lint.lintersByFt.terraform = ["tflint"];
+};
+```
+
 ### Using in a Different Project's Flake
 
 For a project outside the NixOS repo (e.g., `~/Projects/my-project/flake.nix`):

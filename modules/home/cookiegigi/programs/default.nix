@@ -14,5 +14,6 @@
     ./yazi.nix
     ./foot.nix
     ./chromium.nix
+    ./devtools.nix
   ];
 }

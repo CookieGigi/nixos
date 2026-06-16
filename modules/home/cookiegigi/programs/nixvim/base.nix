@@ -1,4 +1,4 @@
-_: {
+{lib, ...}: {
   # ── Leader key ──────────────────────────────────────────────
   globals.mapleader = " ";
   globals.maplocalleader = " ";
@@ -86,7 +86,50 @@ _: {
         };
       };
     };
-    lsp-format.enable = true;
+
+    # Conform (formatting)
+    conform-nvim = {
+      enable = true;
+      autoInstall.enable = false;
+      settings = {
+        format_on_save = {
+          lsp_format = "fallback";
+          timeout_ms = 500;
+        };
+        formatters_by_ft = {
+          nix = ["alejandra"];
+        };
+      };
+    };
+
+    # Lint (linters)
+    lint = {
+      enable = true;
+      autoInstall.enable = false;
+      lintersByFt = {
+        nix = ["statix" "deadnix"];
+      };
+      linters = {
+        statix = {
+          cmd = "statix";
+          args = ["check" "-i" "--stdin"];
+          stdin = true;
+        };
+        deadnix = {
+          cmd = "deadnix";
+          args = ["-"];
+          stdin = true;
+        };
+      };
+      autoCmd = {
+        event = ["BufWritePost" "InsertLeave"];
+        callback = lib.nixvim.mkRaw ''
+          function()
+            require('lint').try_lint()
+          end
+        '';
+      };
+    };
 
     # Autocompletion (blink-cmp)
     blink-cmp = {
@@ -178,6 +221,15 @@ _: {
       key = "<Right>";
       action = "<Nop>";
       mode = "i";
+    }
+    # Format
+    {
+      key = "<leader>f";
+      action = "<cmd>lua require('conform').format({ async = true, lsp_format = 'fallback' })<cr>";
+      mode = ["n" "v"];
+      options = {
+        desc = "Format buffer";
+      };
     }
   ];
 }

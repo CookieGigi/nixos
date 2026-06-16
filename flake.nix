@@ -150,9 +150,12 @@
         imports = [
           ./modules/home/cookiegigi/programs/nixvim/base.nix
         ];
-        plugins.lsp.servers.qmlls = {
-          enable = true;
-          package = pkgs.kdePackages.qttools;
+        plugins = {
+          lsp.servers.qmlls = {
+            enable = true;
+            package = pkgs.kdePackages.qttools;
+          };
+          conform-nvim.settings.formatters_by_ft.qml = ["qmlformat"];
         };
       };
     in
