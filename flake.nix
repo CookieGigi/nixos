@@ -144,6 +144,17 @@
     devShells.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       inherit (self.checks.x86_64-linux.pre-commit-check) shellHook enabledPackages;
+
+      # Project-specific Neovim with qmlls for QML development in this repo
+      projectNvim = nixvim.legacyPackages.x86_64-linux.makeNixvim {
+        imports = [
+          ./modules/home/cookiegigi/programs/nixvim/base.nix
+        ];
+        plugins.lsp.servers.qmlls = {
+          enable = true;
+          package = pkgs.kdePackages.qttools;
+        };
+      };
     in
       pkgs.mkShell {
         shellHook = ''
@@ -168,6 +179,7 @@
             sops
             age
             kdePackages.qtdeclarative
+            projectNvim
           ]);
       };
 
