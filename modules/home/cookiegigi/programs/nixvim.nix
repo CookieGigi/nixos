@@ -103,7 +103,7 @@
         enable = true;
         setupLspCapabilities = true;
         settings = {
-          keymap.preset = "super-tab";
+          keymap.preset = "none";
           completion = {
             accept.auto_brackets.enabled = true;
             documentation.auto_show = true;
