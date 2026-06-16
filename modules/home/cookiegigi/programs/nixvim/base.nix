@@ -107,12 +107,19 @@
       enable = true;
       autoInstall.enable = false;
       lintersByFt = {
-        nix = ["statix" "deadnix"];
+        nix = [
+          "statix"
+          "deadnix"
+        ];
       };
       linters = {
         statix = {
           cmd = "statix";
-          args = ["check" "-i" "--stdin"];
+          args = [
+            "check"
+            "-i"
+            "--stdin"
+          ];
           stdin = true;
         };
         deadnix = {
@@ -122,7 +129,10 @@
         };
       };
       autoCmd = {
-        event = ["BufWritePost" "InsertLeave"];
+        event = [
+          "BufWritePost"
+          "InsertLeave"
+        ];
         callback = lib.nixvim.mkRaw ''
           function()
             require('lint').try_lint()
@@ -136,7 +146,7 @@
       enable = true;
       setupLspCapabilities = true;
       settings = {
-        keymap.preset = "none";
+        keymap.preset = "default";
         completion = {
           accept.auto_brackets.enabled = true;
           documentation.auto_show = true;
@@ -226,7 +236,10 @@
     {
       key = "<leader>f";
       action = "<cmd>lua require('conform').format({ async = true, lsp_format = 'fallback' })<cr>";
-      mode = ["n" "v"];
+      mode = [
+        "n"
+        "v"
+      ];
       options = {
         desc = "Format buffer";
       };
