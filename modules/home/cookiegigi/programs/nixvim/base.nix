@@ -178,7 +178,17 @@
     };
 
     # Snacks (picker + lazygit)
-    snacks.enable = true;
+    snacks = {
+      enable = true;
+      settings = {
+        picker = {
+          enabled = true;
+        };
+        lazygit = {
+          enabled = true;
+        };
+      };
+    };
 
     # Yazi file manager integration
     yazi.enable = true;
@@ -253,6 +263,31 @@
       ];
       options = {
         desc = "Format buffer";
+      };
+    }
+    # Snacks pickers
+    {
+      key = "<leader>ff";
+      action = "<cmd>lua Snacks.picker.files()<cr>";
+      mode = "n";
+      options = {
+        desc = "Find files";
+      };
+    }
+    {
+      key = "<leader>fg";
+      action = "<cmd>lua Snacks.picker.grep()<cr>";
+      mode = "n";
+      options = {
+        desc = "Live grep";
+      };
+    }
+    {
+      key = "<leader>gg";
+      action = "<cmd>lua Snacks.lazygit()<cr>";
+      mode = "n";
+      options = {
+        desc = "Lazygit";
       };
     }
   ];
