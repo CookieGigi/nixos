@@ -157,6 +157,17 @@
           use_nvim_cmp_as_default = true;
           nerd_font_variant = "normal";
         };
+        sources = {
+          default = ["lsp" "path" "snippets" "buffer"];
+          providers = {
+            buffer = {
+              score_offset = -7;
+            };
+            lsp = {
+              fallbacks = [];
+            };
+          };
+        };
       };
     };
 
