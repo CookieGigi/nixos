@@ -15,5 +15,6 @@
     ./foot.nix
     ./chromium.nix
     ./devtools.nix
+    ./heroic.nix
   ];
 }
