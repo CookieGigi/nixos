@@ -5,6 +5,8 @@
     vimAlias = true;
     viAlias = true;
 
+    nixpkgs.useGlobalPackages = true;
+
     extraPackages = with pkgs; [
       tree-sitter
     ];
