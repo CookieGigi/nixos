@@ -116,6 +116,7 @@
         ./modules/clipboard/wclip.nix
         ./modules/desktop/niri.nix
         ./modules/audio.nix
+        ./modules/bluetooth.nix
         ./modules/localization/frenglish.nix
         ./modules/programs/programs.nix
         ./modules/users/cookiegigi.nix
