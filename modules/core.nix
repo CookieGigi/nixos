@@ -37,6 +37,12 @@
   # Allow proprietary Nvidia drivers
   nixpkgs.config.allowUnfree = true;
 
+  # Enable OpenGL/Vulkan (32-bit support required for Proton/Wine games)
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
