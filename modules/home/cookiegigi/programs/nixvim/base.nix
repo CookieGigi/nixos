@@ -33,51 +33,22 @@
 
   # ── Custom commands ─────────────────────────────────────────
   extraConfigLua = ''
-    vim.api.nvim_create_user_command("LspInfo", function()
+    vim.api.nvim_create_user_command("LspRestart", function()
       local clients = vim.lsp.get_clients({ bufnr = 0 })
       if #clients == 0 then
         vim.notify("No LSP clients attached to this buffer", vim.log.levels.INFO)
         return
       end
 
-      local lines = { "Attached LSP clients:", "" }
       for _, client in ipairs(clients) do
-        table.insert(lines, "• " .. client.name)
-        table.insert(lines, "  id: " .. client.id)
-        table.insert(lines, "  root_dir: " .. (client.config.root_dir or "N/A"))
-        table.insert(lines, "  filetypes: " .. vim.inspect(client.config.filetypes or {}))
-        table.insert(lines, "")
+        vim.lsp.stop_client(client.id)
       end
 
-      local buf = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-      vim.bo[buf].modifiable = false
-      vim.bo[buf].buftype = "nofile"
-
-      local width = math.min(80, vim.o.columns - 4)
-      local height = math.min(#lines + 2, vim.o.lines - 4)
-      local col = math.floor((vim.o.columns - width) / 2)
-      local row = math.floor((vim.o.lines - height) / 2)
-
-      local win = vim.api.nvim_open_win(buf, true, {
-        relative = "editor",
-        width = width,
-        height = height,
-        col = col,
-        row = row,
-        style = "minimal",
-        border = "rounded",
-        title = " LspInfo ",
-        title_pos = "center",
-      })
-
-      vim.keymap.set("n", "q", function()
-        vim.api.nvim_win_close(win, true)
-      end, { buffer = buf, silent = true })
-      vim.keymap.set("n", "<Esc>", function()
-        vim.api.nvim_win_close(win, true)
-      end, { buffer = buf, silent = true })
-    end, { desc = "Show attached LSP clients" })
+      vim.defer_fn(function()
+        vim.cmd("edit")
+        vim.notify("LSP restarted", vim.log.levels.INFO)
+      end, 300)
+    end, { desc = "Restart LSP clients" })
   '';
 
   # ── Plugins ─────────────────────────────────────────────────
