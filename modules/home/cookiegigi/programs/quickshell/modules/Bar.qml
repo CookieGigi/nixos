@@ -59,6 +59,13 @@ Scope {
             alignment: "left"
         }
 
+        PrayerPopup {
+            id: prayerPopup
+            screen: modelData
+            anchorWidget: prayerWidget
+            alignment: "left"
+        }
+
         MediaPopup {
             id: mediaPopup
             screen: modelData
@@ -92,14 +99,20 @@ Scope {
                 rightMargin: 16
             }
 
-            // Left: clock
+            // Left: clock + prayer
             FlexboxLayout {
                 justifyContent: FlexboxLayout.JustifyStart
+                columnGap: 8
                 Layout.preferredWidth: columnWidth
                 Layout.maximumWidth: columnWidth
                 Layout.fillHeight: true
                 ClockWidget {
                     id: clockWidget
+                    Layout.fillHeight: true
+                    screen: modelData
+                }
+                PrayerWidget {
+                    id: prayerWidget
                     Layout.fillHeight: true
                     screen: modelData
                 }
@@ -163,6 +176,7 @@ Scope {
         PopupRegistry.register(modelData, "power", powerMenu);
         PopupRegistry.register(modelData, "network", networkMenu);
         PopupRegistry.register(modelData, "calendar", calendarPopup);
+        PopupRegistry.register(modelData, "prayer", prayerPopup);
         PopupRegistry.register(modelData, "media", mediaPopup);
         PopupRegistry.register(modelData, "volume", volumePopup);
         PopupRegistry.register(modelData, "battery", batteryPopup);

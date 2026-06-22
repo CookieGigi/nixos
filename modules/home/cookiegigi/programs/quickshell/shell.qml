@@ -66,6 +66,14 @@ ShellRoot {
         }
     }
 
+    IpcHandler {
+        target: "prayer"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.togglePrayer(screen);
+        }
+    }
+
     Variants {
         model: Quickshell.screens
         Bar {

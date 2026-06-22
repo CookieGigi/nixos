@@ -106,4 +106,7 @@ Singleton {
     function toggleBattery(screen) {
         toggle(screen, "battery");
     }
+    function togglePrayer(screen) {
+        toggle(screen, "prayer");
+    }
 }

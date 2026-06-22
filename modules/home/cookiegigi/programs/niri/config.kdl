@@ -85,6 +85,7 @@ binds {
     Mod+Shift+C hotkey-overlay-title="Calendar Popup" { spawn "qs" "-c" "bar" "ipc" "call" "calendar" "toggle"; }
     Mod+Shift+A hotkey-overlay-title="Volume Popup" { spawn "qs" "-c" "bar" "ipc" "call" "volume" "toggle"; }
     Mod+Shift+B hotkey-overlay-title="Battery Popup" { spawn "qs" "-c" "bar" "ipc" "call" "battery" "toggle"; }
+    Mod+Shift+Y hotkey-overlay-title="Prayer Times" { spawn "qs" "-c" "bar" "ipc" "call" "prayer" "toggle"; }
     // Screen locker: swaylock
     Super+Alt+L { spawn "swaylock"; }
 
