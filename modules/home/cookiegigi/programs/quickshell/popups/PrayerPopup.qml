@@ -9,6 +9,7 @@ PopupBase {
     title: "Prayer Times"
     popupId: "prayer"
     popupWidth: 280
+    implicitHeight: 280
 
     content: ColumnLayout {
         anchors {
