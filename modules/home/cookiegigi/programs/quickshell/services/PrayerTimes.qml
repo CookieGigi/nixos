@@ -58,7 +58,7 @@ Singleton {
                 }
             }
         }
-        onExited: {
+        onExited: exitCode => {
             if (exitCode !== 0) {
                 console.warn("PrayerTimes: prayer-times-json exited with code", exitCode);
             }
