@@ -3,7 +3,7 @@
 
 HOST = xps
 
-.PHONY: switch build check fmt iso disko edit-secrets quickshell-dev
+.PHONY: switch build check fmt iso disko edit-secrets quickshell-dev update upgrade
 
 # Rebuild and activate the system configuration
 switch:
@@ -32,6 +32,13 @@ disko:
 # Open the encrypted secrets file for editing (via sops)
 edit-secrets:
 	sudo nix run .#edit-secrets
+
+# Update flake inputs (nixpkgs, home-manager, etc.) — bumps flake.lock
+update:
+	nix flake update
+
+# Update flake inputs and rebuild+activate the system
+upgrade: update switch
 
 # Run quickshell bar from repo source for instant hot-reload during development
 quickshell-dev:
