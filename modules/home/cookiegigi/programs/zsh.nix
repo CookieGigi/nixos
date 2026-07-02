@@ -65,6 +65,11 @@
 
       # Order 1000: general config (completion, prompt, bindkeys)
       ''
+        # ── Environment variables ───────────────────────────────
+        # Force proton-pass-cli to use D-Bus Secret Service instead of
+        # the kernel keyring, which fails with EACCES on Linux 7.x.
+        export PROTON_PASS_LINUX_KEYRING="dbus"
+
         # ── Completion ──────────────────────────────────────────
         # Case-insensitive completion
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{A-Z}={a-z}'

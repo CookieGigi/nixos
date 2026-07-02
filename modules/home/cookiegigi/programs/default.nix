@@ -16,5 +16,6 @@
     ./chromium.nix
     ./devtools.nix
     ./heroic.nix
+    ./proton.nix
   ];
 }

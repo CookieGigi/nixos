@@ -8,6 +8,8 @@ _: {
       "nixos"
       "Projects"
       ".cache/uad/backups/"
+      # GNOME Keyring (secret service) persistence for proton-pass-cli
+      ".local/share/keyrings"
       # Neovim state
       ".local/share/nvim"
       ".local/state/nvim"
