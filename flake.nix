@@ -123,6 +123,7 @@
         ./modules/home
         ./modules/networks/wifi-home.nix
         ./modules/services.nix
+        ./modules/ssh.nix
       ];
     };
 

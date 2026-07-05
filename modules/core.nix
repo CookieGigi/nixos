@@ -24,10 +24,6 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
-  # SSH
-  programs.ssh.startAgent = true;
-  services.gnome.gcr-ssh-agent.enable = false;
-
   # UPower for battery monitoring
   services.upower.enable = true;
 
