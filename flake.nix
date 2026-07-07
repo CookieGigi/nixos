@@ -97,48 +97,91 @@
         ${pkgs.lib.getExe package} run --all-files --config ${configFile}
       '';
 
-    nixosConfigurations.xps = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {inherit pixie-sddm nixvim;};
-      modules = [
-        ./hosts/xps/configuration.nix
-        impermanence.nixosModules.impermanence
-        disko.nixosModules.disko
-        home-manager.nixosModules.home-manager
-        nixos-hardware.nixosModules.dell-xps-15-9530
-        nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
-        nur.modules.nixos.default
-        sops-nix.nixosModules.sops
-        ./modules/sops.nix
-        ./modules/core.nix
-        ./modules/tpm.nix
-        ./modules/clipboard/xclip.nix
-        ./modules/clipboard/wclip.nix
-        ./modules/desktop/niri.nix
-        ./modules/audio.nix
-        ./modules/bluetooth.nix
-        ./modules/localization/frenglish.nix
-        ./modules/programs/programs.nix
-        ./modules/users/cookiegigi.nix
-        ./modules/home
-        ./modules/networks/wifi-home.nix
-        ./modules/services.nix
-        ./modules/ssh.nix
-      ];
-    };
+    nixosConfigurations = {
+      xps = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit pixie-sddm nixvim;};
+        modules = [
+          ./hosts/xps/configuration.nix
+          impermanence.nixosModules.impermanence
+          disko.nixosModules.disko
+          home-manager.nixosModules.home-manager
+          nixos-hardware.nixosModules.dell-xps-15-9530
+          nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
+          nur.modules.nixos.default
+          sops-nix.nixosModules.sops
+          ./modules/sops.nix
+          ./modules/core.nix
+          ./modules/tpm.nix
+          ./modules/clipboard/xclip.nix
+          ./modules/clipboard/wclip.nix
+          ./modules/desktop/niri.nix
+          ./modules/audio.nix
+          ./modules/bluetooth.nix
+          ./modules/localization/frenglish.nix
+          ./modules/programs/programs.nix
+          ./modules/users/cookiegigi.nix
+          ./modules/home
+          ./modules/networks/wifi-home.nix
+          ./modules/services.nix
+          ./modules/ssh.nix
+        ];
+      };
 
-    nixosConfigurations.xps-iso = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        # 1. iso base
-        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-        # 2. disko config
-        ./hosts/xps/disko.nix
-        # 3. disko module (need for disko.nix to work)
-        disko.nixosModules.disko
-        # 4. overrides (new file!)
-        ./modules/iso.nix
-      ];
+      server = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit nixvim;};
+        modules = [
+          ./hosts/server/configuration.nix
+          impermanence.nixosModules.impermanence
+          disko.nixosModules.disko
+          home-manager.nixosModules.home-manager
+          nixos-hardware.nixosModules.msi-b550-tomahawk
+          nixos-hardware.nixosModules.common-gpu-nvidia
+          nixos-hardware.nixosModules.common-pc-ssd
+          sops-nix.nixosModules.sops
+          ./modules/sops.nix
+          ./modules/core.nix
+          ./modules/tpm.nix
+          ./modules/clipboard/xclip.nix
+          ./modules/clipboard/wclip.nix
+          ./modules/bluetooth.nix
+          ./modules/localization/frenglish.nix
+          ./modules/programs/programs.nix
+          ./modules/users/cookiegigi.nix
+          ./modules/home/default-server.nix
+          ./modules/services.nix
+          ./modules/ssh.nix
+        ];
+      };
+
+      xps-iso = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          # 1. iso base
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+          # 2. disko config
+          ./hosts/xps/disko.nix
+          # 3. disko module (need for disko.nix to work)
+          disko.nixosModules.disko
+          # 4. overrides (new file!)
+          ./modules/iso.nix
+        ];
+      };
+
+      server-iso = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          # 1. iso base
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+          # 2. disko config
+          ./hosts/server/disko.nix
+          # 3. disko module (need for disko.nix to work)
+          disko.nixosModules.disko
+          # 4. overrides (new file!)
+          ./modules/iso.nix
+        ];
+      };
     };
 
     packages.x86_64-linux = {
