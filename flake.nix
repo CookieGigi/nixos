@@ -137,7 +137,6 @@
           disko.nixosModules.disko
           home-manager.nixosModules.home-manager
           nixos-hardware.nixosModules.msi-b550-tomahawk
-          nixos-hardware.nixosModules.common-gpu-nvidia
           nixos-hardware.nixosModules.common-pc-ssd
           sops-nix.nixosModules.sops
           ./modules/sops.nix
