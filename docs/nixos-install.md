@@ -1,149 +1,355 @@
 # NixOS Install Walkthrough
 
-> How to install NixOS on a new machine using this flake, from ISO creation to a remotely manageable system.
+> Complete guide to installing NixOS on a new machine using this flake.
 >
-> Based on the `server` (MSI B550 Tomahawk) install. Adapt host name, disk paths, and hardware config for other machines.
+> This covers the full journey: from creating the host configuration, building the install ISO, running disko to partition disks, setting up secrets with sops-nix, enrolling TPM2 for LUKS auto-unlock, and establishing remote access.
+>
+> **Example host**: `server` (MSI B550 Tomahawk, headless server). The same pattern applies to any new machine — adapt disk paths, hostname, and hardware config.
 
 ---
 
-## Overview
+## What you're building
 
-1. Build the install ISO from this flake.
-2. Boot the ISO on the target machine.
-3. Partition, format, and mount disks declaratively with **disko**.
-4. Copy the **sops age key** so activation can decrypt the user password.
-5. Run `nixos-install`.
-6. Reboot, then enroll **TPM2** for headless LUKS auto-unlock.
-7. Enable **SSH** and verify remote access.
+This is a **declarative, reproducible NixOS system** with the following properties:
+
+| Feature | How it's implemented |
+|---------|----------------------|
+| **Declarative disks** | `disko` — one command partitions, formats, and mounts everything |
+| **Full-disk encryption** | LUKS on the system disk, with optional TPM2 auto-unlock |
+| **Ephemeral root** | `/` is tmpfs (impermanence) — reboot wipes root, state lives on `/persist` |
+| **Atomic secrets** | `sops-nix` — encrypted secrets in git, decrypted at boot |
+| **Remote management** | SSH with key-only auth, managed from your workstation |
+| **Reproducible config** | Everything in the flake — rebuild any time, same result |
+
+**Two-machine workflow**:
+
+- **xps** (workstation): Edit config → `nix fmt` → commit → push to GitHub
+- **server** (new machine): `git pull` → `sudo nixos-rebuild switch --flake .#server`
 
 ---
 
 ## Prerequisites
 
-- The target host config exists under `hosts/<host>/` (e.g. `hosts/server/`).
-- `disko.nix` lists the correct disk device paths (`/dev/nvme0n1`, `/dev/sda`, etc.). **Edit before install if they differ**.
-- `hardware-configuration.nix` is already generated for the target machine (or you are ready to regenerate it after install).
-- The **sops age key** is accessible: either the primary key on your existing machine (`/persist/var/lib/sops-nix/key.txt`) or the backup key from Proton Pass.
-- The flake is clean and pushed to `origin/main` so the installer can clone it.
+Before starting, ensure:
+
+1. **Host config directory exists**: `hosts/<hostname>/` with at minimum:
+   - `disko.nix` — disk layout (check device paths!)
+   - `hardware-configuration.nix` — `nixos-generate-config` output
+   - `configuration.nix` — host-specific settings
+
+2. **sops is set up**: The `secrets/secrets.yaml` file contains at least:
+   - `user-password` — the `cookiegigi` user's password hash
+   - Your age public key is in `.sops.yaml` as a recipient
+
+3. **You have the age private key**: Either:
+   - Primary: `/persist/var/lib/sops-nix/key.txt` on your xps
+   - Backup: Stored in Proton Pass (or your password manager)
+
+4. **The flake builds**: On your xps, verify:
+   ```bash
+   cd ~/nixos
+   nix flake check
+   ```
+
+5. **Flake is pushed to origin/main**: The installer will clone from GitHub.
 
 ---
 
-## 1. Build the ISO
+## Phase 1: Create the host configuration (on xps)
 
-On your existing NixOS machine (xps):
+If this is a brand new host, you need to create its configuration first.
+
+### 1a. Create the host directory
 
 ```bash
 cd ~/nixos
-nix build .#nixosConfigurations.<host>-iso.config.system.build.isoImage
-# e.g. for the server:
-# nix build .#nixosConfigurations.server-iso.config.system.build.isoImage
+mkdir -p hosts/<hostname>
 ```
 
-Flash the resulting `.iso` to a USB drive (e.g. with `dd` or `cp`).
+### 1b. Create `disko.nix`
 
-**Optional — fix the ISO for flakes:**
+This is the most critical file. **Triple-check the device paths** (`/dev/nvme0n1`, `/dev/sda`, etc.) — disko will erase whatever you point it at.
 
-If your ISO lacks flakes (older installer or missing `nix.settings.experimental-features`), add this to `modules/iso.nix` before building:
+Example for the server (adapt as needed):
 
 ```nix
-nix.settings.experimental-features = ["nix-command" "flakes"];
+{
+  disko.devices = {
+    disk = {
+      # NVMe - Boot, OS, Nix Store
+      main = {
+        type = "disk";
+        device = "/dev/nvme0n1";  # <-- VERIFY THIS
+        content = {
+          type = "gpt";
+          partitions = {
+            ESP = {
+              size = "1G";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+              };
+            };
+            luks = {
+              size = "100%";
+              content = {
+                type = "luks";
+                name = "cookieluks";
+                settings = {allowDiscards = true;};
+                content = {
+                  type = "btrfs";
+                  subvolumes = {
+                    "/@persist" = {
+                      mountOptions = ["compress=zstd:1" "noatime"];
+                      mountpoint = "/persist";
+                    };
+                    "/@data" = {
+                      mountOptions = ["compress=zstd:1" "noatime"];
+                      mountpoint = "/data";
+                    };
+                    "/@nix" = {
+                      mountOptions = ["compress=zstd:1" "noatime"];
+                      mountpoint = "/nix";
+                    };
+                    "/@snapshots" = {};
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+
+      # Optional: additional disk for media/backup
+      media = {
+        type = "disk";
+        device = "/dev/sda";  # <-- VERIFY THIS
+        content = {
+          type = "gpt";
+          partitions = {
+            primary = {
+              size = "100%";
+              content = {
+                type = "btrfs";
+                subvolumes = {
+                  "/@media" = {
+                    mountOptions = ["compress=lzo" "noatime"];
+                    mountpoint = "/media";
+                  };
+                  "/@backup" = {
+                    mountOptions = ["compress=lzo" "noatime"];
+                    mountpoint = "/backup";
+                  };
+                  "/@downloads" = {
+                    mountOptions = ["compress=lzo" "noatime"];
+                    mountpoint = "/downloads";
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+
+    nodev = {
+      "/" = {
+        fsType = "tmpfs";
+        mountOptions = ["size=4G" "mode=755"];
+      };
+    };
+  };
+}
+```
+
+> **Mountpoint shadowing gotcha**: Each subvolume's `mountpoint` must be unique. We previously had `@data` mounting to `/persist` (shadowing `@persist`) and `@backup` mounting to `/media` (shadowing `@media`). Ensure each mountpoint is distinct.
+
+### 1c. Generate `hardware-configuration.nix`
+
+On the target machine (from a live environment or another Linux):
+
+```bash
+sudo nixos-generate-config --root /mnt
+# Then copy /mnt/etc/nixos/hardware-configuration.nix to your flake
+```
+
+Or manually create it based on `nixos-generate-config` output. Key things to verify:
+- `boot.initrd.availableKernelModules` includes storage drivers (`nvme`, `sd_mod`, `ahci`, etc.)
+- `hardware.cpu.amd.updateMicrocode` (for AMD) or `hardware.cpu.intel.updateMicrocode` (for Intel)
+- `nixpkgs.hostPlatform` matches your architecture
+
+### 1d. Create `configuration.nix`
+
+Minimal host-specific configuration:
+
+```nix
+{...}: {
+  imports = [
+    ./hardware-configuration.nix
+    ./disko.nix
+  ];
+
+  networking.hostName = "<hostname>";
+  networking.domain = "cookiegigi.com";
+
+  system.stateVersion = "25.11";  # Set to current NixOS version
+}
+```
+
+### 1e. Add the host to `flake.nix`
+
+In `flake.nix`, add a new `nixosConfigurations.<hostname>` entry. Copy the `server` config as a template:
+
+```nix
+<hostname> = nixpkgs.lib.nixosSystem {
+  system = "x86_64-linux";
+  specialArgs = {inherit nixvim;};
+  modules = [
+    ./hosts/<hostname>/configuration.nix
+    impermanence.nixosModules.impermanence
+    disko.nixosModules.disko
+    home-manager.nixosModules.home-manager
+    # Add hardware-specific modules from nixos-hardware if available
+    sops-nix.nixosModules.sops
+    ./modules/sops.nix
+    ./modules/core.nix
+    ./modules/tpm.nix          # Skip for desktop/laptop if not needed
+    ./modules/clipboard/xclip.nix
+    ./modules/clipboard/wclip.nix
+    ./modules/bluetooth.nix
+    ./modules/localization/frenglish.nix
+    ./modules/programs/programs.nix
+    ./modules/users/cookiegigi.nix
+    ./modules/home/default-server.nix  # Or default.nix for desktop
+    ./modules/services.nix
+  ];
+};
+```
+
+### 1f. Build and test
+
+```bash
+cd ~/nixos
+nix fmt
+nix flake check
+# Verify the new host evaluates:
+nixos-rebuild build --flake .#<hostname>
+```
+
+Commit and push:
+
+```bash
+git add -A
+git commit -m "feat: add <hostname> host configuration"
+git push
 ```
 
 ---
 
-## 2. Boot the ISO
+## Phase 2: Build the install ISO (on xps)
 
-Insert the USB, boot from it, and wait for the console login.
+```bash
+cd ~/nixos
+nix build .#nixosConfigurations.<hostname>-iso.config.system.build.isoImage
+```
 
-The minimal ISO has a root user with an empty password, but `sshd` is **not** started by default.
+This creates an ISO that:
+- Boots a minimal NixOS environment
+- Includes the disko module (for partitioning)
+- Has the same kernel/modules as your target config
+
+Flash to USB:
+
+```bash
+# Find your USB device (BE CAREFUL)
+lsblk
+
+# Example: /dev/sdX (replace X with actual letter)
+sudo dd if=result/iso/nixos-*.iso of=/dev/sdX bs=4M status=progress
+sync
+```
+
+> **ISO flakes gotcha**: The minimal ISO may not have flakes enabled. If you get `experimental-feature nix-command is disabled` errors on the installer, either:
+> 1. Add `nix.settings.experimental-features = ["nix-command" "flakes"];` to `modules/iso.nix` before building, OR
+> 2. Fix it at runtime with: `echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf`
 
 ---
 
-## 3. First steps on the installer
+## Phase 3: Install (on target machine)
 
-### Network
+### 3a. Boot the ISO
 
-Ethernet (DHCP) should work out of the box:
+Insert USB, boot from it, wait for the console login prompt.
+
+The minimal ISO boots to root with empty password.
+
+### 3b. Initial setup
+
+**Network** (ethernet should work via DHCP):
 
 ```bash
 ping nixos.org
 ```
 
-### Keyboard
-
-If your keyboard is AZERTY (or any non-US layout), set it now:
+**Keyboard** (if non-US layout):
 
 ```bash
-loadkeys fr
+loadkeys fr  # or your layout
 ```
 
-> **Gotcha**: the LUKS passphrase you type here is what you'll enter later at boot. The initrd console may still use a **US layout** unless `console.earlySetup = true` is set in your config. To avoid surprises, pick a passphrase using only characters that are identical in both layouts, or be ready to translate when typing at the boot prompt.
+> **LUKS passphrase gotcha**: The passphrase you create during disko will be needed at every boot until TPM is enrolled. The initrd console uses a US keyboard layout by default (unless your config sets `console.earlySetup = true`). Pick a passphrase using only characters that are the same in US and your layout, or be prepared to translate.
 
-### Verify disk paths
-
-```bash
-lsblk
-```
-
-Confirm the devices match `hosts/<host>/disko.nix` (e.g. `/dev/nvme0n1` and `/dev/sda`).
-If they don't, **edit the file before proceeding** — disko will erase whatever device you point it at.
-
-### Enable flakes (if the ISO doesn't have them)
-
-If `nix --version` or `nix run` complains about `experimental-feature nix-command is disabled`:
+**Enable flakes** (if needed):
 
 ```bash
 echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
 ```
 
-This also covers `nixos-install --flake` later.
+### 3c. Verify disk paths
 
----
+```bash
+lsblk
+```
 
-## 4. Clone the flake
+Confirm the device names match `disko.nix`. If they don't, **abort** and edit the file on your xps, rebuild the ISO, and start over.
+
+### 3d. Clone the flake
 
 ```bash
 git clone https://github.com/CookieGigi/nixos.git
 cd nixos
 ```
 
-If `git` is missing on the minimal ISO:
+If `git` is not available:
 
 ```bash
 nix shell nixpkgs#git
 ```
 
----
+### 3e. Partition with disko
 
-## 5. Partition, format, and mount with disko
-
-This **destroys all data** on the target disks. It also asks you to create the LUKS passphrase.
+**This destroys all data on the target disks.**
 
 ```bash
-sudo nix run .#disko -- --mode disko ./hosts/<host>/disko.nix
+sudo nix run .#disko -- --mode disko ./hosts/<hostname>/disko.nix
 ```
 
+You'll be prompted for the LUKS passphrase. This is the encryption key for your system disk.
+
 Disko will:
-- create GPT partitions,
-- set up LUKS (`cookieluks`),
-- create BTRFS subvolumes,
-- mount everything under `/mnt`.
+1. Create GPT partition tables
+2. Create EFI partition (`/boot`)
+3. Create LUKS container (`cookieluks`)
+4. Create BTRFS subvolumes
+5. Mount everything under `/mnt`
 
-> **Layout check**: after the `16a5082` fix, the server uses:
-> - `@persist` → `/persist`
-> - `@data` → `/data`
-> - `@nix` → `/nix`
-> - `@media` → `/media`
-> - `@backup` → `/backup`
-> - `@downloads` → `/downloads`
+### 3f. Copy the sops age key — **CRITICAL**
 
----
+Without this, `sops-nix` cannot decrypt secrets, and the `cookiegigi` user will have no password.
 
-## 6. Copy the sops age key — **critical**
-
-The install will fail to decrypt `user-password` if the age key is missing. Without it, the `cookiegigi` user has no password.
-
-On the target machine (after disko mounts `/mnt`):
+**Option 1: Type it manually**
 
 ```bash
 sudo mkdir -p /mnt/persist/var/lib/sops-nix
@@ -151,85 +357,91 @@ sudo nano /mnt/persist/var/lib/sops-nix/key.txt
 sudo chmod 600 /mnt/persist/var/lib/sops-nix/key.txt
 ```
 
-Paste the **primary** age private key (from `/persist/var/lib/sops-nix/key.txt` on your xps) or the **backup** key from Proton Pass. Both are valid recipients in `.sops.yaml`.
+**Option 2: Copy via SSH from xps** (recommended, avoids typing a long key)
 
-**Alternative** — copy over SSH from your xps instead of typing:
-
-On the installer, start sshd and set a temporary root password:
+On the installer, start sshd:
 
 ```bash
-passwd
+passwd                    # Set a temporary root password
 systemctl start sshd
-ip a    # note the IP
+ip a                      # Note the IP address
 ```
 
 From the xps:
 
 ```bash
+# Create directory on target
 ssh root@<installer-ip> "mkdir -p /mnt/persist/var/lib/sops-nix"
+
+# Copy the age key
 sudo cat /persist/var/lib/sops-nix/key.txt | ssh root@<installer-ip> \
   "cat > /mnt/persist/var/lib/sops-nix/key.txt && chmod 600 /mnt/persist/var/lib/sops-nix/key.txt"
 ```
 
----
-
-## 7. Install the system
+### 3g. Install NixOS
 
 ```bash
-sudo nixos-install --flake .#<host> --no-root-passwd
+sudo nixos-install --flake .#<hostname> --no-root-passwd
 ```
 
-`--no-root-passwd` skips the interactive root password prompt. The `cookiegigi` user's password comes from sops (`hashedPasswordFile`).
+- `--no-root-passwd`: Skips setting a root password (we use `cookiegigi` + sudo)
+- The `cookiegigi` user's password comes from `sops.secrets."user-password"` (decrypted at activation)
 
----
-
-## 8. Reboot
+### 3h. Reboot
 
 ```bash
 reboot
 ```
 
-Remove the USB. At the LUKS prompt, type your passphrase (mind the US-layout gotcha if applicable).
+Remove the USB drive when prompted.
 
-Log in as `cookiegigi` with the password stored in `secrets/secrets.yaml`.
+At the LUKS prompt, enter the passphrase you set during disko.
+
+Log in as `cookiegigi` with the password from your secrets.
 
 ---
 
-## 9. Post-install setup
+## Phase 4: Post-install configuration (on target machine)
 
-### 9a. Clone the flake on the new machine
-
-The repo must live at `~/nixos` (persisted via `home.persistence."/persist"` in `modules/home/cookiegigi/persistence-server.nix`):
+### 4a. Clone the flake locally
 
 ```bash
 git clone https://github.com/CookieGigi/nixos.git ~/nixos
 ```
 
-### 9b. TPM2 auto-unlock (headless / server hosts)
+This lives on `/persist` (via `home.persistence` in `modules/home/cookiegigi/persistence-server.nix`), so it survives reboots.
 
-`modules/tpm.nix` is already imported by the server config, but the TPM is not yet enrolled into the LUKS slot. Without this, every reboot requires the passphrase at the console.
+### 4b. TPM2 auto-unlock (for headless/server machines)
 
-Check the TPM is visible (if not, enable **fTPM** in the BIOS):
+`modules/tpm.nix` is already imported by the config, but the TPM is not yet enrolled into the LUKS slot.
+
+**Check TPM is available** (if not, enable **fTPM** in BIOS):
 
 ```bash
 sudo systemd-cryptenroll --tpm2-device=list
 ```
 
-Enroll it:
+**Enroll the TPM**:
 
 ```bash
 sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 \
   /dev/disk/by-partlabel/disk-main-luks
 ```
 
-- PCR 7 = secure-boot state (stable across BIOS updates).
-- Add `+0` if you also want to bind to the exact firmware (requires re-enrollment after firmware updates).
+- `pcrs=7`: Binds to Secure Boot state (stable across firmware updates)
+- The existing passphrase remains as a fallback
 
-Then reboot: it should skip the passphrase prompt entirely.
+**Test it**:
 
-### 9c. Enable SSH on the server
+```bash
+reboot
+```
 
-Add to `hosts/<host>/configuration.nix` (done for the server in commit `0082675`):
+If configured correctly, the system boots without prompting for the LUKS passphrase.
+
+### 4c. Configure SSH server
+
+For headless machines, add to `hosts/<hostname>/configuration.nix`:
 
 ```nix
 services.openssh = {
@@ -241,71 +453,160 @@ services.openssh = {
 };
 
 users.users.cookiegigi.openssh.authorizedKeys.keys = [
-  "ssh-ed25519 <your-xps-public-key>"
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDANNAAqC6VheKXQRqV1Nw8XUznTgzPpdmE43/ZRC27g cookiegigi@cookiegigi.com"
 ];
 ```
 
-Public keys are **not secrets** — safe to commit in plain text. Only the private key stays on the xps.
+Public keys are **not secrets** — safe to commit. Only the private key (`~/.ssh/id_ed25519` on xps) must stay secret.
 
-Then on the server:
+Apply on the target machine:
 
 ```bash
 cd ~/nixos
 git pull
-sudo nixos-rebuild switch --flake .#<host>
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-### 9d. SSH from the xps
+### 4d. Configure SSH client (on xps)
+
+Add to `hosts/xps/ssh.nix` (or equivalent):
+
+```nix
+programs.ssh.extraConfig = ''
+  Host <hostname>
+    Hostname <ip-address>
+    Port 22
+    User cookiegigi
+'';
+```
+
+Then test:
 
 ```bash
-ssh server
+ssh <hostname>
 ```
 
-> **Gotcha**: if you previously SSH'd into the *installer* at `192.168.1.49`, your `known_hosts` contains the ISO's throwaway key. You'll get a `HOST KEY HAS CHANGED` warning. Clear it with:
+> **known_hosts gotcha**: If you previously SSH'd into the *installer* at this IP, your `known_hosts` contains the ISO's throwaway key. You'll get a `HOST KEY HAS CHANGED` warning. Fix with:
 > ```bash
-> ssh-keygen -R 192.168.1.49
+> ssh-keygen -R <ip-address>
 > ```
 
 ---
 
-## 10. Sanity checks
+## Phase 5: Ongoing workflow
 
-On the new machine:
+### Making changes
 
-```bash
-findmnt -t btrfs,vfat       # /persist /nix /data /media /backup /downloads /boot
-ip a                         # confirm the expected IP (e.g. 192.168.1.49)
-```
+1. **Edit on xps**: Make config changes in `~/nixos`
+2. **Format and check**: `nix fmt && nix flake check`
+3. **Commit and push**: `git commit` → `git push`
+4. **Apply on target**: `cd ~/nixos && git pull && sudo nixos-rebuild switch --flake .#<hostname>`
+
+### What persists across reboots
+
+Because `/` is tmpfs (impermanence), only explicitly declared paths survive:
+
+**System-level** (`modules/core.nix` + `modules/sops.nix`):
+- `/persist` — the persistent BTRFS subvolume
+- `/etc/NetworkManager/system-connections`
+- `/etc/ssh` — host SSH keys
+- `/var/lib/nixos` — user/group IDs
+- `/var/lib/sops-nix` — age key
+
+**User-level** (`modules/home/cookiegigi/persistence-server.nix`):
+- `~/.ssh` — SSH keys and config
+- `~/nixos` — this repository
+- `~/.local/share/keyrings` — GNOME Keyring (for Proton Pass CLI)
+- `~/.local/share/nvim`, `~/.local/state/nvim`, `~/.cache/nvim` — Neovim state
+
+### Adding secrets
+
+1. Edit `secrets/secrets.yaml` with `sops`:
+   ```bash
+   nix run .#edit-secrets
+   # or manually:
+   SOPS_AGE_KEY_FILE=/persist/var/lib/sops-nix/key.txt sops secrets/secrets.yaml
+   ```
+
+2. Add the secret declaration in `modules/sops.nix`:
+   ```nix
+   sops.secrets."my-new-secret" = {
+     # neededForUsers = true;  # if needed during user creation
+   };
+   ```
+
+3. Use it in config:
+   ```nix
+   config.services.someService.passwordFile = config.sops.secrets."my-new-secret".path;
+   ```
+
+4. Commit, push, and rebuild.
 
 ---
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `nix-command` disabled on ISO | `echo "experimental-features = nix-command flakes" \| sudo tee -a /etc/nix/nix.conf` |
-| sops fails during install | The age key at `/mnt/persist/var/lib/sops-nix/key.txt` is missing or wrong. Copy the correct one before `nixos-install`. |
-| LUKS passphrase doesn't work at boot | The initrd console may use US layout. Try typing the passphrase as if the keyboard were QWERTY. |
-| `known_hosts` mismatch after install | `ssh-keygen -R <IP>` to remove the ISO's old key. |
-| TPM not detected | Enable **fTPM** (AMD) or **Intel PTT** in the BIOS security settings. |
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| `nix-command` disabled on ISO | Minimal ISO doesn't enable flakes by default | Add `nix.settings.experimental-features = ["nix-command" "flakes"];` to `modules/iso.nix` before building, or run `echo "experimental-features = nix-command flakes" \| sudo tee -a /etc/nix/nix.conf` on the installer |
+| sops fails during `nixos-install` | Age key missing or wrong | Ensure `/mnt/persist/var/lib/sops-nix/key.txt` exists and contains a valid key listed in `.sops.yaml` |
+| LUKS passphrase doesn't work at boot | Keyboard layout mismatch | Initrd console uses US layout. Try typing as if on QWERTY, or use only characters identical in both layouts |
+| TPM not detected | fTPM/PTT disabled in BIOS | Enable **fTPM** (AMD) or **Intel PTT** in BIOS security settings |
+| `known_hosts` mismatch | ISO key vs installed system key | `ssh-keygen -R <ip>` to remove old entry |
+| `cookiegigi` user missing after install | `hashedPasswordFile` points to non-existent secret | Check `sops.secrets."user-password".neededForUsers = true;` is set |
+| Disko wipes wrong disk | Wrong device path in `disko.nix` | **Always** `lsblk` before running disko. Device names can change between boots |
 
 ---
 
-## Reference files
+## Reference
+
+### Key files
 
 | File | Purpose |
 |------|---------|
-| `hosts/<host>/disko.nix` | Declarative disk layout (LUKS + BTRFS) |
-| `hosts/<host>/hardware-configuration.nix` | Kernel modules, generated by `nixos-generate-config` |
+| `hosts/<hostname>/disko.nix` | Declarative disk partitioning (LUKS + BTRFS) |
+| `hosts/<hostname>/hardware-configuration.nix` | Kernel modules, generated by `nixos-generate-config` |
+| `hosts/<hostname>/configuration.nix` | Host-specific NixOS config |
 | `modules/sops.nix` | sops-nix activation + secret definitions |
-| `modules/tpm.nix` | systemd initrd + TPM2 LUKS unlock |
-| `modules/home/cookiegigi/persistence-server.nix` | What survives reboots on the server |
-| `modules/iso.nix` | ISO overrides (disable systemd-boot, squashfs compression) |
-| `.sops.yaml` | Age key recipients for secret encryption |
+| `modules/tpm.nix` | TPM2 initrd modules + LUKS unlock config |
+| `modules/core.nix` | Bootloader, networking, impermanence base config |
+| `modules/iso.nix` | ISO-specific overrides |
+| `modules/users/cookiegigi.nix` | User account definition |
+| `modules/home/cookiegigi/persistence-server.nix` | Home directory persistence rules |
+| `secrets/secrets.yaml` | Encrypted secrets (user password, WiFi, etc.) |
+| `.sops.yaml` | Age key recipients for encryption |
+
+### Useful commands
+
+```bash
+# Check flake evaluates
+nix flake check
+
+# Build ISO
+nix build .#nixosConfigurations.<hostname>-iso.config.system.build.isoImage
+
+# Test config without switching
+sudo nixos-rebuild test --flake .#<hostname>
+
+# Check BTRFS subvolumes
+btrfs subvolume list /
+
+# Check LUKS status
+sudo cryptsetup status cookieluks
+
+# Check TPM enrollment
+sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks
+
+# View decrypted secrets (for debugging)
+sudo cat /run/secrets/user-password
+```
 
 ---
 
-## Next steps after install
+## See also
 
-- Future config changes are edited on the xps, pushed to `origin/main`, and pulled on the server with `git pull && sudo nixos-rebuild switch --flake .#<host>`.
-- For a desktop host (xps), the workflow is identical but skips TPM enrollment and SSH server setup (the desktop already has its own config).
+- [`docs/sops-nix.md`](./sops-nix.md) — Managing secrets with sops-nix
+- [`docs/home-manager.md`](./home-manager.md) — Home-manager setup
+- [NixOS Manual — Installation](https://nixos.org/manual/nixos/stable/#sec-installation)
+- [disko documentation](https://github.com/nix-community/disko)
+- [sops-nix documentation](https://github.com/Mic92/sops-nix)
