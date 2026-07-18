@@ -18,6 +18,7 @@
     settings = {
       auto-optimise-store = true;
       experimental-features = ["nix-command" "flakes"];
+      trusted-users = ["root" "@wheel"];
     };
   };
 
@@ -43,6 +44,7 @@
     hideMounts = true;
     directories = [
       "/etc/NetworkManager/system-connections"
+      "/etc/ssh"
       "/var/log"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
