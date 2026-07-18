@@ -124,7 +124,7 @@
           ./modules/home
           ./modules/networks/wifi-home.nix
           ./modules/services.nix
-          ./modules/ssh.nix
+          ./hosts/xps/ssh.nix
         ];
       };
 
@@ -150,7 +150,6 @@
           ./modules/users/cookiegigi.nix
           ./modules/home/default-server.nix
           ./modules/services.nix
-          ./modules/ssh.nix
         ];
       };
 
