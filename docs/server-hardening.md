@@ -4,7 +4,7 @@
 > **Host:** `server` (MSI B550, x86_64-linux)
 > **Goal:** AI inference, media streaming, backup orchestration, and self-hosted services.
 
-> **Last updated:** 2026-07-18 — Phase 1 completed and committed (`2d9f243`).
+> **Last updated:** 2026-07-18 — Phase 1 completed and committed (`2d9f243`); Phase 2 reviewed with SSH recon, open questions answered, decision points defined.
 > Repository was restructured into role-based directories (`modules/common/`, `modules/desktop/`, `modules/server/`) before hardening.
 
 ---
@@ -148,23 +148,60 @@ Implemented with:
 
 **Goal:** Build the AI, media, backup, and self-hosting stack.
 
-**Open questions before implementation:**
+**Answers (2026-07-18):**
 
-1. **GPU:** What card is in this machine? (NVIDIA / AMD / Intel?) This determines AI container and compute setup.
-2. **Internet exposure:** Will this server be directly reachable from the internet (port forwarding), or only via VPN/Tailscale?
-3. **Domains:** Do you plan to use `*.cookiegigi.com` subdomains with reverse proxy + Let's Encrypt, or local IPs only?
-4. **Backup destination:** Where should backups go? (S3, B2, another server, external disk?)
-
-#### Proposed modules (pending answers above):
-
-| Goal | Module | Technology |
+| # | Question | Answer |
 |---|---|---|
-| **Reverse Proxy** | `modules/server/reverse-proxy.nix` | **Caddy** — automatic HTTPS via ACME, dead-simple config. Traefik is an alternative if Docker labels are preferred. |
-| **AI** | `modules/server/ai.nix` | **Ollama** — run as rootless Podman container. GPU passthrough depends on card (NVIDIA needs `nvidia-container-toolkit`; AMD is easier via ROCm). |
-| **Media** | `modules/server/media.nix` | **Jellyfin** — containerized, bind-mount `/media` from SATA HDD. |
-| **Backup** | `modules/server/backup.nix` | **Restic** (offsite/cloud) + **Sanoid** (local BTRFS snapshots on `/data`, `/media`, `/backup`). |
-| **Remote Access** | `modules/server/vpn.nix` | **Tailscale** or **WireGuard** — avoid exposing SSH directly to the internet. Tailscale is zero-config mesh VPN. |
-| **Auth Gate** | `modules/server/auth.nix` | **Authelia** — protect self-hosted services with 2FA behind the reverse proxy. |
+| 1 | GPU | **NVIDIA RTX 3080 Ti 12 GB** (GA102, PCI `10DE:2208`). Currently on open-source `nouveau` driver; proprietary driver needed for CUDA/NVENC. |
+| 2 | Exposure | **LAN-only for now.** No port forwarding, no public ingress. |
+| 3 | Domains | **Public `*.cookiegigi.com` subdomains with a *local* CA** (Caddy `tls internal`). Split-horizon DNS, not public ACME. |
+| 4 | Backup target | **The local `/backup` partition** on the SATA HDD. |
+
+#### SSH Recon Findings (from `server.home`)
+
+- **CPU:** AMD, 16 threads
+- **RAM:** 15 GiB
+- **Internet:** Working (HTTP 200 from cache.nixos.org)
+- **IPv6 note:** The server holds a global IPv6 address (`2a01:cb19:...`). Port 22 is currently open to all interfaces via `services.openssh.openFirewall`; on IPv6 without NAT this may be internet-reachable depending on the router firewall.
+
+#### Corrections to the original plan
+
+1. **Sanoid is ZFS-only** — it cannot snapshot BTRFS. For BTRFS local snapshots, use **btrbk** or **snapper**.
+2. **Backup encryption leak:** `/persist` and `/data` are LUKS-encrypted, but `/backup` lives on the **unencrypted** SATA HDD. Plaintext snapshots (btrbk) of `/persist` → `/backup` would silently undo disk-encryption. **Restic encrypts its repository client-side** — this tips the backup recommendation toward Restic for sensitive volumes.
+
+#### Proposed modules (reviewed):
+
+| Goal | Module | Technology | Status |
+|---|---|---|---|
+| **GPU driver** | `modules/server/nvidia.nix` | Proprietary NVIDIA driver (modesetting + open GA102 modules), `nvidia-smi` | **Build first** |
+| **Reverse Proxy** | `modules/server/reverse-proxy.nix` | **Caddy** with `tls internal` (local CA, no ACME, no public exposure) | Build |
+| **AI** | `modules/server/ai.nix` | **Ollama** native NixOS service (`services.ollama`, `acceleration = "cuda"`), not containerized | Build |
+| **Media** | `modules/server/media.nix` | **Jellyfin** native NixOS service (`services.jellyfin`), behind Caddy | Build |
+| **Backup** | `modules/server/backup.nix` | **Restic** encrypted repo on `/backup/restic`; optional **btrbk** local snapshots | Build |
+| **Remote Access** | `modules/server/vpn.nix` | **Tailscale** — add only when remote access is needed | Deferred |
+| **Auth Gate** | `modules/server/auth.nix` | **Authelia** — add only when services are exposed publicly | Deferred |
+
+> **Rationale for deferring Tailscale & Authelia:** LAN-only means there is no external attack surface for these to mitigate. Tailscale is a 5-line module to add later; Authelia adds significant identity-backend complexity that buys nothing on a trusted LAN with one user.
+
+#### Phase 2 Decision Points (awaiting user go-ahead)
+
+| # | Decision | Recommendation |
+|---|---|---|
+| 1 | Ollama: native NixOS service vs rootless Podman container? | **Native service** — nixpkgs already builds CUDA support, avoids nvidia-container-toolkit + CDI + Podman GPU passthrough complexity. |
+| 2 | Jellyfin: native NixOS service vs container? | **Native service** — mature module, NVENC works out of the box with the NVIDIA driver. |
+| 3 | DNS for `*.cookiegigi.com`: `networking.extraHosts` on xps vs local DNS server? | **extraHosts on xps first** — zero new services, trivially declarative; migrate to local DNS later if phones/other devices need it. |
+| 4 | Back up `/media` too, or only `/persist` + `/data`? | **`/persist` + `/data` only** — media is replaceable and large. |
+| 5 | Restrict SSH (port 22) to LAN subnets, given global IPv6? | **Yes** — small firewall change in `security.nix` to whitelist LAN ranges. |
+| 6 | Add btrbk local snapshots alongside Restic? | Optional — fast BTRFS rollback without encryption; your call. |
+
+#### Implementation Order
+
+1. `nvidia.nix` — driver only; first rebuild confirms `nvidia-smi` and CUDA stack.
+2. `backup.nix` — protect `/persist` before services accumulate state.
+3. `reverse-proxy.nix` — local CA + Caddy, plus DNS (`extraHosts`) on the xps side.
+4. `media.nix` — Jellyfin behind Caddy.
+5. `ai.nix` — Ollama with CUDA; may take longest to build due to CUDA closure size.
+6. Update this doc with final statuses.
 
 ### Phase 3: Optional Deeper Hardening
 
@@ -198,16 +235,17 @@ Implemented with:
 | `hosts/server/configuration.nix` | Import `modules/server` role; extract SSH to `ssh.nix` | ✅ Done |
 | `modules/common/core.nix` | Remove laptop-specific settings (upower, networkmanager, enable32Bit) | ✅ Done |
 
-### Phase 2 Files (New — pending open questions)
+### Phase 2 Files (New — reviewed)
 
 | File | Purpose |
 |---|---|
-| `modules/server/reverse-proxy.nix` | Caddy ingress |
-| `modules/server/ai.nix` | Ollama / inference |
-| `modules/server/media.nix` | Jellyfin |
-| `modules/server/backup.nix` | Restic + Sanoid |
-| `modules/server/vpn.nix` | Tailscale / WireGuard |
-| `modules/server/auth.nix` | Authelia |
+| `modules/server/nvidia.nix` | Proprietary NVIDIA driver |
+| `modules/server/reverse-proxy.nix` | Caddy ingress with local CA |
+| `modules/server/ai.nix` | Ollama native service (CUDA) |
+| `modules/server/media.nix` | Jellyfin native service |
+| `modules/server/backup.nix` | Restic encrypted repo + optional btrbk snapshots |
+| `modules/server/vpn.nix` | Tailscale (deferred) |
+| `modules/server/auth.nix` | Authelia (deferred) |
 
 ---
 
@@ -225,10 +263,20 @@ Implemented with:
 - [x] Run `nix flake check`
 - [x] Run `nix build .#nixosConfigurations.server.config.system.build.toplevel`
 
-### Phase 2 PENDING
+### Phase 2 Reviewed — awaiting implementation
 
-- [ ] Answer open questions (GPU, exposure, domains, backup target)
-- [ ] Implement Phase 2 modules (reverse-proxy, ai, media, backup, vpn, auth)
+- [x] Answer open questions (GPU, exposure, domains, backup target)
+- [x] Confirm GPU via SSH (NVIDIA GA102 / RTX 3080 Ti 12 GB)
+- [x] Document corrections (Sanoid → btrbk, backup encryption leak)
+- [x] Define decision points & implementation order
+- [ ] **User confirmation** on the 6 decision points above
+- [ ] Implement `nvidia.nix`
+- [ ] Implement `backup.nix`
+- [ ] Implement `reverse-proxy.nix`
+- [ ] Implement `media.nix`
+- [ ] Implement `ai.nix`
+- [ ] Update DNS (`extraHosts` on xps) for `*.cookiegigi.com`
+- [ ] Update this doc with final Phase 2 statuses
 
 ### Phase 3 PENDING
 
