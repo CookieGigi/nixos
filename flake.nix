@@ -110,21 +110,6 @@
           nixos-hardware.nixosModules.dell-xps-15-9530-nvidia
           nur.modules.nixos.default
           sops-nix.nixosModules.sops
-          ./modules/sops.nix
-          ./modules/core.nix
-          ./modules/tpm.nix
-          ./modules/clipboard/xclip.nix
-          ./modules/clipboard/wclip.nix
-          ./modules/desktop/niri.nix
-          ./modules/audio.nix
-          ./modules/bluetooth.nix
-          ./modules/localization/frenglish.nix
-          ./modules/programs/programs.nix
-          ./modules/users/cookiegigi.nix
-          ./modules/home
-          ./modules/networks/wifi-home.nix
-          ./modules/services.nix
-          ./hosts/xps/ssh.nix
         ];
       };
 
@@ -139,17 +124,6 @@
           nixos-hardware.nixosModules.msi-b550-tomahawk
           nixos-hardware.nixosModules.common-pc-ssd
           sops-nix.nixosModules.sops
-          ./modules/sops.nix
-          ./modules/core.nix
-          ./modules/tpm.nix
-          ./modules/clipboard/xclip.nix
-          ./modules/clipboard/wclip.nix
-          ./modules/bluetooth.nix
-          ./modules/localization/frenglish.nix
-          ./modules/programs/programs.nix
-          ./modules/users/cookiegigi.nix
-          ./modules/home/default-server.nix
-          ./modules/services.nix
         ];
       };
 

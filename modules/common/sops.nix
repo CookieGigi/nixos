@@ -8,7 +8,7 @@ _: {
 
   sops = {
     # Default sops file used for all secrets unless overridden per-secret.
-    defaultSopsFile = ../secrets/secrets.yaml;
+    defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
 
     # Age key for decryption.

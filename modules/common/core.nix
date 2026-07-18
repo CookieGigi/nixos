@@ -22,28 +22,20 @@
     };
   };
 
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # UPower for battery monitoring
-  services.upower.enable = true;
-
-  # persist
-  fileSystems."/persist".neededForBoot = true;
-
   # Allow proprietary Nvidia drivers
   nixpkgs.config.allowUnfree = true;
 
-  # Enable OpenGL/Vulkan (32-bit support required for Proton/Wine games)
+  # Enable OpenGL/Vulkan (64-bit only — 32-bit is desktop/gaming-specific)
   hardware.graphics = {
     enable = true;
-    enable32Bit = true;
   };
+
+  # Impermanence base mount
+  fileSystems."/persist".neededForBoot = true;
 
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
-      "/etc/NetworkManager/system-connections"
       "/etc/ssh"
       "/var/log"
       "/var/lib/nixos"
