@@ -28,7 +28,7 @@
                   subvolumes = {
                     "/@data" = {
                       mountOptions = ["compress=zstd:1" "noatime"];
-                      mountpoint = "/persist";
+                      mountpoint = "/data";
                     };
                     "/@persist" = {
                       mountOptions = ["compress=zstd:1" "noatime"];
@@ -65,7 +65,7 @@
                   };
                   "/@backup" = {
                     mountOptions = ["compress=lzo" "noatime"]; # lzo faster for large files
-                    mountpoint = "/media";
+                    mountpoint = "/backup";
                   };
                   "/@downloads" = {
                     mountOptions = ["compress=lzo" "noatime"];
