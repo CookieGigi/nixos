@@ -3,7 +3,7 @@
 
 HOST = xps
 
-.PHONY: switch build check fmt iso disko edit-secrets quickshell-dev update upgrade
+.PHONY: switch build check fmt iso disko edit-secrets quickshell-dev update upgrade server-switch
 
 # Rebuild and activate the system configuration
 switch:
@@ -12,6 +12,12 @@ switch:
 # Build the system configuration without activating it
 build:
 	sudo nixos-rebuild build --flake .#$(HOST)
+
+# Rebuild and activate the server remotely over SSH
+# (builds locally on the xps, copies the closure, activates on the server;
+# prompts for the server's sudo password)
+server-switch:
+	nixos-rebuild switch --flake .#server --target-host server --ask-sudo-password
 
 # Verify the flake for errors
 check:
