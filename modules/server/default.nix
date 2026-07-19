@@ -6,5 +6,6 @@
     ./containers.nix
     ./nvidia.nix
     ./llama-cpp.nix
+    ./opencode-serve.nix
   ];
 }

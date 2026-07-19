@@ -60,4 +60,9 @@
   environment.persistence."/persist".directories = [
     "/var/lib/fail2ban"
   ];
+
+  # Preserve HF_TOKEN when using sudo so huggingface-cli works as root.
+  security.sudo.extraConfig = ''
+    Defaults env_keep += "HF_TOKEN"
+  '';
 }

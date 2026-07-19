@@ -20,12 +20,24 @@ _: {
     };
 
     # Secrets definitions
-    secrets."user-password" = {
-      neededForUsers = true;
-    };
+    secrets = {
+      "user-password" = {
+        neededForUsers = true;
+      };
 
-    secrets."wifi-home-env" = {
-      # The decrypted file will be a valid systemd EnvironmentFile
+      "wifi-home-env" = {
+        # The decrypted file will be a valid systemd EnvironmentFile
+      };
+
+      "hf-token" = {
+        owner = "cookiegigi";
+        mode = "0400";
+      };
+
+      "opencode-server-password" = {
+        owner = "cookiegigi";
+        mode = "0400";
+      };
     };
   };
 
