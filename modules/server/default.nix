@@ -5,5 +5,6 @@
     ./security.nix
     ./containers.nix
     ./nvidia.nix
+    ./llama-cpp.nix
   ];
 }
