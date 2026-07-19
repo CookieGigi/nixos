@@ -4,7 +4,7 @@
 > **Host:** `server` (MSI B550, x86_64-linux)
 > **Goal:** AI inference, media streaming, backup orchestration, and self-hosted services.
 
-> **Last updated:** 2026-07-18 — Phase 1 completed and committed (`2d9f243`); Phase 2 reviewed with SSH recon, open questions answered, decision points defined.
+> **Last updated:** 2026-07-19 — Phase 1 completed. `nvidia.nix` implemented and built successfully (headless, open GA102 modules, no container toolkit).
 > Repository was restructured into role-based directories (`modules/common/`, `modules/desktop/`, `modules/server/`) before hardening.
 
 ---
@@ -270,7 +270,7 @@ Implemented with:
 - [x] Document corrections (Sanoid → btrbk, backup encryption leak)
 - [x] Define decision points & implementation order
 - [ ] **User confirmation** on the 6 decision points above
-- [ ] Implement `nvidia.nix`
+- [x] Implement `nvidia.nix` (headless, no container toolkit, open GA102 modules)
 - [ ] Implement `backup.nix`
 - [ ] Implement `reverse-proxy.nix`
 - [ ] Implement `media.nix`
