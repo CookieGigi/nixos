@@ -3,7 +3,7 @@
     ./git.nix
     ./nixvim.nix
     ./zsh.nix
-    ./opencode
+    ./opencode-server
     ./lazygit.nix
     ./nix-direnv.nix
     ./yazi.nix
