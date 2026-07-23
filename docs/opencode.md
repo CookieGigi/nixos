@@ -222,6 +222,65 @@ opencode models [provider]
 
 ---
 
+## Server-Side llama.cpp Backend
+
+The `server` host runs `llama.cpp` as a systemd service (`services.llama-cpp`) with CUDA support, exposing an OpenAI-compatible API on port `8080`.
+
+### Multi-Model Mode
+
+`llama.cpp` is configured in **router / multi-model mode**:
+
+- `models-dir` points to `/var/lib/llama-cpp/models`
+- **No default `model`** is hardcoded in the llama.cpp settings, so the server does not preload a single model at startup. Any `.gguf` file in the directory can be selected at runtime via the `model` parameter in API requests.
+- Each model has its own `llama-cpp-model-download-<name>.service` that downloads the GGUF before `llama-cpp.service` starts.
+
+### Currently Served Models
+
+| Model | Repo | File | Size | Description |
+|-------|------|------|------|-------------|
+| Qwen 3.5 14B A3B | `brunopio/...` | `qwen3.5-14b-a3b-...-q4_k_m.gguf` | ~8.7 GB | Reasoning / coding (default) |
+| Gemma 4 12B IT | `bartowski/gemma-4-12B-it-GGUF` | `gemma-4-12B-it-Q4_K_M.gguf` | ~7.7 GB | Multimodal (text + image) |
+
+Both models are downloaded automatically on first boot or rebuild. Models persist under `/var/lib/llama-cpp/models` (BTRFS `@persist`).
+
+### Selecting a Model in OpenCode
+
+On the server, OpenCode is configured with a `local` provider that points to `http://localhost:8080/v1`. Both models are listed under `provider.local.models`. Change the active model by setting:
+
+```json
+{
+  "model": "local/gemma",
+  "small_model": "local/gemma"
+}
+```
+
+Or use the TUI (`opencode` → models menu) to switch at runtime.
+
+### Downloading a New Model
+
+To add another model:
+
+1. Add an entry to the `models` list in `modules/server/llama-cpp.nix`.
+2. Rebuild: `sudo nixos-rebuild switch --flake .#server`
+3. The new `llama-cpp-model-download-<name>.service` will fetch the GGUF on next boot.
+4. Add a corresponding entry to `modules/home/cookiegigi/programs/opencode/server-config.nix` under `provider.local.models`.
+
+### Manual Model Management
+
+```bash
+# List downloaded models
+ls -lh /var/lib/llama-cpp/models
+
+# Download a model manually (e.g. for testing)
+export HF_TOKEN=$(cat /persist/...)  # or use the shellInit hook
+huggingface-cli download <repo> <file> --local-dir /var/lib/llama-cpp/models
+
+# Check which models llama.cpp sees
+curl http://localhost:8080/v1/models
+```
+
+---
+
 ## Project Status
 
 > ⚠️ The upstream [opencode-ai/opencode](https://github.com/opencode-ai/opencode) repository was **archived on 2025-09-18** and is now read-only. Development continues under the name **[Crush](https://github.com/charmbracelet/crush)** by the original author and the Charm team.
