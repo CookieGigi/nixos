@@ -1,5 +1,37 @@
 {pkgs, ...}: let
   base = import ./config.nix {inherit pkgs;};
+
+  # Centralized model registry shared with llama-cpp.nix
+  models = import ../../../../server/models.nix;
+
+  modelStem = file: pkgs.lib.removeSuffix ".gguf" file;
+
+  mkOpencodeModel = model: {
+    inherit (model) name;
+    value = {
+      id = modelStem model.file;
+      name = model.displayName;
+      inherit (model) family reasoning;
+      status = "active";
+      temperature = true;
+      tool_call = model.toolCall;
+      limit = {
+        context = 8192;
+        output = 4096;
+      };
+      cost = {
+        input = 0;
+        output = 0;
+      };
+      modalities = {
+        input =
+          if model.vision
+          then ["text" "image"]
+          else ["text"];
+        output = ["text"];
+      };
+    };
+  };
 in {
   config =
     base.config
@@ -16,50 +48,7 @@ in {
             baseURL = "http://localhost:8080/v1";
             apiKey = "dummy";
           };
-          models = {
-            qwen = {
-              id = "qwen";
-              name = "Qwen 3.5 14B A3B (local)";
-              family = "qwen";
-              status = "active";
-              temperature = true;
-              reasoning = true;
-              tool_call = true;
-              limit = {
-                context = 8192;
-                output = 4096;
-              };
-              cost = {
-                input = 0;
-                output = 0;
-              };
-              modalities = {
-                input = ["text"];
-                output = ["text"];
-              };
-            };
-            gemma = {
-              id = "gemma-4-12B-it-Q4_K_M";
-              name = "Gemma 4 12B IT (local)";
-              family = "gemma";
-              status = "active";
-              temperature = true;
-              reasoning = true;
-              tool_call = true;
-              limit = {
-                context = 8192;
-                output = 4096;
-              };
-              cost = {
-                input = 0;
-                output = 0;
-              };
-              modalities = {
-                input = ["text" "image"];
-                output = ["text"];
-              };
-            };
-          };
+          models = pkgs.lib.listToAttrs (map mkOpencodeModel models);
         };
       };
     };

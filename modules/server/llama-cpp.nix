@@ -4,24 +4,22 @@
   pkgs,
   ...
 }: let
-  # Models to download and serve. Each entry:
-  #   name       - friendly identifier used for service names
-  #   repo       - HuggingFace repo ID containing the GGUF
-  #   file       - main GGUF filename to download
-  #   extraFiles - optional additional files (e.g. mmproj) downloaded to mmproj/
-  models = [
-    {
-      name = "qwen";
-      repo = "brunopio/Qwen3.5-14B-A3B-Claude-4.6-Opus-Reasoning-Distilled-reap-Q4_K_M-GGUF";
-      file = "qwen3.5-14b-a3b-claude-4.6-opus-reasoning-distilled-reap-q4_k_m.gguf";
-    }
-    {
-      name = "gemma-4-12b";
-      repo = "bartowski/gemma-4-12B-it-GGUF";
-      file = "gemma-4-12B-it-Q4_K_M.gguf";
-      extraFiles = ["mmproj-gemma-4-12B-it-f16.gguf"];
-    }
-  ];
+  # Model registry — single source of truth for all served models.
+  # Edit ./models.nix to add, remove, or update models.
+  models = import ./models.nix;
+
+  # Newer llama.cpp with Gemma 4 vision fixes (b10092 vs old b9747).
+  # nixpkgs lags behind; overrideAttrs pins a recent release tag.
+  llama-cpp-new = (pkgs.llama-cpp.override {cudaSupport = true;}).overrideAttrs (_: rec {
+    version = "10092";
+    src = pkgs.fetchFromGitHub {
+      owner = "ggml-org";
+      repo = "llama.cpp";
+      tag = "b${version}";
+      hash = "sha256-jlxLmv8jaHy/NWQ9GTSxrzw+sE3DeQbkvnkEFzulY5w=";
+    };
+    npmDepsHash = "sha256-B7uEynAG70a3xauBKc20RuFa9cnWaWzVBCh+LPLBnIM=";
+  });
 
   modelStem = file: lib.removeSuffix ".gguf" file;
 
@@ -89,7 +87,7 @@
       in ''
         [${modelStem model.file}]
         model = /var/lib/llama-cpp/models/${model.file}
-        ctx-size = 8192
+        ctx-size = 24576
         n-gpu-layers = 999
         ${lib.optionalString (mmproj != null) "mmproj = /var/lib/llama-cpp/mmproj/${mmproj}"}
 
@@ -122,7 +120,7 @@ in {
     enable = true;
 
     # Use CUDA-enabled build for NVIDIA GPU acceleration.
-    package = pkgs.llama-cpp.override {cudaSupport = true;};
+    package = llama-cpp-new;
 
     # Router mode using an explicit preset file instead of --models-dir.
     # This prevents mmproj files from being scanned as broken standalone models
@@ -132,7 +130,11 @@ in {
       port = 8080;
       "models-preset" = "${modelsPresetFile}";
       "n-gpu-layers" = 999;
-      "ctx-size" = 8192;
+      "ctx-size" = 24576;
+      "parallel" = 1;
+      "ubatch-size" = 4096;
+      "batch-size" = 4096;
+      jinja = true;
     };
 
     openFirewall = true;
@@ -153,6 +155,43 @@ in {
         };
       };
     };
+
+  # Auto-cleanup: remove GGUF files on disk that are no longer in the registry.
+  # This keeps /var/lib/llama-cpp in sync with the declarative model list.
+  system.activationScripts.cleanup-llama-models = lib.mkIf (models != []) ''
+    allowed_list=$(mktemp)
+    trap "rm -f $allowed_list" EXIT
+
+    ${lib.concatMapStrings (m: ''
+        echo ${lib.escapeShellArg m.file} >> "$allowed_list"
+        ${lib.concatMapStrings (f: ''
+          echo ${lib.escapeShellArg f} >> "$allowed_list"
+        '') (m.extraFiles or [])}
+      '')
+      models}
+
+    if [ -d /var/lib/llama-cpp/models ]; then
+      for f in /var/lib/llama-cpp/models/*.gguf; do
+        [ -e "$f" ] || continue
+        basename=$(basename "$f")
+        if ! grep -qxF "$basename" "$allowed_list"; then
+          echo "[cleanup-llama-models] Removing orphaned model: $basename"
+          rm -f "$f"
+        fi
+      done
+    fi
+
+    if [ -d /var/lib/llama-cpp/mmproj ]; then
+      for f in /var/lib/llama-cpp/mmproj/*.gguf; do
+        [ -e "$f" ] || continue
+        basename=$(basename "$f")
+        if ! grep -qxF "$basename" "$allowed_list"; then
+          echo "[cleanup-llama-models] Removing orphaned mmproj: $basename"
+          rm -f "$f"
+        fi
+      done
+    fi
+  '';
 
   users.users.llama-cpp = {
     isSystemUser = true;
