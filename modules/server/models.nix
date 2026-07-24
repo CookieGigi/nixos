@@ -12,6 +12,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 8192;
   }
   {
     name = "qwen-3.5-9b";
@@ -23,6 +24,7 @@
     vision = true;
     toolCall = true;
     reasoning = true;
+    ctxSize = 16384;
   }
   {
     name = "gemma-4-12b";
@@ -34,6 +36,7 @@
     vision = true;
     toolCall = true;
     reasoning = true;
+    ctxSize = 8192;
   }
   {
     name = "phi-4-mini-reasoning";
@@ -44,6 +47,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 24576;
   }
   {
     name = "mistral-nemo";
@@ -54,6 +58,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 8192;
   }
   {
     name = "llama-3.1-heretic";
@@ -64,6 +69,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 16384;
   }
   {
     name = "qwen3-8b";
@@ -74,6 +80,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 16384;
   }
   {
     name = "phi-3.5-mini";
@@ -84,6 +91,7 @@
     vision = false;
     toolCall = true;
     reasoning = true;
+    ctxSize = 24576;
   }
   {
     name = "qwen2.5-vl-7b";
@@ -95,5 +103,6 @@
     vision = true;
     toolCall = true;
     reasoning = true;
+    ctxSize = 16384;
   }
 ]

@@ -87,7 +87,7 @@
       in ''
         [${modelStem model.file}]
         model = /var/lib/llama-cpp/models/${model.file}
-        ctx-size = 24576
+        ctx-size = ${toString (model.ctxSize or 8192)}
         n-gpu-layers = 999
         ${lib.optionalString (mmproj != null) "mmproj = /var/lib/llama-cpp/mmproj/${mmproj}"}
 
@@ -130,7 +130,6 @@ in {
       port = 8080;
       "models-preset" = "${modelsPresetFile}";
       "n-gpu-layers" = 999;
-      "ctx-size" = 24576;
       "parallel" = 1;
       "ubatch-size" = 4096;
       "batch-size" = 4096;

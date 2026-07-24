@@ -16,7 +16,7 @@
       temperature = true;
       tool_call = model.toolCall;
       limit = {
-        context = 8192;
+        context = model.ctxSize or 8192;
         output = 4096;
       };
       cost = {
