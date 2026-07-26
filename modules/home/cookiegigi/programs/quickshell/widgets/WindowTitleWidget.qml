@@ -38,7 +38,7 @@ Item {
 
         StyledText {
             id: titleText
-            visible: !root.isLauncherOpen
+            visible: !root.isLauncherOpen && root.popupTitle == ""
             anchors.centerIn: parent
             width: parent.width - Theme.paddingH * 2
             text: ToplevelManager.activeToplevel?.title ?? "Open"
