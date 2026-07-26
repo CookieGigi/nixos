@@ -30,8 +30,6 @@ Item {
         id: bg
         anchors.fill: parent
 
-        visible: (ToplevelManager.activeToplevel?.title ?? "") != "" || root.popupTitle !== "" || root.isLauncherOpen
-
         onClicked: {
             if (root.screen && !root.isLauncherOpen) {
                 PopupRegistry.toggleLauncher(root.screen);
@@ -40,10 +38,10 @@ Item {
 
         StyledText {
             id: titleText
-            visible: !root.isLauncherOpen && root.popupTitle === ""
+            visible: !root.isLauncherOpen
             anchors.centerIn: parent
             width: parent.width - Theme.paddingH * 2
-            text: ToplevelManager.activeToplevel?.title ?? ""
+            text: ToplevelManager.activeToplevel?.title ?? "Open"
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             styledBold: true
