@@ -14,6 +14,9 @@ _: {
       ".local/share/nvim"
       ".local/state/nvim"
       ".cache/nvim"
+      # Steam
+      ".local/share/Steam"
+      ".steam"
     ];
   };
 }

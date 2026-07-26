@@ -7,5 +7,7 @@
     ./clipboard/xclip.nix
     ./clipboard/wclip.nix
     ./networks/wifi-home.nix
+    ./steam.nix
+    ./nix-ld.nix
   ];
 }
