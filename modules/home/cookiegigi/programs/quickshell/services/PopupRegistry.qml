@@ -109,4 +109,7 @@ Singleton {
     function togglePrayer(screen) {
         toggle(screen, "prayer");
     }
+    function toggleBluetooth(screen) {
+        toggle(screen, "bluetooth");
+    }
 }

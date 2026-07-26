@@ -67,6 +67,14 @@ ShellRoot {
     }
 
     IpcHandler {
+        target: "bluetooth"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleBluetooth(screen);
+        }
+    }
+
+    IpcHandler {
         target: "prayer"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];

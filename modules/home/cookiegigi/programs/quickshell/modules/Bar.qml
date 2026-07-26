@@ -52,6 +52,13 @@ Scope {
             alignment: "center"
         }
 
+        BluetoothMenu {
+            id: bluetoothMenu
+            screen: modelData
+            anchorWidget: bluetoothWidget
+            alignment: "center"
+        }
+
         CalendarPopup {
             id: calendarPopup
             screen: modelData
@@ -157,6 +164,11 @@ Scope {
                     screen: modelData
                     Layout.fillHeight: true
                 }
+                BluetoothWidget {
+                    id: bluetoothWidget
+                    screen: modelData
+                    Layout.fillHeight: true
+                }
                 BatteryWidget {
                     id: batteryWidget
                     Layout.fillHeight: true
@@ -175,6 +187,7 @@ Scope {
         PopupRegistry.register(modelData, "launcher", appLauncher);
         PopupRegistry.register(modelData, "power", powerMenu);
         PopupRegistry.register(modelData, "network", networkMenu);
+        PopupRegistry.register(modelData, "bluetooth", bluetoothMenu);
         PopupRegistry.register(modelData, "calendar", calendarPopup);
         PopupRegistry.register(modelData, "prayer", prayerPopup);
         PopupRegistry.register(modelData, "media", mediaPopup);
