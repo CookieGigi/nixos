@@ -1,4 +1,7 @@
 {pkgs, ...}: {
+  # Binary needed by ProtonFixes and some native games for display detection
+  environment.systemPackages = [pkgs.xrandr];
+
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
