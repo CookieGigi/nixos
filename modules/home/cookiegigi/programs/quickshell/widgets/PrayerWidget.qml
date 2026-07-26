@@ -20,7 +20,7 @@ Pill {
         spacing: 6
 
         Icon {
-            text: "🕌"
+            text: ""
             accentColor: root.isHover ? Theme.accentColor : Theme.text
         }
 
