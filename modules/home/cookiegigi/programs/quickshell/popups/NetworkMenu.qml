@@ -1,4 +1,5 @@
 import QtQuick.Layouts
+import Quickshell
 import "../components"
 import "../theme"
 import "../services"
@@ -8,6 +9,7 @@ PopupBase {
     title: "Network Menu"
     popupId: "network"
     popupWidth: 250
+    implicitHeight: 150
 
     anchorLeft: false
     anchorRight: true
@@ -37,6 +39,20 @@ PopupBase {
             visible: NetworkStatus.connectionType == "ethernet"
             label: "Speed"
             value: NetworkStatus.speed
+        }
+        Button {
+
+            implicitWidth: 18
+            implicitHeight: 18
+            Icon {
+                text: ""
+                accentColor: parent.isHover ? Theme.accentColor : Theme.text
+            }
+
+            onClicked: {
+                root.closePopup();
+                Quickshell.execDetached(["foot", "-a", "quickshell-tui", "-e", "wifitui"]);
+            }
         }
     }
 }

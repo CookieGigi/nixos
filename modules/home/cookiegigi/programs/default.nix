@@ -17,5 +17,6 @@
     ./devtools.nix
     ./heroic.nix
     ./proton.nix
+    ./wifitui.nix
   ];
 }
