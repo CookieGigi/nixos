@@ -87,7 +87,7 @@ in {
   # Models live on /media (HDD) to save NVMe space.
   # Container images are cached under /var/lib/containers on NVMe for fast I/O.
   virtualisation.oci-containers.containers.llama = {
-    image = "ghcr.io/ggerganov/llama.cpp:server-cuda-b4719";
+    image = "ghcr.io/ggml-org/llama.cpp:server-cuda";
     autoStart = true;
     ports = ["8080:8080"];
     volumes = [
@@ -160,8 +160,17 @@ in {
     podman-llama = {
       after = ["llama-model-migrate.service"];
       requires = ["llama-model-migrate.service"];
+      environment = {
+        TMPDIR = "/persist/tmp";
+      };
     };
   };
+
+  # Ensure /persist/tmp exists so Podman can use it for image pulls
+  # (the tmpfs root is too small for multi-GB CUDA container images).
+  systemd.tmpfiles.rules = [
+    "d /persist/tmp 0755 root root -"
+  ];
 
   # Open firewall for llama.cpp HTTP server.
   networking.firewall.allowedTCPPorts = [8080];
