@@ -9,5 +9,6 @@
     ./networks/wifi-home.nix
     ./steam.nix
     ./nix-ld.nix
+    ./containers.nix
   ];
 }

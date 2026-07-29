@@ -14,4 +14,7 @@ _: {
     # Provide nvidia-smi, nvidia-settings binaries.
     nvidiaSettings = true;
   };
+
+  # Enable NVIDIA Container Toolkit for GPU passthrough to Podman containers.
+  hardware.nvidia-container-toolkit.enable = true;
 }

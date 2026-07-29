@@ -12,7 +12,7 @@
     wantedBy = ["multi-user.target"];
     after = [
       "network.target"
-      "llama-cpp.service"
+      "podman-llama.service"
     ];
 
     serviceConfig = {

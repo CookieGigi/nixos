@@ -2,7 +2,7 @@
   base = import ./config.nix {inherit pkgs;};
 
   # Centralized model registry shared with llama-cpp.nix
-  models = import ../../../../server/models.nix;
+  models = import ../../../../common/llama/models.nix;
 
   modelStem = file: pkgs.lib.removeSuffix ".gguf" file;
 

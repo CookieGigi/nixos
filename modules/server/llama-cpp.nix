@@ -5,8 +5,8 @@
   ...
 }: let
   # Model registry — single source of truth for all served models.
-  # Edit ./models.nix to add, remove, or update models.
-  models = import ./models.nix;
+  # Edit ../common/llama/models.nix to add, remove, or update models.
+  models = import ../common/llama/models.nix;
 
   # Newer llama.cpp with Gemma 4 vision fixes (b10092 vs old b9747).
   # nixpkgs lags behind; overrideAttrs pins a recent release tag.
