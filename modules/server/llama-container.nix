@@ -87,7 +87,7 @@ in {
   # Models live on /media (HDD) to save NVMe space.
   # Container images are cached under /var/lib/containers on NVMe for fast I/O.
   virtualisation.oci-containers.containers.llama = {
-    image = "ghcr.io/ggerganov/llama.cpp:server--cuda";
+    image = "ghcr.io/ggerganov/llama.cpp:server-cuda-b4719";
     autoStart = true;
     ports = ["8080:8080"];
     volumes = [
