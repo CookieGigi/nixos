@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
     ./disko.nix
     ./ssh.nix
+    ./tpm-media.nix
     ../../modules/server
     ../../modules/home/default-server.nix
   ];

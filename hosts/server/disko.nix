@@ -54,22 +54,27 @@
         content = {
           type = "gpt";
           partitions = {
-            primary = {
+            luks = {
               size = "100%";
               content = {
-                type = "btrfs";
-                subvolumes = {
-                  "/@media" = {
-                    mountOptions = ["compress=lzo" "noatime"]; # lzo faster for large files
-                    mountpoint = "/media";
-                  };
-                  "/@backup" = {
-                    mountOptions = ["compress=lzo" "noatime"]; # lzo faster for large files
-                    mountpoint = "/backup";
-                  };
-                  "/@downloads" = {
-                    mountOptions = ["compress=lzo" "noatime"];
-                    mountpoint = "/downloads";
+                type = "luks";
+                name = "medialuks";
+                settings = {allowDiscards = true;};
+                content = {
+                  type = "btrfs";
+                  subvolumes = {
+                    "/@media" = {
+                      mountOptions = ["compress=lzo" "noatime"]; # lzo faster for large files
+                      mountpoint = "/media";
+                    };
+                    "/@backup" = {
+                      mountOptions = ["compress=lzo" "noatime"]; # lzo faster for large files
+                      mountpoint = "/backup";
+                    };
+                    "/@downloads" = {
+                      mountOptions = ["compress=lzo" "noatime"];
+                      mountpoint = "/downloads";
+                    };
                   };
                 };
               };
