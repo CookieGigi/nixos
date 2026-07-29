@@ -28,73 +28,51 @@
       '')
       models);
 
-  # Manual download services — not started automatically at boot.
-  # Run sequentially when triggered manually to avoid OOM.
-  # Example: systemctl start llama-model-download-<name>.service
-  mkDownloadService = prevServiceName: model: {
-    name = "llama-model-download-${model.name}";
-    value = {
-      description = "Download ${model.name} GGUF model to /media";
-      after = ["local-fs.target"] ++ lib.optional (prevServiceName != null) "${prevServiceName}.service";
-      requires = lib.optional (prevServiceName != null) "${prevServiceName}.service";
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
-      script = ''
-        set -euo pipefail
-        export HF_TOKEN=$(cat ${config.sops.secrets."hf-token".path})
-        mkdir -p /media/llama-models /media/llama-mmproj
+  # One-shot manual download script: downloads all missing models sequentially.
+  # Usage: sudo llama-model-download-all
+  downloadAllScript = pkgs.writeShellScriptBin "llama-model-download-all" ''
+    set -euo pipefail
+    export HF_TOKEN=$(cat ${config.sops.secrets."hf-token".path})
+    mkdir -p /media/llama-models /media/llama-mmproj
 
+    ${lib.concatMapStrings (model: ''
         # Main model file
-        if [ ! -f "/media/llama-models/${model.file}" ]; then
-          echo "Downloading model ${model.name} (${model.file})..."
+        if [ -f "/media/llama-models/${model.file}" ]; then
+          echo "[skip] ${model.name}: ${model.file} already exists"
+        else
+          echo "[download] ${model.name}: ${model.file}..."
           ${pkgs.python3Packages.huggingface-hub}/bin/hf download \
             ${model.repo} \
             ${model.file} \
             --local-dir /media/llama-models
-          echo "Model ${model.name} download complete."
-        else
-          echo "Model ${model.name} already exists."
+          echo "[done] ${model.name}: ${model.file}"
         fi
 
         # Extra files (e.g. mmproj)
         ${lib.concatMapStrings (file: ''
-          if [ ! -f "/media/llama-mmproj/${file}" ]; then
-            echo "Downloading ${file} for model ${model.name}..."
+          if [ -f "/media/llama-mmproj/${file}" ]; then
+            echo "[skip] ${model.name}: ${file} already exists"
+          else
+            echo "[download] ${model.name}: ${file}..."
             ${pkgs.python3Packages.huggingface-hub}/bin/hf download \
               ${model.repo} \
               ${file} \
               --local-dir /media/llama-mmproj
-            echo "Downloaded ${file}."
-          else
-            echo "${file} already exists."
+            echo "[done] ${model.name}: ${file}"
           fi
         '') (model.extraFiles or [])}
-      '';
-    };
-  };
+      '')
+      models}
 
-  # Fold-left to chain services: each gets the previous service name.
-  downloadServices = lib.listToAttrs (lib.reverseList (
-    lib.foldl' (
-      acc: model: let
-        prev =
-          if acc == []
-          then null
-          else (lib.head acc).name;
-        svc = mkDownloadService prev model;
-      in
-        [svc] ++ acc
-    ) []
-    models
-  ));
+    echo "All model downloads complete."
+  '';
 in {
   # huggingface-cli for downloading models and inject HF_TOKEN.
   environment = {
     systemPackages = [
       pkgs.python3Packages.huggingface-hub
       pkgs.opencode
+      downloadAllScript
     ];
 
     shellInit = ''
@@ -137,57 +115,53 @@ in {
   };
 
   # One-shot migration: copy existing models from old /var/lib/llama-cpp to /media.
-  # Auto-download services for declarative model registry.
-  # Ensure llama container waits for migration + downloads.
-  systemd.services =
-    downloadServices
-    // {
-      llama-model-migrate = {
-        description = "Migrate llama models to /media HDD storage";
-        wantedBy = ["multi-user.target"];
-        before = ["podman-llama.service"];
-        after = ["local-fs.target"];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
-        script = ''
-          set -euo pipefail
-          mkdir -p /media/llama-models /media/llama-mmproj
-
-          # Migrate main models
-          if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
-            echo "Migrating models from /var/lib/llama-cpp/models..."
-            for f in /var/lib/llama-cpp/models/*.gguf; do
-              [ -e "$f" ] || continue
-              basename=$(basename "$f")
-              if [ ! -f "/media/llama-models/$basename" ]; then
-                echo "Copying $basename to /media/llama-models..."
-                cp -a "$f" "/media/llama-models/$basename"
-              fi
-            done
-          fi
-
-          # Migrate mmproj files
-          if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
-            echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
-            for f in /var/lib/llama-cpp/mmproj/*.gguf; do
-              [ -e "$f" ] || continue
-              basename=$(basename "$f")
-              if [ ! -f "/media/llama-mmproj/$basename" ]; then
-                echo "Copying $basename to /media/llama-mmproj..."
-                cp -a "$f" "/media/llama-mmproj/$basename"
-              fi
-            done
-          fi
-        '';
+  systemd.services = {
+    llama-model-migrate = {
+      description = "Migrate llama models to /media HDD storage";
+      wantedBy = ["multi-user.target"];
+      before = ["podman-llama.service"];
+      after = ["local-fs.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
       };
+      script = ''
+        set -euo pipefail
+        mkdir -p /media/llama-models /media/llama-mmproj
 
-      podman-llama = {
-        after = ["llama-model-migrate.service"];
-        requires = ["llama-model-migrate.service"];
-      };
+        # Migrate main models
+        if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
+          echo "Migrating models from /var/lib/llama-cpp/models..."
+          for f in /var/lib/llama-cpp/models/*.gguf; do
+            [ -e "$f" ] || continue
+            basename=$(basename "$f")
+            if [ ! -f "/media/llama-models/$basename" ]; then
+              echo "Copying $basename to /media/llama-models..."
+              cp -a "$f" "/media/llama-models/$basename"
+            fi
+          done
+        fi
+
+        # Migrate mmproj files
+        if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
+          echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
+          for f in /var/lib/llama-cpp/mmproj/*.gguf; do
+            [ -e "$f" ] || continue
+            basename=$(basename "$f")
+            if [ ! -f "/media/llama-mmproj/$basename" ]; then
+              echo "Copying $basename to /media/llama-mmproj..."
+              cp -a "$f" "/media/llama-mmproj/$basename"
+            fi
+          done
+        fi
+      '';
     };
+
+    podman-llama = {
+      after = ["llama-model-migrate.service"];
+      requires = ["llama-model-migrate.service"];
+    };
+  };
 
   # Open firewall for llama.cpp HTTP server.
   networking.firewall.allowedTCPPorts = [8080];
