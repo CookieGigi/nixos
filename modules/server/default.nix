@@ -8,5 +8,6 @@
     ./llama-container.nix
     ./opencode-serve.nix
     ./immich.nix
+    ./proton-drive.nix
   ];
 }
