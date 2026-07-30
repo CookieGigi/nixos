@@ -53,9 +53,10 @@
       ContainerName=immich-database
       Network=immich.network
       Volume=/persist/immich/postgres:/var/lib/postgresql/data
+      Volume=${config.sops.secrets."immich-db-password".path}:/run/secrets/immich-db-password:ro
       Environment=POSTGRES_USER=postgres
       Environment=POSTGRES_DB=immich
-      Environment=POSTGRES_PASSWORD_FILE=${config.sops.secrets."immich-db-password".path}
+      Environment=POSTGRES_PASSWORD_FILE=/run/secrets/immich-db-password
       Environment=POSTGRES_INITDB_ARGS=--data-checksums
       ShmSize=128mb
       HealthCmd=pg_isready -U postgres -d immich || exit 1
@@ -102,11 +103,12 @@
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
-      Environment=DB_HOSTNAME=database
+      Environment=DB_HOSTNAME=immich-database
       Environment=DB_USERNAME=postgres
       Environment=DB_DATABASE_NAME=immich
-      Environment=DB_PASSWORD_FILE=${config.sops.secrets."immich-db-password".path}
-      Environment=REDIS_HOSTNAME=redis
+      Environment=DB_PASSWORD_FILE=/run/secrets/immich-db-password
+      Volume=${config.sops.secrets."immich-db-password".path}:/run/secrets/immich-db-password:ro
+      Environment=REDIS_HOSTNAME=immich-redis
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_MEDIA_LOCATION=/data
       Environment=TZ=Etc/UTC
