@@ -51,10 +51,13 @@
 
     mkdir -p "$DATA_DIR" "$CACHE_DIR" "$STATE_DIR" "$PASS_DIR"
 
-    # Ensure GPG keyring directory exists
+    # Ensure GPG keyring directory exists and configure pinentry
     if [ ! -d "$HOME/.gnupg" ]; then
       mkdir -p "$HOME/.gnupg"
       chmod 700 "$HOME/.gnupg"
+    fi
+    if [ ! -f "$HOME/.gnupg/gpg-agent.conf" ]; then
+      echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$HOME/.gnupg/gpg-agent.conf"
     fi
 
     # Load image if not present
