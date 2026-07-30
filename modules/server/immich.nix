@@ -15,8 +15,9 @@
     "d /persist/immich/library     0755 root root -"
     "d /persist/immich/postgres    0755 root root -"
     "d /persist/immich/model-cache 0755 root root -"
-    # HDD (bulk) — original photos/videos mounted as external library
-    "d /media/picture              0755 root root -"
+    # HDD (bulk) — original photos and videos as separate external libraries
+    "d /media/pictures             0755 root root -"
+    "d /media/videos               0755 root root -"
   ];
 
   # ===========================================================================
@@ -106,8 +107,9 @@
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
-      # HDD — original photos/videos (external library mount, read-only)
-      Volume=/media/picture:/media/picture:ro
+      # HDD — original photos and videos as separate external libraries
+      Volume=/media/pictures:/media/pictures:ro
+      Volume=/media/videos:/media/videos:ro
       Environment=DB_HOSTNAME=immich-database
       Environment=DB_USERNAME=postgres
       Environment=DB_DATABASE_NAME=immich
