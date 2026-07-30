@@ -47,7 +47,7 @@
     # Start gpg-agent daemon for this container
     ${pkgs.gnupg}/bin/gpg-agent --daemon --sh >/dev/null 2>&1 || true
 
-    ${pkgs.coreutils}/bin/exec ${protonDriveBin}/bin/proton-drive "$@"
+    exec ${protonDriveBin}/bin/proton-drive "$@"
   '';
 
   protonDriveImage = pkgs.dockerTools.buildLayeredImage {
@@ -85,11 +85,10 @@
       echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$HOME/.gnupg/gpg-agent.conf"
     fi
 
-    # Load image if not present
-    if ! ${pkgs.podman}/bin/podman image exists localhost/proton-drive:latest 2>/dev/null; then
-      echo "Loading proton-drive container image..."
-      ${pkgs.podman}/bin/podman load -i ${protonDriveImage}
-    fi
+    # Load image, replacing any stale cached version
+    echo "Loading proton-drive container image..."
+    ${pkgs.podman}/bin/podman rmi -f localhost/proton-drive:latest 2>/dev/null || true
+    ${pkgs.podman}/bin/podman load -i ${protonDriveImage}
 
     exec ${pkgs.podman}/bin/podman run --rm -it \
       -v "$DATA_DIR:/root/.local/share/proton-drive-cli" \
