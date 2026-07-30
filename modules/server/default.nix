@@ -7,5 +7,6 @@
     ./nvidia.nix
     ./llama-container.nix
     ./opencode-serve.nix
+    ./immich.nix
   ];
 }
