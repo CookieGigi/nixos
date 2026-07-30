@@ -33,31 +33,31 @@
   downloadAllScript = pkgs.writeShellScriptBin "llama-model-download-all" ''
     set -euo pipefail
     export HF_TOKEN=$(cat ${config.sops.secrets."hf-token".path})
-    mkdir -p /media/llama-models /media/llama-mmproj
+    mkdir -p /media/ai/llama-models /media/ai/llama-mmproj
 
     ${lib.concatMapStrings (model: ''
         # Main model file
-        if [ -f "/media/llama-models/${model.file}" ]; then
+        if [ -f "/media/ai/llama-models/${model.file}" ]; then
           echo "[skip] ${model.name}: ${model.file} already exists"
         else
           echo "[download] ${model.name}: ${model.file}..."
           ${pkgs.python3Packages.huggingface-hub}/bin/hf download \
             ${model.repo} \
             ${model.file} \
-            --local-dir /media/llama-models
+            --local-dir /media/ai/llama-models
           echo "[done] ${model.name}: ${model.file}"
         fi
 
         # Extra files (e.g. mmproj)
         ${lib.concatMapStrings (file: ''
-          if [ -f "/media/llama-mmproj/${file}" ]; then
+          if [ -f "/media/ai/llama-mmproj/${file}" ]; then
             echo "[skip] ${model.name}: ${file} already exists"
           else
             echo "[download] ${model.name}: ${file}..."
             ${pkgs.python3Packages.huggingface-hub}/bin/hf download \
               ${model.repo} \
               ${file} \
-              --local-dir /media/llama-mmproj
+              --local-dir /media/ai/llama-mmproj
             echo "[done] ${model.name}: ${file}"
           fi
         '') (model.extraFiles or [])}
@@ -91,8 +91,8 @@ in {
     autoStart = true;
     ports = ["8080:8080"];
     volumes = [
-      "/media/llama-models:/models:ro"
-      "/media/llama-mmproj:/mmproj:ro"
+      "/media/ai/llama-models:/models:ro"
+      "/media/ai/llama-mmproj:/mmproj:ro"
       "${containerPresetFile}:/models/preset.ini:ro"
     ];
     cmd = [
@@ -126,34 +126,34 @@ in {
         RemainAfterExit = true;
       };
       script = ''
-        set -euo pipefail
-        mkdir -p /media/llama-models /media/llama-mmproj
+            set -euo pipefail
+        mkdir -p /media/ai/llama-models /media/ai/llama-mmproj
 
-        # Migrate main models
-        if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
-          echo "Migrating models from /var/lib/llama-cpp/models..."
-          for f in /var/lib/llama-cpp/models/*.gguf; do
-            [ -e "$f" ] || continue
-            basename=$(basename "$f")
-            if [ ! -f "/media/llama-models/$basename" ]; then
-              echo "Copying $basename to /media/llama-models..."
-              cp -a "$f" "/media/llama-models/$basename"
+            # Migrate main models
+            if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
+              echo "Migrating models from /var/lib/llama-cpp/models..."
+              for f in /var/lib/llama-cpp/models/*.gguf; do
+                [ -e "$f" ] || continue
+                basename=$(basename "$f")
+                if [ ! -f "/media/ai/llama-models/$basename" ]; then
+                  echo "Copying $basename to /media/ai/llama-models..."
+                  cp -a "$f" "/media/ai/llama-models/$basename"
+                fi
+              done
             fi
-          done
-        fi
 
-        # Migrate mmproj files
-        if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
-          echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
-          for f in /var/lib/llama-cpp/mmproj/*.gguf; do
-            [ -e "$f" ] || continue
-            basename=$(basename "$f")
-            if [ ! -f "/media/llama-mmproj/$basename" ]; then
-              echo "Copying $basename to /media/llama-mmproj..."
-              cp -a "$f" "/media/llama-mmproj/$basename"
+            # Migrate mmproj files
+            if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
+              echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
+              for f in /var/lib/llama-cpp/mmproj/*.gguf; do
+                [ -e "$f" ] || continue
+                basename=$(basename "$f")
+                if [ ! -f "/media/ai/llama-mmproj/$basename" ]; then
+                  echo "Copying $basename to /media/ai/llama-mmproj..."
+                  cp -a "$f" "/media/ai/llama-mmproj/$basename"
+                fi
+              done
             fi
-          done
-        fi
       '';
     };
 
@@ -188,8 +188,8 @@ in {
       '')
       models}
 
-    if [ -d /media/llama-models ]; then
-      for f in /media/llama-models/*.gguf; do
+    if [ -d /media/ai/llama-models ]; then
+      for f in /media/ai/llama-models/*.gguf; do
         [ -e "$f" ] || continue
         basename=$(basename "$f")
         if ! grep -qxF "$basename" "$allowed_list"; then
@@ -199,8 +199,8 @@ in {
       done
     fi
 
-    if [ -d /media/llama-mmproj ]; then
-      for f in /media/llama-mmproj/*.gguf; do
+    if [ -d /media/ai/llama-mmproj ]; then
+      for f in /media/ai/llama-mmproj/*.gguf; do
         [ -e "$f" ] || continue
         basename=$(basename "$f")
         if ! grep -qxF "$basename" "$allowed_list"; then
