@@ -31,23 +31,23 @@
     set -euo pipefail
 
     export GNUPGHOME=/root/.gnupg
-    export GPG_TTY=$(tty)
+    export GPG_TTY=$(${pkgs.coreutils}/bin/tty)
     export HOME=/root
 
     # Ensure GPG home exists with proper permissions
-    mkdir -p "$GNUPGHOME"
-    chmod 700 "$GNUPGHOME"
+    ${pkgs.coreutils}/bin/mkdir -p "$GNUPGHOME"
+    ${pkgs.coreutils}/bin/chmod 700 "$GNUPGHOME"
 
     # Overwrite agent config with container-local pinentry path
-    echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$GNUPGHOME/gpg-agent.conf"
+    ${pkgs.coreutils}/bin/echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$GNUPGHOME/gpg-agent.conf"
 
     # Remove any host-mounted agent socket so container starts its own agent
-    rm -f "$GNUPGHOME/S.gpg-agent" "$GNUPGHOME/S.gpg-agent.extra" 2>/dev/null || true
+    ${pkgs.coreutils}/bin/rm -f "$GNUPGHOME/S.gpg-agent" "$GNUPGHOME/S.gpg-agent.extra" 2>/dev/null || true
 
     # Start gpg-agent daemon for this container
-    gpg-agent --daemon --sh >/dev/null 2>&1 || true
+    ${pkgs.gnupg}/bin/gpg-agent --daemon --sh >/dev/null 2>&1 || true
 
-    exec ${protonDriveBin}/bin/proton-drive "$@"
+    ${pkgs.coreutils}/bin/exec ${protonDriveBin}/bin/proton-drive "$@"
   '';
 
   protonDriveImage = pkgs.dockerTools.buildLayeredImage {
@@ -58,9 +58,11 @@
       pkgs.pass
       pkgs.gnupg
       pkgs.pinentry-curses
+      pkgs.coreutils
     ];
     config = {
       Entrypoint = [protonDriveEntrypoint];
+      Env = ["PATH=${pkgs.lib.makeBinPath [pkgs.coreutils pkgs.gnupg pkgs.pass pkgs.pinentry-curses]}:/usr/bin:/bin"];
     };
   };
 
