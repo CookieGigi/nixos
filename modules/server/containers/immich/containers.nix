@@ -1,20 +1,10 @@
 {config, ...}: {
-  # ===========================================================================
-  # Secrets
-  # ===========================================================================
   sops.secrets."immich-db-password" = {
     owner = "root";
     group = "immich-services";
     mode = "0440";
   };
 
-  # Data directories are declared centrally in storage-layout.nix.
-  # Immich-specific paths: /persist/immich/{library,postgres,model-cache}
-  #                          /media/{pictures,videos}
-
-  # ===========================================================================
-  # Quadlet units
-  # ===========================================================================
   environment.etc = {
     "containers/systemd/immich.network".text = ''
       [Network]
@@ -107,7 +97,6 @@
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
-      # HDD — original photos and videos as separate external libraries
       Volume=/media/pictures:/media/pictures:ro
       Volume=/media/videos:/media/videos:ro
       Environment=DB_HOSTNAME=immich-database
@@ -128,8 +117,5 @@
     '';
   };
 
-  # ===========================================================================
-  # Firewall
-  # ===========================================================================
   networking.firewall.allowedTCPPorts = [2283];
 }

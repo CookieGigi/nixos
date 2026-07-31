@@ -34,17 +34,13 @@
     export GPG_TTY=$(${pkgs.coreutils}/bin/tty)
     export HOME=/root
 
-    # Ensure GPG home exists with proper permissions
     ${pkgs.coreutils}/bin/mkdir -p "$GNUPGHOME"
     ${pkgs.coreutils}/bin/chmod 700 "$GNUPGHOME"
 
-    # Overwrite agent config with container-local pinentry path
     ${pkgs.coreutils}/bin/echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$GNUPGHOME/gpg-agent.conf"
 
-    # Remove any host-mounted agent socket so container starts its own agent
     ${pkgs.coreutils}/bin/rm -f "$GNUPGHOME/S.gpg-agent" "$GNUPGHOME/S.gpg-agent.extra" 2>/dev/null || true
 
-    # Start gpg-agent daemon for this container
     ${pkgs.gnupg}/bin/gpg-agent --daemon --sh >/dev/null 2>&1 || true
 
     exec ${protonDriveBin}/bin/proton-drive "$@"
@@ -76,7 +72,6 @@
 
     mkdir -p "$DATA_DIR" "$CACHE_DIR" "$STATE_DIR" "$PASS_DIR"
 
-    # Ensure GPG keyring directory exists and configure pinentry
     if [ ! -d "$HOME/.gnupg" ]; then
       mkdir -p "$HOME/.gnupg"
       chmod 700 "$HOME/.gnupg"
@@ -85,7 +80,6 @@
       echo "pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses" > "$HOME/.gnupg/gpg-agent.conf"
     fi
 
-    # Load image, replacing any stale cached version
     echo "Loading proton-drive container image..."
     ${pkgs.podman}/bin/podman rmi -f localhost/proton-drive:latest 2>/dev/null || true
     ${pkgs.podman}/bin/podman load -i ${protonDriveImage}
@@ -112,7 +106,6 @@
     if [ -f "$SOPS_KEY_FILE" ]; then
       echo "Found sops-managed GPG key at $SOPS_KEY_FILE"
 
-      # Import into user's GPG keyring if not already present
       KEY_FP=$(${pkgs.gnupg}/bin/gpg --batch --with-colons --import-options show-only --import "$SOPS_KEY_FILE" 2>/dev/null | grep '^fpr' | head -1 | cut -d: -f10)
 
       if [ -z "$KEY_FP" ]; then
@@ -128,7 +121,6 @@
         echo "GPG key already present: $KEY_FP"
       fi
 
-      # Initialize pass store if not already done
       if [ ! -d "$HOME/.password-store" ]; then
         echo "Initializing password store..."
         ${pkgs.pass}/bin/pass init "$KEY_FP"
@@ -160,7 +152,6 @@
     fi
   '';
 in {
-  # GPG agent with TUI pinentry for headless key generation
   programs.gnupg.agent = {
     enable = true;
     pinentryPackage = pkgs.pinentry-curses;
@@ -206,7 +197,6 @@ in {
     fi
   '';
 
-  # Pre-load the container image on boot
   systemd.services.proton-drive-image = {
     description = "Load proton-drive container image into podman";
     serviceConfig = {

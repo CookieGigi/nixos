@@ -4,16 +4,13 @@
   pkgs,
   ...
 }: let
-  # Centralized model registry.
-  # Edit ../common/llama/models.nix to add, remove, or update models.
-  models = import ../common/llama/models.nix;
+  models = import ../../../common/llama/models.nix;
 
   modelStem = file: lib.removeSuffix ".gguf" file;
 
   mmprojFor = model:
     lib.findFirst (f: lib.hasPrefix "mmproj" f) null (model.extraFiles or []);
 
-  # Container-specific preset: paths inside the container mount namespace.
   containerPresetFile =
     pkgs.writeText "llama-container-preset.ini"
     (lib.concatMapStrings (model: let
@@ -28,15 +25,12 @@
       '')
       models);
 
-  # One-shot manual download script: downloads all missing models sequentially.
-  # Usage: sudo llama-model-download-all
   downloadAllScript = pkgs.writeShellScriptBin "llama-model-download-all" ''
     set -euo pipefail
     export HF_TOKEN=$(cat ${config.sops.secrets."hf-token".path})
     mkdir -p /media/ai/llama-models /media/ai/llama-mmproj
 
     ${lib.concatMapStrings (model: ''
-        # Main model file
         if [ -f "/media/ai/llama-models/${model.file}" ]; then
           echo "[skip] ${model.name}: ${model.file} already exists"
         else
@@ -48,7 +42,6 @@
           echo "[done] ${model.name}: ${model.file}"
         fi
 
-        # Extra files (e.g. mmproj)
         ${lib.concatMapStrings (file: ''
           if [ -f "/media/ai/llama-mmproj/${file}" ]; then
             echo "[skip] ${model.name}: ${file} already exists"
@@ -67,7 +60,6 @@
     echo "All model downloads complete."
   '';
 in {
-  # huggingface-cli for downloading models and inject HF_TOKEN.
   environment = {
     systemPackages = [
       pkgs.python3Packages.huggingface-hub
@@ -79,13 +71,9 @@ in {
       export HF_TOKEN=$(cat ${config.sops.secrets."hf-token".path})
     '';
 
-    # Make OpenCode on the server automatically use the local llama.cpp endpoint.
     variables.LOCAL_ENDPOINT = "http://localhost:8080/v1";
   };
 
-  # llama.cpp container with CUDA support for GPU inference.
-  # Models live on /media (HDD) to save NVMe space.
-  # Container images are cached under /var/lib/containers on NVMe for fast I/O.
   virtualisation.oci-containers.containers.llama = {
     image = "ghcr.io/ggml-org/llama.cpp:server-cuda";
     autoStart = true;
@@ -117,7 +105,6 @@ in {
     log-driver = "journald";
   };
 
-  # One-shot migration: copy existing models from old /var/lib/llama-cpp to /media.
   systemd.services = {
     llama-model-migrate = {
       description = "Migrate llama models to /media HDD storage";
@@ -129,34 +116,32 @@ in {
         RemainAfterExit = true;
       };
       script = ''
-            set -euo pipefail
+        set -euo pipefail
         mkdir -p /media/ai/llama-models /media/ai/llama-mmproj
 
-            # Migrate main models
-            if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
-              echo "Migrating models from /var/lib/llama-cpp/models..."
-              for f in /var/lib/llama-cpp/models/*.gguf; do
-                [ -e "$f" ] || continue
-                basename=$(basename "$f")
-                if [ ! -f "/media/ai/llama-models/$basename" ]; then
-                  echo "Copying $basename to /media/ai/llama-models..."
-                  cp -a "$f" "/media/ai/llama-models/$basename"
-                fi
-              done
+        if [ -d /var/lib/llama-cpp/models ] && [ "$(ls -A /var/lib/llama-cpp/models 2>/dev/null)" ]; then
+          echo "Migrating models from /var/lib/llama-cpp/models..."
+          for f in /var/lib/llama-cpp/models/*.gguf; do
+            [ -e "$f" ] || continue
+            basename=$(basename "$f")
+            if [ ! -f "/media/ai/llama-models/$basename" ]; then
+              echo "Copying $basename to /media/ai/llama-models..."
+              cp -a "$f" "/media/ai/llama-models/$basename"
             fi
+          done
+        fi
 
-            # Migrate mmproj files
-            if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
-              echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
-              for f in /var/lib/llama-cpp/mmproj/*.gguf; do
-                [ -e "$f" ] || continue
-                basename=$(basename "$f")
-                if [ ! -f "/media/ai/llama-mmproj/$basename" ]; then
-                  echo "Copying $basename to /media/ai/llama-mmproj..."
-                  cp -a "$f" "/media/ai/llama-mmproj/$basename"
-                fi
-              done
+        if [ -d /var/lib/llama-cpp/mmproj ] && [ "$(ls -A /var/lib/llama-cpp/mmproj 2>/dev/null)" ]; then
+          echo "Migrating mmproj files from /var/lib/llama-cpp/mmproj..."
+          for f in /var/lib/llama-cpp/mmproj/*.gguf; do
+            [ -e "$f" ] || continue
+            basename=$(basename "$f")
+            if [ ! -f "/media/ai/llama-mmproj/$basename" ]; then
+              echo "Copying $basename to /media/ai/llama-mmproj..."
+              cp -a "$f" "/media/ai/llama-mmproj/$basename"
             fi
+          done
+        fi
       '';
     };
 
@@ -169,17 +154,13 @@ in {
     };
   };
 
-  # Ensure /persist/tmp exists so Podman can use it for image pulls
-  # (the tmpfs root is too small for multi-GB CUDA container images).
   systemd.tmpfiles.rules = [
     "d /persist/tmp 0755 root root -"
   ];
 
-  # Open firewall for llama.cpp HTTP server.
   networking.firewall.allowedTCPPorts = [8080];
 
-  # Auto-cleanup: remove GGUF files on /media that are no longer in the registry.
-  system.activationScripts.cleanup-llama-models = lib.mkIf (models != []) ''
+  system.activationScripts.cleanup-llama-container-models = lib.mkIf (models != []) ''
     allowed_list=$(mktemp)
     trap "rm -f $allowed_list" EXIT
 
@@ -196,7 +177,7 @@ in {
         [ -e "$f" ] || continue
         basename=$(basename "$f")
         if ! grep -qxF "$basename" "$allowed_list"; then
-          echo "[cleanup-llama-models] Removing orphaned model: $basename"
+          echo "[cleanup-llama-container-models] Removing orphaned model: $basename"
           rm -f "$f"
         fi
       done
@@ -207,7 +188,7 @@ in {
         [ -e "$f" ] || continue
         basename=$(basename "$f")
         if ! grep -qxF "$basename" "$allowed_list"; then
-          echo "[cleanup-llama-models] Removing orphaned mmproj: $basename"
+          echo "[cleanup-llama-container-models] Removing orphaned mmproj: $basename"
           rm -f "$f"
         fi
       done

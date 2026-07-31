@@ -5,10 +5,11 @@
     ./security.nix
     ./containers.nix
     ./nvidia.nix
-    ./llama-container.nix
+    ./llama-cpp.nix
     ./opencode-serve.nix
     ./storage-layout.nix
-    ./immich.nix
-    ./proton-drive.nix
+    ./containers/immich
+    ./containers/llama
+    ./containers/proton-drive
   ];
 }
