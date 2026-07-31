@@ -31,34 +31,80 @@ Organize by **content type**, not by application. Each top-level directory is a 
 
 | Directory | Content | Managed by | Notes |
 |-----------|---------|------------|-------|
-| `/media/ai/` | AI model weights (GGUF, mmproj) | `llama-container.nix` | Read-only mounts into llama.cpp container |
-| `/media/ai/llama-models` | LLM weights | `llama-model-download-all` | Downloaded from HuggingFace |
-| `/media/ai/llama-mmproj` | Vision projector weights | `llama-model-download-all` | Paired with multimodal models |
 | `/media/pictures/` | Original photos | Immich external library | Read-only mount into immich-server |
 | `/media/videos/` | Original videos | Immich external library | Read-only mount into immich-server |
+| `/media/videos/home/` | Home videos | Manual | Subdirectory of videos |
+| `/media/videos/movies/` | Movies | Jellyfin (future) | Subdirectory of videos |
+| `/media/videos/shows/` | TV shows | Jellyfin (future) | Subdirectory of videos |
+| `/media/videos/clips/` | Short clips | Manual | Subdirectory of videos |
+| `/media/videos/music-videos/` | Music videos | Manual | Subdirectory of videos |
+| `/media/music/` | Music files | Future service | Shared media group |
+| `/media/documents/` | Documents | Manual | Subdirectory organization |
+| `/media/documents/books/` | E-books | Manual | Subdirectory of documents |
+| `/media/documents/papers/` | Academic papers | Manual | Subdirectory of documents |
+| `/media/documents/receipts/` | Scanned receipts | Manual | Subdirectory of documents |
+| `/media/ai/` | AI model weights | `llama` container | Restricted `ai` group |
+| `/media/ai/llama-models` | LLM weights (GGUF) | `llama-model-download-all` | Downloaded from HuggingFace |
+| `/media/ai/llama-mmproj` | Vision projector weights | `llama-model-download-all` | Paired with multimodal models |
 | `/media/backup/` | System backups | Manual or scheduled | BTRFS subvolume `@backup` |
 | `/media/downloads/` | Transient downloads | Manual | BTRFS subvolume `@downloads` |
+
+## Permissions
+
+All `/media/*` directories use `2775 root:media` unless noted:
+- `2775` = setgid + rwxrwxr-x
+- New files inherit the `media` group automatically
+- Both `cookiegigi` and `immich` can read via the `media` group
+
+Exception — `/media/ai/*` uses `2770 root:ai` for restricted AI model access.
 
 ## Rules
 1. **Photos and videos are separate** — do not mix them. Immich handles them as distinct external libraries.
 2. **Do not put app-generated data here** — thumbnails, encoded video, search indices, and databases belong on NVMe (`/persist/`).
-3. **Read-only from containers** — containers mount `/media/*` as `:ro`. If you need write access (e.g., Immich deleting originals), change the mount flag in the Quadlet container definition.
-4. **New content type = new top-level directory** — e.g., `/media/music/`, `/media/documents/`, `/media/datasets/`. Update `systemd.tmpfiles.rules` in the relevant Nix module to ensure the directory exists.
+3. **Read-only from containers by default** — containers mount `/media/*` as `:ro`. If you need write access (e.g., Immich deleting originals), change the mount flag in the Quadlet container definition.
+4. **New content type = new top-level directory** — e.g., `/media/datasets/`, `/media/audiobooks/`. Update `systemd.tmpfiles.rules` in `modules/server/storage-layout.nix`.
+
+## Adding a new top-level directory
+
+1. Add a tmpfiles rule in `modules/server/storage-layout.nix`:
+   ```nix
+   "d /media/datasets 2775 root media -"
+   ```
+2. If a container needs access, add a volume mount in the service's `container.nix`:
+   ```nix
+   Volume=/media/datasets:/media/datasets:ro
+   ```
+3. Run `nix fmt` and rebuild (`make server-switch`)
+4. If using Immich, create an external library in the admin UI
 
 ## Adding a new external library to Immich
-1. Add a tmpfiles rule in `modules/server/immich.nix`:
-   ```nix
-   "d /media/music 0755 root root -"
-   ```
-2. Add a container volume mount:
+
+1. Ensure the directory exists in `/media/` (via tmpfiles rule)
+2. Verify the immich container user has access via the `media` group
+3. Add a container volume mount in `modules/server/containers/immich/containers.nix`:
    ```nix
    Volume=/media/music:/media/music:ro
    ```
-3. Rebuild (`make server-switch`)
-4. In Immich admin UI, create an external library pointing to `/media/music`
+4. Rebuild (`make server-switch`)
+5. In Immich admin UI, create an external library pointing to `/media/music`
 
 ## Immich data flow
 - **Originals** (HDD): `/media/pictures/`, `/media/videos/`
 - **Working set** (NVMe): `/persist/immich/library/` — thumbnails, encoded video, faces, internal uploads
 - **Database** (NVMe): `/persist/immich/postgres/`
 - **ML cache** (NVMe): `/persist/immich/model-cache/`
+
+## Data placement guide
+
+| Content | Put it here | Why |
+|---------|-------------|-----|
+| Photos from camera | `/media/pictures/` | Warm tier, originals |
+| Videos from camera | `/media/videos/home/` | Warm tier, originals |
+| Downloaded movies | `/media/videos/movies/` | Warm tier, large files |
+| Music files | `/media/music/` | Warm tier, originals |
+| E-books | `/media/documents/books/` | Warm tier, small files |
+| AI model weights | `/media/ai/llama-models/` | Warm tier, large files |
+| Downloads in progress | `/downloads/` | Transient tier |
+| Immich thumbnails | `/persist/immich/library/` | Hot tier, app-generated |
+| Immich database | `/persist/immich/postgres/` | Hot tier, fast access needed |
+| Working files | `/data/working/` | Hot tier, temporary |
