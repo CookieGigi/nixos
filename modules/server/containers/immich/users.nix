@@ -6,9 +6,15 @@
         members = ["immich" "immich-db"];
       };
 
-      immich = {};
-      immich-redis = {};
-      immich-db = {};
+      immich = {
+        gid = 300;
+      };
+      immich-redis = {
+        gid = 305;
+      };
+      immich-db = {
+        gid = 321;
+      };
     };
 
     users = {
@@ -21,7 +27,7 @@
 
       immich-redis = {
         isSystemUser = true;
-        uid = 302;
+        uid = 305;
         group = "immich-redis";
       };
 

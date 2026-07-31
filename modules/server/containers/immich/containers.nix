@@ -19,8 +19,8 @@
       [Container]
       Image=docker.io/valkey/valkey:9
       ContainerName=immich-redis
-      User=302
-      Group=302
+      User=305
+      Group=305
       Network=immich.network
       HealthCmd=redis-cli ping || exit 1
 
@@ -40,7 +40,7 @@
       Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
       ContainerName=immich-database
       User=999
-      Group=999
+      Group=321
       GroupAdd=201
       Network=immich.network
       Volume=/persist/immich/postgres:/var/lib/postgresql/data
