@@ -41,6 +41,7 @@
       ContainerName=immich-database
       User=999
       Group=999
+      GroupAdd=201
       Network=immich.network
       Volume=/persist/immich/postgres:/var/lib/postgresql/data
       Volume=${config.sops.secrets."immich-db-password".path}:/run/secrets/immich-db-password:ro
@@ -93,6 +94,7 @@
       ContainerName=immich-server
       User=300
       Group=300
+      GroupAdd=201
       Network=immich.network
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data
