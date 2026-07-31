@@ -4,21 +4,13 @@
   # ===========================================================================
   sops.secrets."immich-db-password" = {
     owner = "root";
-    mode = "0400";
+    group = "immich-services";
+    mode = "0440";
   };
 
-  # ===========================================================================
-  # Data directories
-  # ===========================================================================
-  # NVMe (fast) — database, thumbnails, processed video, internal uploads
-  systemd.tmpfiles.rules = [
-    "d /persist/immich/library     0755 root root -"
-    "d /persist/immich/postgres    0755 root root -"
-    "d /persist/immich/model-cache 0755 root root -"
-    # HDD (bulk) — original photos and videos as separate external libraries
-    "d /media/pictures             0755 root root -"
-    "d /media/videos               0755 root root -"
-  ];
+  # Data directories are declared centrally in storage-layout.nix.
+  # Immich-specific paths: /persist/immich/{library,postgres,model-cache}
+  #                          /media/{pictures,videos}
 
   # ===========================================================================
   # Quadlet units
@@ -37,6 +29,8 @@
       [Container]
       Image=docker.io/valkey/valkey:9
       ContainerName=immich-redis
+      User=302
+      Group=302
       Network=immich.network
       HealthCmd=redis-cli ping || exit 1
 
@@ -55,6 +49,8 @@
       [Container]
       Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
       ContainerName=immich-database
+      User=999
+      Group=999
       Network=immich.network
       Volume=/persist/immich/postgres:/var/lib/postgresql/data
       Volume=${config.sops.secrets."immich-db-password".path}:/run/secrets/immich-db-password:ro
@@ -80,6 +76,8 @@
       [Container]
       Image=ghcr.io/immich-app/immich-machine-learning:v3
       ContainerName=immich-machine-learning
+      User=300
+      Group=300
       Network=immich.network
       Volume=/persist/immich/model-cache:/cache
       Environment=IMMICH_VERSION=v3
@@ -103,6 +101,8 @@
       [Container]
       Image=ghcr.io/immich-app/immich-server:v3
       ContainerName=immich-server
+      User=300
+      Group=300
       Network=immich.network
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data

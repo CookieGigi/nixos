@@ -110,7 +110,10 @@ in {
       "4096"
       "--jinja"
     ];
-    extraOptions = ["--device=nvidia.com/gpu=all"];
+    extraOptions = [
+      "--device=nvidia.com/gpu=all"
+      "--user=303:202"
+    ];
     log-driver = "journald";
   };
 

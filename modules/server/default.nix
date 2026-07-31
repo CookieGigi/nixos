@@ -7,6 +7,7 @@
     ./nvidia.nix
     ./llama-container.nix
     ./opencode-serve.nix
+    ./storage-layout.nix
     ./immich.nix
     ./proton-drive.nix
   ];
