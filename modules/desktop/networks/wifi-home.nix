@@ -1,9 +1,9 @@
 {config, ...}: {
   networking.networkmanager.ensureProfiles = {
     environmentFiles = [config.sops.secrets."wifi-home-env".path];
-    profiles."Home" = {
+    profiles."Cencurut" = {
       connection = {
-        id = "Home";
+        id = "Cencurut";
         type = "wifi";
         autoconnect = true;
       };
