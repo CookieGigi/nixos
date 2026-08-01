@@ -22,7 +22,7 @@
       Restart=always
 
       [Install]
-      WantedBy=default.target
+      WantedBy=multi-user.target
     '';
 
     "containers/systemd/immich-database.container".text = ''
@@ -50,7 +50,7 @@
       Restart=always
 
       [Install]
-      WantedBy=default.target
+      WantedBy=multi-user.target
     '';
 
     "containers/systemd/immich-machine-learning.container".text = ''
@@ -76,7 +76,7 @@
       Restart=always
 
       [Install]
-      WantedBy=default.target
+      WantedBy=multi-user.target
     '';
 
     "containers/systemd/immich-server.container".text = ''
@@ -113,7 +113,7 @@
       Restart=always
 
       [Install]
-      WantedBy=default.target
+      WantedBy=multi-user.target
     '';
   };
 }
