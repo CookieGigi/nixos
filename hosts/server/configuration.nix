@@ -30,27 +30,6 @@
     enable = true;
     domain = "cookiegigi.com";
     acmeEmail = "CHANGEME@example.com"; # <-- CHANGE THIS
-
-    upstreams = [
-      {
-        name = "immich";
-        subdomain = "photos";
-        port = 2283;
-        systemdService = "podman-immich-server";
-      }
-      {
-        name = "llama";
-        subdomain = "ai";
-        port = 8080;
-        systemdService = "podman-llama";
-      }
-      {
-        name = "opencode";
-        subdomain = "opencode";
-        port = 4096;
-        systemdService = "opencode-serve";
-      }
-    ];
   };
 
   # This value determines the NixOS release from which the default

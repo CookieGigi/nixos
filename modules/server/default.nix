@@ -6,6 +6,7 @@
     ./containers.nix
     ./nvidia.nix
     ./opencode-serve.nix
+    ./opencode-serve/reverse-proxy.nix
     ./storage-layout.nix
     ./reverse-proxy
     ./containers/immich

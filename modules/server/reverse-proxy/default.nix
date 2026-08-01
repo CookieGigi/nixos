@@ -32,12 +32,6 @@
     upstreams = lib.mkOption {
       type = lib.types.listOf (lib.types.submodule {
         options = {
-          name = lib.mkOption {
-            type = lib.types.str;
-            example = "immich";
-            description = "Human-readable identifier. Used in systemd dependency comments.";
-          };
-
           subdomain = lib.mkOption {
             type = lib.types.str;
             example = "photos";
@@ -55,13 +49,6 @@
             default = "";
             example = lib.literalExpression ''
               header / Strict-Transport-Security "max-age=31536000; includeSubDomains"
-              rate_limit {
-                zone static {
-                  key static
-                  events 100
-                  window 1m
-                }
-              }
             '';
             description = "Additional Caddy site directives appended after the reverse_proxy block.";
           };
@@ -82,12 +69,15 @@
       default = [];
       example = lib.literalExpression ''
         [
-          { name = "immich"; subdomain = "photos"; port = 2283; }
-          { name = "llama"; subdomain = "ai"; port = 8080; systemdService = "llama-cpp"; }
-          { name = "opencode"; subdomain = "opencode"; port = 4096; systemdService = "opencode-serve"; }
+          { subdomain = "photos"; port = 2283; }
+          { subdomain = "ai"; port = 8080; systemdService = "llama-cpp"; }
         ]
       '';
-      description = "List of backend services to expose through the reverse proxy.";
+      description = ''
+        List of backend services to expose through the reverse proxy.
+        Each service module typically appends its own upstream here via
+        `config.services.reverseProxy.upstreams = [ { ... } ]`.
+      '';
     };
   };
 }
