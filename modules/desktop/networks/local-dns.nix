@@ -1,19 +1,19 @@
-_: {
+{pkgs, ...}: {
   # ===========================================================================
-  # Desktop DNS: use the server's AdGuard Home (192.168.1.49) as primary
+  # Desktop DNS: use the server's AdGuard Home (192.168.1.49) exclusively
   # ===========================================================================
-  # Falls back to Cloudflare (1.1.1.1) if the server is unreachable.
-  # Uses systemd-resolved (works cleanly with NetworkManager).
+  # AdGuard handles everything:
+  #   - *.cookiegigi.com → 192.168.1.49 (local rewrites)
+  #   - Everything else → Cloudflare DoH/DoT
+  # No fallback needed — adding 1.1.1.1 causes NXDOMAIN for internal domains.
 
-  # Enable systemd-resolved as the local DNS stub
-  services.resolved.enable = true;
+  services.resolved = {
+    enable = true;
+    settings.Resolve.DNS = "192.168.1.49";
+  };
 
-  # Set upstream nameservers: AdGuard Home first, Cloudflare fallback
-  networking.nameservers = [
-    "192.168.1.49"
-    "1.1.1.1"
-  ];
-
-  # Tell NetworkManager to use systemd-resolved for DNS
   networking.networkmanager.dns = "systemd-resolved";
+
+  # Add dig for DNS debugging
+  environment.systemPackages = [pkgs.bind];
 }
