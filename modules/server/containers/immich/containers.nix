@@ -65,11 +65,12 @@
       After=network-online.target
 
       [Container]
-      Image=ghcr.io/immich-app/immich-machine-learning:v3
+      Image=ghcr.io/immich-app/immich-machine-learning:v3-cuda
       ContainerName=immich-machine-learning
       User=300
       Group=300
       Network=immich.network
+      AddDevice=nvidia.com/gpu=all
       Volume=/persist/immich/model-cache:/cache
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_LOG_LEVEL=log
