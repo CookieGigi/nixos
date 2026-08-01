@@ -96,7 +96,7 @@
       Group=300
       GroupAdd=201
       Network=immich.network
-      PublishPort=2283:2283
+      PublishPort=127.0.0.1:2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
       Volume=/media/pictures:/media/pictures:ro
@@ -119,5 +119,5 @@
     '';
   };
 
-  networking.firewall.allowedTCPPorts = [2283];
+  # Immich no longer exposes a direct WAN port. Access is via the reverse proxy.
 }
