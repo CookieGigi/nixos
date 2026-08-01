@@ -72,6 +72,11 @@
       Environment=IMMICH_LOG_LEVEL=log
       Environment=MACHINE_LEARNING_CACHE_FOLDER=/cache
       Environment=HOME=/cache
+      HealthCmd=curl -fsS http://localhost:3003/ping || exit 1
+      HealthInterval=30s
+      HealthTimeout=10s
+      HealthRetries=5
+      HealthStartPeriod=120s
 
       [Service]
       RestartSec=5
@@ -109,6 +114,11 @@
       Environment=REDIS_HOSTNAME=immich-redis
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_MEDIA_LOCATION=/data
+      HealthCmd=/usr/src/app/bin/immich-healthcheck
+      HealthInterval=30s
+      HealthTimeout=5s
+      HealthRetries=5
+      HealthStartPeriod=60s
 
       [Service]
       RestartSec=5
