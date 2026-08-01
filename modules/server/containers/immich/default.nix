@@ -3,5 +3,6 @@ _: {
     ./containers.nix
     ./users.nix
     ./sops.nix
+    ./filesystem.nix
   ];
 }
