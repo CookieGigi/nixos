@@ -9,7 +9,7 @@
   upstreamServices = lib.filter (u: u.systemdService != null) cfg.upstreams;
 
   # Caddy with Cloudflare DNS plugin when DNS-01 is configured.
-  caddyPkg =
+  caddyBasePkg =
     if cfg.dnsProvider == "cloudflare"
     then
       pkgs.caddy.withPlugins {
@@ -17,6 +17,22 @@
         hash = "sha256-7GoH8YLCoPmPExQxoga2FHB58zQDoZVf1BBwkVi0SsQ=";
       }
     else pkgs.caddy;
+
+  # Wrap caddy to inject the Cloudflare API token from the sops secret.
+  # EnvironmentFile expects KEY=VALUE format, but sops secrets are raw
+  # values. makeWrapper exports the token before exec so {env.CF_API_TOKEN}
+  # resolves correctly in the Caddyfile.
+  caddyPkg =
+    if cfg.dnsProvider == "cloudflare"
+    then
+      pkgs.runCommand "caddy-with-cloudflare-token" {
+        nativeBuildInputs = [pkgs.makeWrapper];
+      } ''
+        mkdir -p $out/bin
+        makeWrapper ${caddyBasePkg}/bin/caddy $out/bin/caddy \
+          --run 'export CF_API_TOKEN=$(cat "${config.sops.secrets."cf-api-token".path}")'
+      ''
+    else caddyBasePkg;
 
   # Build a Caddyfile. When using DNS-01, inject a global block.
   caddyfileText =
@@ -48,18 +64,12 @@ in
     };
 
     # ------------------------------------------------------------------
-    # Cloudflare API token for DNS-01 challenge + systemd ordering
+    # Systemd ordering: start after upstream backends
     # ------------------------------------------------------------------
-    systemd.services.caddy =
-      lib.optionalAttrs (cfg.dnsProvider == "cloudflare") {
-        serviceConfig = {
-          EnvironmentFile = config.sops.secrets."cf-api-token".path;
-        };
-      }
-      // lib.optionalAttrs (upstreamServices != []) {
-        after = map (u: "${u.systemdService}.service") upstreamServices;
-        wants = map (u: "${u.systemdService}.service") upstreamServices;
-      };
+    systemd.services.caddy = lib.optionalAttrs (upstreamServices != []) {
+      after = map (u: "${u.systemdService}.service") upstreamServices;
+      wants = map (u: "${u.systemdService}.service") upstreamServices;
+    };
 
     # ------------------------------------------------------------------
     # Persistence: certificates and Caddy state survive reboots
