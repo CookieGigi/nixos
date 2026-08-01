@@ -3,5 +3,6 @@ _: {
     owner = "root";
     group = "immich-services";
     mode = "0440";
+    restartUnits = ["immich-server.service" "immich-database.service"];
   };
 }
