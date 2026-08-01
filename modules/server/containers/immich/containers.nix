@@ -11,7 +11,7 @@
       After=network-online.target
 
       [Container]
-      Image=docker.io/valkey/valkey:9
+      Image=docker.io/valkey/valkey:9.1.1
       ContainerName=immich-redis
       User=305
       Group=305
@@ -32,7 +32,7 @@
       After=network-online.target
 
       [Container]
-      Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+      Image=ghcr.io/immich-app/postgres:16-vectorchord1.1.1
       ContainerName=immich-database
       User=999
       Group=321
@@ -61,7 +61,7 @@
       After=network-online.target
 
       [Container]
-      Image=ghcr.io/immich-app/immich-machine-learning:v3-cuda
+      Image=ghcr.io/immich-app/immich-machine-learning:v3.1.0-cuda
       ContainerName=immich-machine-learning
       User=300
       Group=300
@@ -89,7 +89,7 @@
       Wants=immich-machine-learning.service
 
       [Container]
-      Image=ghcr.io/immich-app/immich-server:v3
+      Image=ghcr.io/immich-app/immich-server:v3.1.0
       ContainerName=immich-server
       User=300
       Group=300
