@@ -68,7 +68,6 @@
       Volume=/persist/immich/model-cache:/cache
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_LOG_LEVEL=log
-      Environment=NO_COLOR=false
       Environment=MACHINE_LEARNING_CACHE_FOLDER=/cache
       Environment=HOME=/cache
 
