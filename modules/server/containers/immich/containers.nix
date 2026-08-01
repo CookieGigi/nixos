@@ -107,7 +107,6 @@
       Environment=REDIS_HOSTNAME=immich-redis
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_MEDIA_LOCATION=/data
-      Environment=TZ=Etc/UTC
 
       [Service]
       Restart=always
