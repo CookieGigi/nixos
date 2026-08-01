@@ -25,11 +25,6 @@
   # Allow proprietary Nvidia drivers
   nixpkgs.config.allowUnfree = true;
 
-  # Enable OpenGL/Vulkan (64-bit only — 32-bit is desktop/gaming-specific)
-  hardware.graphics = {
-    enable = true;
-  };
-
   # Impermanence base mount
   fileSystems."/persist".neededForBoot = true;
 

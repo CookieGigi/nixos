@@ -24,15 +24,6 @@ _: {
       "user-password" = {
         neededForUsers = true;
       };
-
-      "wifi-home-env" = {
-        # The decrypted file will be a valid systemd EnvironmentFile
-      };
-
-      "opencode-server-password" = {
-        owner = "cookiegigi";
-        mode = "0400";
-      };
     };
   };
 

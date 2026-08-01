@@ -5,6 +5,10 @@
   # NetworkManager for desktop networking
   networking.networkmanager.enable = true;
 
+  # Enable OpenGL/Vulkan (64-bit only — 32-bit is desktop/gaming-specific)
+  hardware.graphics = {
+    enable = true;
+  };
   # 32-bit OpenGL/Vulkan support (required for Proton/Wine gaming)
   hardware.graphics.enable32Bit = true;
 

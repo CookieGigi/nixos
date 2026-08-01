@@ -3,10 +3,9 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./disko.nix
-    ./ssh.nix
     ../../modules/desktop
-    ../../modules/desktop/niri.nix
     ../../modules/home
+    ./tpm.nix
   ];
 
   networking.hostName = "xps";

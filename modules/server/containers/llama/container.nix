@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  models = import ../../../common/llama/models.nix;
+  models = import ./models.nix;
 
   modelStem = file: lib.removeSuffix ".gguf" file;
 

@@ -1,15 +1,16 @@
 {
   imports = [
     ../common
+    ./sops.nix
     ./core-desktop.nix
     ./audio.nix
     ./bluetooth.nix
-    ./clipboard/xclip.nix
     ./clipboard/wclip.nix
     ./networks/wifi-home.nix
     ./networks/local-dns.nix
     ./steam.nix
     ./nix-ld.nix
-    ./containers.nix
+    ./ssh.nix
+    ./niri.nix
   ];
 }
