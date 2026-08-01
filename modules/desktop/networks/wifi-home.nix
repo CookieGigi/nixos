@@ -15,8 +15,9 @@
         key-mgmt = "wpa-psk";
         psk = "@WIFI_HOME_PASSWORD@";
       };
-      # Use systemd-resolved DNS exclusively; ignore DHCP-provided DNS.
       ipv4 = {
+        # Use AdGuard Home on the server as DNS, ignore router's DHCP DNS
+        dns = "192.168.1.49";
         ignore-auto-dns = true;
       };
     };
