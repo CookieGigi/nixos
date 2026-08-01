@@ -11,6 +11,6 @@
     ./local-dns.nix
     ./containers/immich
     ./containers/llama
-    #    ./containers/proton-drive
+    ./containers/proton-drive
   ];
 }
