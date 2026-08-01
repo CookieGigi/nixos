@@ -3,10 +3,8 @@
   pkgs,
   ...
 }: {
-  # Open firewall for the OpenCode server API.
-  networking.firewall.allowedTCPPorts = [4096];
-
-  # OpenCode headless server — always-on, accessible from LAN and Android app.
+  # OpenCode headless server — now bound to localhost only.
+  # Access is via the reverse proxy (opencode.cookiegigi.com).
   systemd.services.opencode-serve = {
     description = "OpenCode headless server";
     wantedBy = ["multi-user.target"];
@@ -26,7 +24,7 @@
       ];
       ExecStart = pkgs.writeShellScript "opencode-serve" ''
         export OPENCODE_SERVER_PASSWORD=$(cat ${config.sops.secrets."opencode-server-password".path})
-        exec ${pkgs.opencode}/bin/opencode serve --hostname 0.0.0.0 --port 4096
+        exec ${pkgs.opencode}/bin/opencode serve --hostname 127.0.0.1 --port 4096
       '';
       Restart = "on-failure";
       RestartSec = "5s";

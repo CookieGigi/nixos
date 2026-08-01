@@ -74,10 +74,11 @@ in {
     variables.LOCAL_ENDPOINT = "http://localhost:8080/v1";
   };
 
+  # Bind container port to localhost only — Caddy is the sole ingress.
   virtualisation.oci-containers.containers.llama = {
     image = "ghcr.io/ggml-org/llama.cpp:server-cuda";
     autoStart = true;
-    ports = ["8080:8080"];
+    ports = ["127.0.0.1:8080:8080"];
     volumes = [
       "/media/ai/llama-models:/models:ro"
       "/media/ai/llama-mmproj:/mmproj:ro"
@@ -158,7 +159,8 @@ in {
     "d /persist/tmp 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [8080];
+  # No direct firewall opening — access is via reverse proxy only.
+  # networking.firewall.allowedTCPPorts = [8080];
 
   system.activationScripts.cleanup-llama-container-models = lib.mkIf (models != []) ''
     allowed_list=$(mktemp)

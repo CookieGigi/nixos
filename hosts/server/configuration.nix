@@ -12,6 +12,47 @@
   networking.hostName = "server";
   networking.domain = "cookiegigi.com";
 
+  # ---------------------------------------------------------------------------
+  # Reverse proxy: Caddy + Let's Encrypt
+  # ---------------------------------------------------------------------------
+  # All backend services are bound to localhost only. Caddy terminates TLS
+  # and routes subdomains:
+  #   photos.cookiegigi.com  -> Immich   (localhost:2283)
+  #   ai.cookiegigi.com      -> llama.cpp (localhost:8080)
+  #   opencode.cookiegigi.com -> OpenCode serve (localhost:4096)
+  #
+  # REQUIREMENTS before switching on:
+  # 1. Set acmeEmail to a real address (Let's Encrypt needs it).
+  # 2. Forward ports 80 and 443 on your router to this server.
+  # 3. Ensure DNS A/AAAA records for the subdomains point here.
+  # ---------------------------------------------------------------------------
+  services.reverseProxy = {
+    enable = true;
+    domain = "cookiegigi.com";
+    acmeEmail = "CHANGEME@example.com"; # <-- CHANGE THIS
+
+    upstreams = [
+      {
+        name = "immich";
+        subdomain = "photos";
+        port = 2283;
+        systemdService = "podman-immich-server";
+      }
+      {
+        name = "llama";
+        subdomain = "ai";
+        port = 8080;
+        systemdService = "podman-llama";
+      }
+      {
+        name = "opencode";
+        subdomain = "opencode";
+        port = 4096;
+        systemdService = "opencode-serve";
+      }
+    ];
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
