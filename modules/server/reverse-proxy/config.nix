@@ -5,6 +5,6 @@ _: {
   services.reverseProxy = {
     enable = true;
     domain = "cookiegigi.com";
-    acmeEmail = "CHANGEME@example.com"; # <-- Set your real email before deploying
+    acmeEmail = "cookiegigi@cookiegigi.com"; # <-- Set your real email before deploying
   };
 }
