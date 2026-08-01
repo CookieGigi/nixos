@@ -61,12 +61,19 @@ in
     };
 
     # ------------------------------------------------------------------
-    # Systemd ordering: start after upstream backends
+    # Systemd: capabilities for binding to privileged ports + ordering
     # ------------------------------------------------------------------
-    systemd.services.caddy = lib.optionalAttrs (upstreamServices != []) {
-      after = map (u: "${u.systemdService}.service") upstreamServices;
-      wants = map (u: "${u.systemdService}.service") upstreamServices;
-    };
+    systemd.services.caddy =
+      {
+        serviceConfig = {
+          AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
+          CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
+        };
+      }
+      // lib.optionalAttrs (upstreamServices != []) {
+        after = map (u: "${u.systemdService}.service") upstreamServices;
+        wants = map (u: "${u.systemdService}.service") upstreamServices;
+      };
 
     # ------------------------------------------------------------------
     # Persistence: certificates and Caddy state survive reboots
