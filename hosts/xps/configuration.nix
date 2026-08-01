@@ -5,6 +5,7 @@
     ./disko.nix
     ../../modules/desktop
     ../../modules/home
+    ./tpm.nix
   ];
 
   networking.hostName = "xps";
