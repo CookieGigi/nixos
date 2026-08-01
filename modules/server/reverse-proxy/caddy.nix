@@ -13,8 +13,8 @@
     if cfg.dnsProvider == "cloudflare"
     then
       pkgs.caddy.withPlugins {
-        plugins = ["github.com/caddy-dns/cloudflare@v0.0.0-20240305155001-d7796e885597"];
-        hash = lib.fakeHash;
+        plugins = ["github.com/caddy-dns/cloudflare@v0.2.4"];
+        hash = "sha256-7GoH8YLCoPmPExQxoga2FHB58zQDoZVf1BBwkVi0SsQ=";
       }
     else pkgs.caddy;
 
