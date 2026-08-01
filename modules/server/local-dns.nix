@@ -87,21 +87,24 @@
   # ------------------------------------------------------------------
   # Firewall: port 53 only for the LAN subnet
   # ------------------------------------------------------------------
-  networking.firewall = {
-    allowedUDPPorts = [53];
-    extraCommands = ''
-      iptables -A nixos-fw -p udp --dport 53 -s 192.168.1.0/24 -j nixos-fw-accept
-      iptables -A nixos-fw -p tcp --dport 53 -s 192.168.1.0/24 -j nixos-fw-accept
-      iptables -A nixos-fw -p udp --dport 53 -j nixos-fw-refuse
-      iptables -A nixos-fw -p tcp --dport 53 -j nixos-fw-refuse
-    '';
-  };
+  networking.firewall.extraCommands = ''
+    iptables -A nixos-fw -p udp --dport 53 -s 192.168.1.0/24 -j nixos-fw-accept
+    iptables -A nixos-fw -p tcp --dport 53 -s 192.168.1.0/24 -j nixos-fw-accept
+    iptables -A nixos-fw -p udp --dport 53 -j nixos-fw-refuse
+    iptables -A nixos-fw -p tcp --dport 53 -j nixos-fw-refuse
+  '';
 
   # Server uses AdGuard locally
   networking.nameservers = ["127.0.0.1"];
 
+  # Ensure AdGuard state directory exists with correct ownership
+  # before systemd tries to use StateDirectory=AdGuardHome
+  systemd.tmpfiles.rules = [
+    "d /var/lib/private/AdGuardHome 0750 adguardhome adguardhome -"
+  ];
+
   # Persist AdGuard data and filters
   environment.persistence."/persist".directories = [
-    "/var/lib/AdGuardHome"
+    "/var/lib/private/AdGuardHome"
   ];
 }
