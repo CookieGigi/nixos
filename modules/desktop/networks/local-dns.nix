@@ -9,7 +9,11 @@
 
   services.resolved = {
     enable = true;
-    settings.Resolve.DNS = "192.168.1.49";
+    settings.Resolve = {
+      DNS = "192.168.1.49";
+      # Disable built-in fallback DNS servers
+      FallbackDNS = "";
+    };
   };
 
   networking.networkmanager.dns = "systemd-resolved";

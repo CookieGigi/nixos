@@ -15,6 +15,10 @@
         key-mgmt = "wpa-psk";
         psk = "@WIFI_HOME_PASSWORD@";
       };
+      # Use systemd-resolved DNS exclusively; ignore DHCP-provided DNS.
+      ipv4 = {
+        ignore-auto-dns = true;
+      };
     };
   };
 }
