@@ -9,6 +9,7 @@
     ./opencode-serve/reverse-proxy.nix
     ./storage-layout.nix
     ./reverse-proxy
+    ./local-dns.nix
     ./containers/immich
     ./containers/llama
     ./containers/proton-drive
