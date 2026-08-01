@@ -20,17 +20,14 @@
 
   # Wrap caddy to inject the Cloudflare API token from the sops secret.
   # EnvironmentFile expects KEY=VALUE format, but sops secrets are raw
-  # values. makeWrapper exports the token before exec so {env.CF_API_TOKEN}
+  # values. The wrapper exports the token before exec so {env.CF_API_TOKEN}
   # resolves correctly in the Caddyfile.
   caddyPkg =
     if cfg.dnsProvider == "cloudflare"
     then
-      pkgs.runCommand "caddy-with-cloudflare-token" {
-        nativeBuildInputs = [pkgs.makeWrapper];
-      } ''
-        mkdir -p $out/bin
-        makeWrapper ${caddyBasePkg}/bin/caddy $out/bin/caddy \
-          --run 'export CF_API_TOKEN=$(cat "${config.sops.secrets."cf-api-token".path}")'
+      pkgs.writeShellScriptBin "caddy" ''
+        export CF_API_TOKEN=$(cat "${config.sops.secrets."cf-api-token".path}")
+        exec ${caddyBasePkg}/bin/caddy "$@"
       ''
     else caddyBasePkg;
 
