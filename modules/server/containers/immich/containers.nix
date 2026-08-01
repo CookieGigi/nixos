@@ -75,6 +75,7 @@
       Environment=IMMICH_LOG_LEVEL=log
       Environment=NO_COLOR=false
       Environment=MACHINE_LEARNING_CACHE_FOLDER=/cache
+      Environment=HOME=/cache
 
       [Service]
       Restart=always
@@ -86,8 +87,9 @@
     "containers/systemd/immich-server.container".text = ''
       [Unit]
       Description=Immich Server
-      After=network-online.target immich-redis.service immich-database.service
+      After=network-online.target immich-redis.service immich-database.service immich-machine-learning.service
       Requires=immich-redis.service immich-database.service
+      Wants=immich-machine-learning.service
 
       [Container]
       Image=ghcr.io/immich-app/immich-server:v3
