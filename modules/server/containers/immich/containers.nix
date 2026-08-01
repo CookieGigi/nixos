@@ -116,6 +116,4 @@
       WantedBy=default.target
     '';
   };
-
-  # Immich no longer exposes a direct WAN port. Access is via the reverse proxy.
 }
