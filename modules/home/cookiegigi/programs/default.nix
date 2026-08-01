@@ -18,5 +18,6 @@
     ./heroic.nix
     ./proton.nix
     ./wifitui.nix
+    ./unzip.nix
   ];
 }

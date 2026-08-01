@@ -8,5 +8,6 @@
     ./yazi.nix
     ./devtools.nix
     ./proton.nix
+    ./unzip.nix
   ];
 }
