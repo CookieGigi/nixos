@@ -1,10 +1,4 @@
 {config, ...}: {
-  sops.secrets."immich-db-password" = {
-    owner = "root";
-    group = "immich-services";
-    mode = "0440";
-  };
-
   environment.etc = {
     "containers/systemd/immich.network".text = ''
       [Network]
