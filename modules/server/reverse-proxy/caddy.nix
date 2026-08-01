@@ -8,15 +8,33 @@
 
   upstreamServices = lib.filter (u: u.systemdService != null) cfg.upstreams;
 
-  # Build a Caddyfile with one site block per upstream.
-  caddyfile = pkgs.writeText "Caddyfile" (lib.concatStringsSep "\n" (map
-    (upstream: ''
-      ${upstream.subdomain}.${cfg.domain} {
-        reverse_proxy localhost:${toString upstream.port}
-        ${upstream.extraCaddyConfig}
+  # Caddy with Cloudflare DNS plugin when DNS-01 is configured.
+  caddyPkg =
+    if cfg.dnsProvider == "cloudflare"
+    then
+      pkgs.caddy.withPlugins {
+        plugins = ["github.com/caddy-dns/cloudflare@v0.0.0-20240305155001-d7796e885597"];
+        hash = lib.fakeHash;
       }
-    '')
-    cfg.upstreams));
+    else pkgs.caddy;
+
+  # Build a Caddyfile. When using DNS-01, inject a global block.
+  caddyfileText =
+    lib.optionalString (cfg.dnsProvider == "cloudflare") ''
+      {
+        acme_dns cloudflare {env.CF_API_TOKEN}
+      }
+    ''
+    + lib.concatStringsSep "\n" (map
+      (upstream: ''
+        ${upstream.subdomain}.${cfg.domain} {
+          reverse_proxy localhost:${toString upstream.port}
+          ${upstream.extraCaddyConfig}
+        }
+      '')
+      cfg.upstreams);
+
+  caddyfile = pkgs.writeText "Caddyfile" caddyfileText;
 in
   lib.mkIf cfg.enable {
     # ------------------------------------------------------------------
@@ -25,16 +43,23 @@ in
     services.caddy = {
       enable = true;
       email = cfg.acmeEmail;
+      package = caddyPkg;
       configFile = "${caddyfile}";
     };
 
     # ------------------------------------------------------------------
-    # Systemd ordering: wait for upstream systemd units if declared
+    # Cloudflare API token for DNS-01 challenge + systemd ordering
     # ------------------------------------------------------------------
-    systemd.services.caddy = lib.optionalAttrs (upstreamServices != []) {
-      after = map (u: "${u.systemdService}.service") upstreamServices;
-      wants = map (u: "${u.systemdService}.service") upstreamServices;
-    };
+    systemd.services.caddy =
+      lib.optionalAttrs (cfg.dnsProvider == "cloudflare") {
+        serviceConfig = {
+          EnvironmentFile = config.sops.secrets."cf-api-token".path;
+        };
+      }
+      // lib.optionalAttrs (upstreamServices != []) {
+        after = map (u: "${u.systemdService}.service") upstreamServices;
+        wants = map (u: "${u.systemdService}.service") upstreamServices;
+      };
 
     # ------------------------------------------------------------------
     # Persistence: certificates and Caddy state survive reboots

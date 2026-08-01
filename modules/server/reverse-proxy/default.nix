@@ -19,6 +19,19 @@
       description = "Email address for Let's Encrypt ACME account registration.";
     };
 
+    dnsProvider = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum ["cloudflare"]);
+      default = null;
+      description = ''
+        DNS provider for ACME DNS-01 challenge. When set, Caddy uses the
+        DNS-01 challenge instead of HTTP-01 or TLS-ALPN-01. This allows
+        certificate issuance without exposing ports 80/443 to the internet.
+
+        - `null`: Use HTTP-01 / TLS-ALPN-01 (requires port forwarding).
+        - `cloudflare`: Use Cloudflare DNS-01 (requires `CF_API_TOKEN` secret).
+      '';
+    };
+
     # ---------------------------------------------------------------------------
     # List-based upstreams — no hardcoded services.
     #

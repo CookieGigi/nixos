@@ -6,5 +6,6 @@ _: {
     enable = true;
     domain = "cookiegigi.com";
     acmeEmail = "cookiegigi@cookiegigi.com"; # <-- Set your real email before deploying
+    dnsProvider = "cloudflare"; # DNS-01 challenge (no port forwarding needed)
   };
 }
