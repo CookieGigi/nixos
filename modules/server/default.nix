@@ -8,7 +8,7 @@
     ./nvidia.nix
     ./storage-layout.nix
     ./containers/immich
-    #    ./containers/llama
+    ./containers/llama
     #    ./containers/proton-drive
   ];
 }
