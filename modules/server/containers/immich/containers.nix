@@ -99,6 +99,7 @@
       Group=300
       GroupAdd=201
       Network=immich.network
+      AddDevice=nvidia.com/gpu=all
       PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
