@@ -39,11 +39,6 @@ _: {
         owner = "cookiegigi";
         mode = "0400";
       };
-
-      "cf-api-token" = {
-        owner = "caddy";
-        mode = "0400";
-      };
     };
   };
 

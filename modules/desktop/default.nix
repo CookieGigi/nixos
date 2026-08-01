@@ -7,6 +7,7 @@
     ./clipboard/xclip.nix
     ./clipboard/wclip.nix
     ./networks/wifi-home.nix
+    ./networks/local-dns.nix
     ./steam.nix
     ./nix-ld.nix
     ./containers.nix

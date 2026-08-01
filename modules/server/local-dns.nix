@@ -1,37 +1,92 @@
-_: {
+{
+  lib,
+  config,
+  ...
+}: {
   # ===========================================================================
-  # Local DNS: resolve cookiegigi.com subdomains to the server's LAN IP
+  # AdGuard Home: local DNS with ad-blocking, DoH/DoT, and local rewrites
   # ===========================================================================
-  # This lets internal clients reach services by subdomain without exposing
-  # internal IPs on public DNS (Cloudflare). All *.cookiegigi.com resolves to
-  # the server at 192.168.1.49.
+  # Replaces dnsmasq. Provides DNS-level ad/tracker blocking, encrypted
+  # upstream queries (DoH/DoT to Cloudflare), and local rewrites so
+  # *.cookiegigi.com resolves to the server LAN IP.
 
-  services.dnsmasq = {
-    enable = true;
-    settings = {
-      # Listen only on loopback and the LAN IP
-      listen-address = ["127.0.0.1" "192.168.1.49"];
+  services = {
+    # Disable the old dnsmasq service
+    dnsmasq.enable = lib.mkForce false;
 
-      # Forward non-local queries to Cloudflare
-      server = ["1.1.1.1" "1.0.0.1"];
+    adguardhome = {
+      enable = true;
+      settings = {
+        # Web UI bound to localhost only — exposed via reverse proxy
+        http.address = "127.0.0.1:3000";
 
-      # Resolve all cookiegigi.com subdomains to the server
-      address = "/cookiegigi.com/192.168.1.49";
+        dns = {
+          # Listen on loopback and LAN IP
+          bind_hosts = ["127.0.0.1" "192.168.1.49"];
+          port = 53;
 
-      # Don't read /etc/hosts or /etc/resolv.conf
-      no-hosts = true;
-      no-resolv = true;
+          # Parallel upstream queries for speed
+          upstream_mode = "parallel";
 
-      # Cache size
-      cache-size = 1000;
+          # Encrypted upstream: DoH + DoT to Cloudflare
+          upstream_dns = [
+            "https://1.1.1.1/dns-query"
+            "https://1.0.0.1/dns-query"
+            "tls://1.1.1.1"
+            "tls://1.0.0.1"
+          ];
 
-      # Log queries (optional, useful for debugging)
-      log-queries = true;
-      log-facility = "-";
+          # Plain UDP bootstrap to resolve the DoH hostnames
+          bootstrap_dns = ["1.1.1.1" "1.0.0.1"];
+
+          # Local rewrites: all cookiegigi.com subdomains → server
+          rewrites = [
+            {
+              domain = "*.cookiegigi.com";
+              answer = "192.168.1.49";
+            }
+            {
+              domain = "cookiegigi.com";
+              answer = "192.168.1.49";
+            }
+          ];
+        };
+
+        filtering = {
+          protection_enabled = true;
+          filtering_enabled = true;
+        };
+
+        filters = [
+          {
+            enabled = true;
+            url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
+            name = "AdGuard DNS filter";
+            id = 1;
+          }
+          {
+            enabled = true;
+            url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt";
+            name = "AdAway Default Blocklist";
+            id = 2;
+          }
+        ];
+      };
     };
+
+    # Reverse proxy: dns.cookiegigi.com → AdGuard web UI
+    reverseProxy.upstreams = lib.mkIf config.services.reverseProxy.enable [
+      {
+        subdomain = "dns";
+        port = 3000;
+        systemdService = "adguardhome";
+      }
+    ];
   };
 
-  # Open DNS port for the LAN only
+  # ------------------------------------------------------------------
+  # Firewall: port 53 only for the LAN subnet
+  # ------------------------------------------------------------------
   networking.firewall = {
     allowedUDPPorts = [53];
     extraCommands = ''
@@ -42,11 +97,11 @@ _: {
     '';
   };
 
-  # Use dnsmasq as the server's own resolver
+  # Server uses AdGuard locally
   networking.nameservers = ["127.0.0.1"];
 
-  # Persist dnsmasq lease file
+  # Persist AdGuard data and filters
   environment.persistence."/persist".directories = [
-    "/var/lib/dnsmasq"
+    "/var/lib/AdGuardHome"
   ];
 }

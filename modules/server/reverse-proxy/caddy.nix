@@ -51,6 +51,14 @@
 in
   lib.mkIf cfg.enable {
     # ------------------------------------------------------------------
+    # Secret: Cloudflare API token for DNS-01 challenge
+    # ------------------------------------------------------------------
+    sops.secrets."cf-api-token" = lib.mkIf (cfg.dnsProvider == "cloudflare") {
+      owner = "caddy";
+      mode = "0400";
+    };
+
+    # ------------------------------------------------------------------
     # Caddy: reverse proxy + automatic HTTPS via ACME
     # ------------------------------------------------------------------
     services.caddy = {
