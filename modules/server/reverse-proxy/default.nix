@@ -1,6 +1,7 @@
 {lib, ...}: {
   imports = [
     ./caddy.nix
+    ./config.nix
   ];
 
   options.services.reverseProxy = {
