@@ -19,6 +19,7 @@
       HealthCmd=redis-cli ping || exit 1
 
       [Service]
+      RestartSec=5
       Restart=always
 
       [Install]
@@ -47,6 +48,7 @@
       HealthCmd=pg_isready -U postgres -d immich || exit 1
 
       [Service]
+      RestartSec=5
       Restart=always
 
       [Install]
@@ -72,6 +74,7 @@
       Environment=HOME=/cache
 
       [Service]
+      RestartSec=5
       Restart=always
 
       [Install]
@@ -108,6 +111,7 @@
       Environment=IMMICH_MEDIA_LOCATION=/data
 
       [Service]
+      RestartSec=5
       Restart=always
 
       [Install]
