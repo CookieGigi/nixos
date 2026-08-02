@@ -9,5 +9,6 @@
     ./devtools.nix
     ./proton.nix
     ./unzip.nix
+    ./rclone.nix
   ];
 }
