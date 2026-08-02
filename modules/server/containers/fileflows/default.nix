@@ -2,6 +2,6 @@ _: {
   imports = [
     ./containers.nix
     ./users.nix
-    ./config.nix
+    ./filesystem.nix
   ];
 }

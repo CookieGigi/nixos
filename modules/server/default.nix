@@ -10,6 +10,6 @@
     ./containers/immich
     ./containers/llama
     ./containers/proton-drive
-    ./containers/organize
+    ./containers/fileflows
   ];
 }
