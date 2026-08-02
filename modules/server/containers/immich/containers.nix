@@ -3,6 +3,9 @@
     "containers/systemd/immich.network".text = ''
       [Network]
       NetworkName=immich
+
+      [Install]
+      WantedBy=multi-user.target
     '';
 
     "containers/systemd/immich-redis.container".text = ''
@@ -32,7 +35,7 @@
       After=network-online.target
 
       [Container]
-      Image=ghcr.io/immich-app/postgres:16-vectorchord1.1.1
+      Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
       ContainerName=immich-database
       User=999
       Group=321
@@ -101,7 +104,7 @@
       GroupAdd=201
       Network=immich.network
       AddDevice=nvidia.com/gpu=all
-      PublishPort=127.0.0.1:2283:2283
+      PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
       Volume=/media/pictures:/media/pictures:ro
