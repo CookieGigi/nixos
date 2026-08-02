@@ -31,16 +31,8 @@ _: {
     # -------------------------------------------------------------------------
     "d /media/pictures             2775 root media -"
     "d /media/videos               2775 root media -"
-    "d /media/videos/home          2775 root media -"
-    "d /media/videos/movies        2775 root media -"
-    "d /media/videos/shows         2775 root media -"
-    "d /media/videos/clips         2775 root media -"
-    "d /media/videos/music-videos  2775 root media -"
     "d /media/music                2775 root media -"
     "d /media/documents            2775 root media -"
-    "d /media/documents/books      2775 root media -"
-    "d /media/documents/papers     2775 root media -"
-    "d /media/documents/receipts   2775 root media -"
 
     # -------------------------------------------------------------------------
     # HDD /backup — cold tier
