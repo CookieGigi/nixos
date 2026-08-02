@@ -1,7 +1,6 @@
 {
   imports = [
     ../common
-    ./sops.nix
     ./core-desktop.nix
     ./audio.nix
     ./bluetooth.nix

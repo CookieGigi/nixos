@@ -1,21 +1,37 @@
 {config, ...}: {
   networking.networkmanager.ensureProfiles = {
-    environmentFiles = [config.sops.secrets."wifi-home-env".path];
     profiles."Cencurut" = {
       connection = {
         id = "Cencurut";
         type = "wifi";
         autoconnect = true;
+        permissions = "";
       };
       wifi = {
         mode = "infrastructure";
-        ssid = "@WIFI_HOME_SSID@";
+        ssid = "Cencurut";
       };
       wifi-security = {
         key-mgmt = "wpa-psk";
-        psk = "@WIFI_HOME_PASSWORD@";
+        psk-flags = "1";
       };
-      ipv4 = {
+      ipv4 = {method = "auto";};
+    };
+
+    secrets.entries = [
+      {
+        file = config.sops.secrets."wifi-home-password".path;
+        key = "psk";
+        matchId = "Cencurut";
+        matchSetting = "wifi-security";
+        matchType = "wifi";
+      }
+    ];
+  };
+
+  sops = {
+    secrets = {
+      "wifi-home-password" = {
       };
     };
   };
