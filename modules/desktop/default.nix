@@ -7,7 +7,6 @@
     ./bluetooth.nix
     ./clipboard/wclip.nix
     ./networks/wifi-home.nix
-    ./networks/local-dns.nix
     ./steam.nix
     ./nix-ld.nix
     ./ssh.nix

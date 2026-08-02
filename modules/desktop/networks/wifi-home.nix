@@ -16,9 +16,6 @@
         psk = "@WIFI_HOME_PASSWORD@";
       };
       ipv4 = {
-        # Use AdGuard Home on the server as DNS, ignore router's DHCP DNS
-        dns = "192.168.1.49";
-        ignore-auto-dns = true;
       };
     };
   };
