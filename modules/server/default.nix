@@ -11,5 +11,6 @@
     ./containers/llama
     ./containers/proton-drive
     ./containers/fileflows
+    ./containers/adguardhome
   ];
 }

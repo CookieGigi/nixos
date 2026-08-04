@@ -3,7 +3,23 @@
   services.upower.enable = true;
 
   # NetworkManager for desktop networking
-  networking.networkmanager.enable = true;
+  networking = {
+    networkmanager = {
+      enable = true;
+      dns = "systemd-resolved";
+    };
+    nameservers = ["192.168.1.49" "1.1.1.1" "9.9.9.9"];
+    dhcpcd.extraConfig = ''
+      nohook resolv.conf
+    '';
+  };
+  services.resolved = {
+    enable = true;
+    settings.Resolve = {
+      DNS = ["192.168.1.49"];
+      FallbackDNS = ["1.1.1.1" "9.9.9.9"];
+    };
+  };
 
   # Enable OpenGL/Vulkan (64-bit only — 32-bit is desktop/gaming-specific)
   hardware.graphics = {
