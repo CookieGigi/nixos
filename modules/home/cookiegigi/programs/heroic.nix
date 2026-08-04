@@ -7,6 +7,7 @@
     directories = [
       "Games/Heroic"
       ".config/heroic"
+      ".config/unity3d"
     ];
   };
 }
