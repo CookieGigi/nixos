@@ -10,7 +10,6 @@ import "../services"
 Button {
     id: root
 
-    visible: NetworkStatus.hasConnection
     property var screen: null
 
     implicitWidth: netLayout.implicitWidth + Theme.paddingH * 2
