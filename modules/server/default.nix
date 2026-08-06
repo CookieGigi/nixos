@@ -12,5 +12,6 @@
     ./containers/proton-drive
     ./containers/fileflows
     ./containers/blocky
+    ./containers/caddy
   ];
 }
