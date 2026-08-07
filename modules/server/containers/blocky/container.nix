@@ -29,6 +29,11 @@
       prefetchExpires: 2h
       prefetchThreshold: 5
 
+
+    customDNS:
+      mapping:
+        photo.cookiegigi.com: 192.168.1.49
+
     statistics:
       enable: true
 
