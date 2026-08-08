@@ -12,5 +12,6 @@
     ./containers/fileflows
     ./containers/blocky
     ./containers/caddy
+    ./containers/zot
   ];
 }
