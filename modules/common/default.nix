@@ -7,5 +7,6 @@
     ./programs/programs.nix
     ./users/cookiegigi.nix
     ./services/keyring.nix
+    ./containers.nix
   ];
 }

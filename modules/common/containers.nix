@@ -2,6 +2,7 @@ _: {
   # Rootless Podman with Docker socket compatibility
   virtualisation.podman = {
     enable = true;
+    defaultNetwork.settings.dns_enabled = true;
   };
 
   environment = {
