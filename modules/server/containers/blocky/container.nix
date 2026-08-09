@@ -56,7 +56,7 @@ in {
     After=network-online.target
 
     [Container]
-    Image=ghcr.io/0xerr0r/blocky:latest
+    Image=zot:5050/ghcr.io/0xerr0r/blocky:latest
     ContainerName=blocky
     PublishPort=127.0.0.1:53:53/tcp
     PublishPort=127.0.0.1:53:53/udp

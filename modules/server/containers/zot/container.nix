@@ -17,6 +17,17 @@
           "enable": true,
           "registries": [
             {
+              "urls": ["https://ghcr.io/library"],
+              "content": [
+                {
+                  "prefix": "**",
+                  "destination": "/ghcr-images"
+                }
+              ],
+              "onDemand": true,
+              "tlsVerify": true
+            },
+            {
               "urls": ["https://docker.io/library"],
               "content": [
                 {
