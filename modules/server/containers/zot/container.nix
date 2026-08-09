@@ -13,6 +13,22 @@
         "level": "debug"
       },
       "extensions": {
+        "sync": {
+          "enable": true,
+          "registries": [
+            {
+              "urls": ["https://docker.io/library"],
+              "content": [
+                {
+                  "prefix": "**",
+                  "destination": "/docker-images"
+                }
+              ],
+              "onDemand": true,
+              "tlsVerify": true
+            }
+          ]
+        },
         "search": {
           "enable": true,
           "cve": {
