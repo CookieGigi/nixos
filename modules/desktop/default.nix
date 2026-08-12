@@ -5,9 +5,9 @@
     ./audio.nix
     ./bluetooth.nix
     ./clipboard/wclip.nix
-    ./steam.nix
     ./nix-ld.nix
     ./ssh.nix
     ./niri.nix
+    ./steam.nix
   ];
 }
