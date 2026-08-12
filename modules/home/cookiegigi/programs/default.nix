@@ -19,5 +19,6 @@
     ./proton.nix
     ./wifitui.nix
     ./unzip.nix
+    ./oculante.nix
   ];
 }

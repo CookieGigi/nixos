@@ -20,6 +20,16 @@ in {
     "yazi/yazi.toml".text = ''
       [mgr]
       show_hidden = true
+
+      [opener]
+      oculante = [
+        { run = "oculante %s", orphan = true, for = "unix"}
+      ]
+
+      [open]
+      rules=[
+        { mime="image/*", use = "oculante"}
+      ]
     '';
 
     "yazi/theme.toml".text = ''
