@@ -17,7 +17,7 @@
           "enable": true,
           "registries": [
             {
-              "urls": ["https://ghcr.io/library"],
+              "urls": ["https://ghcr.io"],
               "content": [
                 {
                   "prefix": "**",

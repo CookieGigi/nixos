@@ -6,6 +6,7 @@
     ./security.nix
     ./nvidia.nix
     ./storage-layout.nix
+    ./container.nix
     ./containers/immich
     ./containers/llama
     ./containers/proton-drive
