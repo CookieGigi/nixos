@@ -15,5 +15,9 @@ _: {
     [[registry.mirror]]
     location = "localhost:5050/ghcr-images"
     insecure = true
+
+    [[registry]]
+    location = "zot.cookiegigi.com:5050"
+    insecure = true
   '';
 }

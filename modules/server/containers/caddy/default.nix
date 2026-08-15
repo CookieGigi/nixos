@@ -5,5 +5,6 @@ _: {
     ./filesystems.nix
     ./users.nix
     ./configuration.nix
+    ./sops.nix
   ];
 }

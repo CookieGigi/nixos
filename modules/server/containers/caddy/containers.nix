@@ -5,7 +5,7 @@ _: {
     After=network-online.target
 
     [Container]
-    Image=docker.io/library/caddy:latest
+    Image=zot.cookiegigi.com:5050/caddy-cloudflare:2.11.4
     ContainerName=caddy
     PublishPort=80:80
     PublishPort=443:443
@@ -16,6 +16,7 @@ _: {
     Volume=/persist/caddy/config:/config
     UserNS=keep-id:uid=80,gid=80
     Environment=TZ=Europe/Paris
+    EnvironmentFile=/run/secrets/caddy-env
 
     [Service]
     Restart=always
