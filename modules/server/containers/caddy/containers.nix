@@ -7,6 +7,7 @@ _: {
     [Container]
     Image=zot.cookiegigi.com:5050/caddy-cloudflare:2.11.4
     ContainerName=caddy
+    Network=zot.network
     PublishPort=80:80
     PublishPort=443:443
     PublishPort=443:443/udp

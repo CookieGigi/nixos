@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   systemd.tmpfiles.rules = [
-    "C /etc/caddy/Caddyfile 0644 root root - ${pkgs.writeText "Caddyfile" ''
+    "C+ /etc/caddy/Caddyfile 0644 root root - ${pkgs.writeText "Caddyfile" ''
       {
       	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
       }
@@ -9,6 +9,13 @@
         tls {
           dns cloudflare {env.CLOUDFLARE_API_TOKEN}
         }
+      }
+
+      zot.cookiegigi.com {
+        log {
+          output stdout
+        }
+        reverse_proxy zot:5000
       }
     ''}"
   ];

@@ -56,25 +56,36 @@
     }
   '';
 in {
-  environment.etc."containers/systemd/zot.container".text = ''
-    [Unit]
-    Description=Zot OCI registry
-    After=network-online.target
+  environment.etc = {
+    "containers/systemd/zot.network".text = ''
+      [Network]
+      NetworkName=zot
 
-    [Container]
-    Image=ghcr.io/project-zot/zot:latest
-    ContainerName=zot
-    PublishPort=5050:5000
-    Volume=${zotConf}:/etc/zot/config.json:ro
-    Volume=/persist/zot/registry:/var/lib/registry
-    UserNS=keep-id:uid=50,gid=50
-    Environment=TZ=Europe/Paris
+      [Install]
+      WantedBy=multi-user.target
+    '';
 
-    [Service]
-    Restart=always
-    RestartSec=5
+    "containers/systemd/zot.container".text = ''
+      [Unit]
+      Description=Zot OCI registry
+      After=network-online.target
 
-    [Install]
-    WantedBy=multi-user.target
-  '';
+      [Container]
+      Image=ghcr.io/project-zot/zot:latest
+      ContainerName=zot
+      Network=zot.network
+      PublishPort=5050:5000
+      Volume=${zotConf}:/etc/zot/config.json:ro
+      Volume=/persist/zot/registry:/var/lib/registry
+      UserNS=keep-id:uid=50,gid=50
+      Environment=TZ=Europe/Paris
+
+      [Service]
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    '';
+  };
 }
