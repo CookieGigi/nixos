@@ -12,6 +12,9 @@
     dhcpcd.extraConfig = ''
       nohook resolv.conf
     '';
+    hosts = {
+      "192.168.1.49" = ["zot.cookiegigi.com"];
+    };
   };
   services.resolved = {
     enable = true;
