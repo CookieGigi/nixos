@@ -1,5 +1,13 @@
 _: {
   environment.etc = {
+    "containers/systemd/fileflows.network".text = ''
+      [Network]
+      NetworkName=fileflows
+
+      [Install]
+      WantedBy=multi-user.target
+    '';
+
     "containers/systemd/fileflows.container".text = ''
       [Unit]
       Description=FileFlows - file processing
@@ -8,6 +16,7 @@ _: {
       [Container]
       Image=docker.io/revenz/fileflows:latest
       ContainerName=fileflows
+      Network=fileflows.network
       PublishPort=5000:5000
       Volume=/persist/fileflows/data:/app/Data
       Volume=/persist/fileflows/logs:/app/Logs

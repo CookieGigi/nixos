@@ -1,5 +1,13 @@
 {config, ...}: {
   environment.etc = {
+    "containers/systemd/immich-internal.network".text = ''
+      [Network]
+      NetworkName=immich-internal
+
+      [Install]
+      WantedBy=multi-user.target
+    '';
+
     "containers/systemd/immich.network".text = ''
       [Network]
       NetworkName=immich
@@ -18,7 +26,7 @@
       ContainerName=immich-redis
       User=305
       Group=305
-      Network=immich.network
+      Network=immich-internal.network
       HealthCmd=redis-cli ping || exit 1
 
       [Service]
@@ -40,7 +48,7 @@
       User=999
       Group=321
       GroupAdd=201
-      Network=immich.network
+      Network=immich-internal.network
       Volume=/persist/immich/postgres:/var/lib/postgresql/data
       Volume=${config.sops.secrets."immich-db-password".path}:/run/secrets/immich-db-password:ro
       Environment=POSTGRES_USER=postgres
@@ -68,7 +76,7 @@
       ContainerName=immich-machine-learning
       User=300
       Group=300
-      Network=immich.network
+      Network=immich-internal.network
       AddDevice=nvidia.com/gpu=all
       Volume=/persist/immich/model-cache:/cache
       Environment=IMMICH_VERSION=v3
@@ -102,6 +110,7 @@
       User=300
       Group=300
       GroupAdd=201
+      Network=immich-internal.network
       Network=immich.network
       AddDevice=nvidia.com/gpu=all
       PublishPort=2283:2283

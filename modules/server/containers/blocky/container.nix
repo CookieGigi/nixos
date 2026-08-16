@@ -11,7 +11,7 @@
       - tcp+udp:149.112.112.10
 
     blocking:
-      blackLists:
+      denylists:
         ads:
           - https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
       clientGroupsBlock:
@@ -33,6 +33,9 @@
     customDNS:
       mapping:
         photo.cookiegigi.com: 192.168.1.49
+        zot.cookiegigi.com: 192.168.1.49
+        blocky.cookiegigi.com: 192.168.1.49
+        fileflows.cookiegigi.com: 192.168.1.49
 
     statistics:
       enable: true
@@ -50,28 +53,39 @@
       timestamp: true
   '';
 in {
-  environment.etc."containers/systemd/blocky.container".text = ''
-    [Unit]
-    Description=Blocky DNS
-    After=network-online.target
+  environment.etc = {
+    "containers/systemd/blocky.network".text = ''
+      [Network]
+      NetworkName=blocky
 
-    [Container]
-    Image=ghcr.io/0xerr0r/blocky:latest
-    ContainerName=blocky
-    PublishPort=127.0.0.1:53:53/tcp
-    PublishPort=127.0.0.1:53:53/udp
-    PublishPort=192.168.1.49:53:53/tcp
-    PublishPort=192.168.1.49:53:53/udp
-    PublishPort=4000:4000
-    Volume=${blockyConf}:/app/config.yml:ro
-    UserNS=keep-id:uid=53,gid=53
-    Environment=TZ=Europe/Paris
+      [Install]
+      WantedBy=multi-user.target
+    '';
 
-    [Service]
-    Restart=always
-    RestartSec=5
+    "containers/systemd/blocky.container".text = ''
+      [Unit]
+      Description=Blocky DNS
+      After=network-online.target
 
-    [Install]
-    WantedBy=multi-user.target
-  '';
+      [Container]
+      Image=ghcr.io/0xerr0r/blocky:latest
+      Network=blocky.network
+      ContainerName=blocky
+      PublishPort=127.0.0.1:53:53/tcp
+      PublishPort=127.0.0.1:53:53/udp
+      PublishPort=192.168.1.49:53:53/tcp
+      PublishPort=192.168.1.49:53:53/udp
+      PublishPort=192.168.1.49:4000:4000
+      Volume=${blockyConf}:/app/config.yml:ro
+      UserNS=keep-id:uid=53,gid=53
+      Environment=TZ=Europe/Paris
+
+      [Service]
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    '';
+  };
 }
