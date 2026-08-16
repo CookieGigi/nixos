@@ -11,6 +11,22 @@
   networking.hostName = "xps";
   networking.domain = "cookiegigi.com";
 
+  # Optimus PRIME — Offload Mode
+  services.xserver.videoDrivers = ["modesetting" "nvidia"];
+
+  hardware.nvidia = {
+    modesetting.enable = true;
+
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
