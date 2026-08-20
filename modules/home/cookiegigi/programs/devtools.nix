@@ -3,5 +3,6 @@
     alejandra
     statix
     deadnix
+    s-tui
   ];
 }
