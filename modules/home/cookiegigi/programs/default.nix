@@ -20,5 +20,6 @@
     ./wifitui.nix
     ./unzip.nix
     ./oculante.nix
+    ./codex.nix
   ];
 }
