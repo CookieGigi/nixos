@@ -21,5 +21,6 @@
     ./unzip.nix
     ./oculante.nix
     ./codex.nix
+    ./obsidian.nix
   ];
 }
