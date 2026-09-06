@@ -25,6 +25,10 @@
     photo.cookiegigi.com {
       reverse_proxy 192.168.1.49:2283
     }
+
+    bookorbit.cookiegigi.com {
+      reverse_proxy 192.168.1.49:3000
+    }
   '';
 in {
   environment.etc = {

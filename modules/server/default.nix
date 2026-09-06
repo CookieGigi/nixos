@@ -14,5 +14,6 @@
     ./containers/blocky
     ./containers/caddy
     ./containers/zot
+    ./containers/bookorbit
   ];
 }
