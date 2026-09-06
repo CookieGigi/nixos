@@ -21,15 +21,27 @@ in {
       [mgr]
       show_hidden = true
 
-      [opener]
-      oculante = [
-        { run = "oculante %s", orphan = true, for = "unix"}
-      ]
+       [opener]
+       oculante = [
+         { run = "oculante %s", orphan = true, for = "unix"}
+       ]
+       firefox = [
+         { run = "firefox %s", orphan = true, for = "unix" }
+       ]
 
-      [open]
-      rules=[
-        { mime="image/*", use = "oculante"}
-      ]
+       [open]
+       rules=[
+         { mime="image/*", use = "oculante" },
+         { mime="application/pdf", use = "firefox" },
+         { mime="text/html", use = "firefox" },
+         { mime="application/xhtml+xml", use = "firefox" },
+         { mime="image/svg+xml", use = "firefox" },
+         { mime="application/xml", use = "firefox" },
+         { mime="text/xml", use = "firefox" },
+         { mime="text/*", use = "firefox" },
+         { mime="application/json", use = "firefox" },
+         { mime="application/javascript", use = "firefox" },
+       ]
     '';
 
     "yazi/theme.toml".text = ''
