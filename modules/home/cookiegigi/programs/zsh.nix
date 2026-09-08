@@ -91,6 +91,9 @@
         bindkey '^[[H' beginning-of-line
         bindkey '^[[F' end-of-line
         bindkey '^[[3~' delete-char
+
+        # devenv
+        eval "$(devenv hook zsh)"
       ''
 
       # ── Foot shell integration ───────────────────────────────────

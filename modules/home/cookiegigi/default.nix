@@ -1,4 +1,10 @@
-{nixvim, ...}: {
+{
+  nixvim,
+  inputs,
+  ...
+}: {
+  home-manager.extraSpecialArgs = {inherit inputs;};
+
   home-manager.users.cookiegigi = {
     imports = [
       nixvim.homeModules.nixvim

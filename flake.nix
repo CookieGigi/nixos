@@ -42,6 +42,8 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    devenv.url = "github:cachix/devenv/v2.2.2";
   };
 
   outputs = {
@@ -57,7 +59,7 @@
     git-hooks,
     nixvim,
     ...
-  }: {
+  } @ inputs: {
     checks.x86_64-linux.pre-commit-check = git-hooks.lib.x86_64-linux.run {
       src = ./.;
       hooks = {
@@ -100,7 +102,7 @@
     nixosConfigurations = {
       xps = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit pixie-sddm nixvim;};
+        specialArgs = {inherit pixie-sddm nixvim inputs;};
         modules = [
           ./hosts/xps/configuration.nix
           impermanence.nixosModules.impermanence

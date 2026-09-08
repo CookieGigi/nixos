@@ -22,5 +22,6 @@
     ./oculante.nix
     ./codex.nix
     ./obsidian.nix
+    ./devenv.nix
   ];
 }
