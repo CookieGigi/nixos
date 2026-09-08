@@ -7,12 +7,12 @@ _: {
     settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
-      extraConfig.core.editor = "vi";
+      core.editor = "vi";
       user.name = "cookiegigi";
       user.email = "cookiegigi@cookiegigi.com";
       gpg.format = "ssh";
 
-      aliases = {
+      alias = {
         unstage = "reset HEAD --";
       };
     };

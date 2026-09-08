@@ -8,11 +8,4 @@ _: {
   };
 
   programs.gamemode.enable = true;
-
-  environment.persistence."/persist" = {
-    hideMounts = true;
-    directories = [
-      "/home/cookiegigi/Games/Steam"
-    ];
-  };
 }

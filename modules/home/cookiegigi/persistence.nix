@@ -17,6 +17,7 @@ _: {
       # Steam
       ".local/share/Steam"
       ".steam"
+      "Games/Steam"
     ];
   };
 }

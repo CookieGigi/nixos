@@ -5,7 +5,7 @@
 
   xdg.desktopEntries.tidal-hifi = {
     name = "Tidal";
-    exec = "tidal-hifi --no-sandbox";
+    exec = "tidal-hifi";
     icon = "tidal-hifi";
     categories = ["Audio" "Music"];
   };
