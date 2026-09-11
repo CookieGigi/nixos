@@ -18,6 +18,8 @@ _: {
       ".local/share/Steam"
       ".steam"
       "Games/Steam"
+      # dev
+      ".cache/"
     ];
   };
 }
