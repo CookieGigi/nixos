@@ -102,7 +102,7 @@
     nixosConfigurations = {
       xps = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit pixie-sddm nixvim inputs;};
+        specialArgs = {inherit pixie-sddm inputs;};
         modules = [
           ./hosts/xps/configuration.nix
           impermanence.nixosModules.impermanence
