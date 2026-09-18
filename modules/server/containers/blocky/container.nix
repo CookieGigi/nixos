@@ -36,6 +36,7 @@
         zot.cookiegigi.com: 192.168.1.49
         blocky.cookiegigi.com: 192.168.1.49
         fileflows.cookiegigi.com: 192.168.1.49
+        homeassistant.cookiegigi.com: 192.168.1.49
 
     statistics:
       enable: true

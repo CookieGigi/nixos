@@ -29,6 +29,10 @@
     bookorbit.cookiegigi.com {
       reverse_proxy 192.168.1.49:3000
     }
+
+    homeassistant.cookiegigi.com {
+      reverse_proxy 10.89.100.1:8123
+    }
   '';
 in {
   environment.etc = {
@@ -46,6 +50,7 @@ in {
       Image=zot.cookiegigi.com:5050/caddy-cloudflare:2.11.4
       ContainerName=caddy
       Network=caddy.network
+      Network=home-assistant-proxy.network:ip=10.89.100.2
       PublishPort=80:80
       PublishPort=443:443
       PublishPort=443:443/udp

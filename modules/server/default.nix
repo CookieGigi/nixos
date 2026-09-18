@@ -15,5 +15,6 @@
     ./containers/caddy
     ./containers/zot
     ./containers/bookorbit
+    ./containers/home-assistant
   ];
 }
