@@ -23,9 +23,49 @@ Singleton {
 
     // ─────────────────────────────────────────────────
     function refresh() {
-        connectionProcess.running = true;
+        _refreshPending = true;
     }
     Component.onCompleted: root.refresh()
+
+    // nmcli terse output escapes both colons and backslashes.
+    function parseFields(line) {
+        const fields = [];
+        let field = "", escaped = false;
+        for (const ch of line) {
+            if (escaped) {
+                field += ch;
+                escaped = false;
+            } else if (ch === "\\") {
+                escaped = true;
+            } else if (ch === ":") {
+                fields.push(field);
+                field = "";
+            } else {
+                field += ch;
+            }
+        }
+        fields.push(field);
+        return fields;
+    }
+
+    property bool _refreshPending: false
+
+    // Serialize the complete query cycle and coalesce events arriving while busy.
+    Timer {
+        interval: 200
+        running: root._refreshPending && !connectionProcess.running && !wifiDetailProcess.running && !ethernetDetailProcess.running
+        onTriggered: {
+            root._refreshPending = false;
+            connectionProcess.running = true;
+        }
+    }
+
+    Timer {
+        interval: 30000
+        running: true
+        repeat: true
+        onTriggered: root.refresh()
+    }
 
     // ── backing props ─────────────────────────────────
     property bool _hasConnection: false
@@ -48,9 +88,14 @@ Singleton {
                 root._connectionType = "";
                 root._connectionName = "";
                 root._device = "";
+                root._signalStrength = 0;
+                root._frequency = "";
+                root._bssid = "";
+                root._security = "";
+                root._speed = "";
 
                 for (const line of lines) {
-                    const parts = line.split(":");
+                    const parts = root.parseFields(line);
                     if (parts.length < 3)
                         continue;
                     const type = parts[0];
@@ -90,19 +135,19 @@ Singleton {
 
     property var _wifiDetailProcess: Process {
         id: wifiDetailProcess
-        command: ["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,BSSID,SECURITY", "dev", "wifi"]
+        command: ["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,FREQ,BSSID,SECURITY", "dev", "wifi", "list", "ifname", root._device, "--rescan", "no"]
         stdout: StdioCollector {
             onStreamFinished: {
                 const lines = text.split("\n").filter(l => l.trim() !== "");
                 for (const line of lines) {
-                    const parts = line.split(/:(?!\\)/).map(p => p.replace(/\\:/g, ":"));
+                    const parts = root.parseFields(line);
                     if (parts.length < 6)
                         continue;
                     if (parts[0] !== "*")
                         continue;
-                    const freq = parts[3];
+                    const freq = parseInt(parts[3]);
                     root._signalStrength = parseInt(parts[2]) || 0;
-                    root._frequency = freq.includes("6") ? "6 GHz" : freq.includes("5") ? "5 GHz" : "2.4 GHz";
+                    root._frequency = freq >= 5925 && freq <= 7125 ? "6 GHz" : freq >= 4900 && freq < 5925 ? "5 GHz" : freq >= 2400 && freq <= 2500 ? "2.4 GHz" : "";
                     root._bssid = parts[4];
                     root._security = parts[5];
                     break;
@@ -113,16 +158,11 @@ Singleton {
 
     property var _ethernetDetailProcess: Process {
         id: ethernetDetailProcess
-        command: ["nmcli", "-t", "-f", "GENERAL.SPEED", "dev", "show", root._device]
+        command: ["cat", "/sys/class/net/" + root._device + "/speed"]
         stdout: StdioCollector {
             onStreamFinished: {
-                const line = text.split("\n").find(l => l.includes("SPEED"));
-                if (line) {
-                    const val = line.split(":").slice(1).join(":").trim();
-                    root._speed = val === "Unknown" ? "" : val;
-                } else {
-                    root._speed = "";
-                }
+                const speed = parseInt(text.trim());
+                root._speed = speed > 0 ? speed + " Mb/s" : "";
             }
         }
     }
@@ -131,8 +171,17 @@ Singleton {
         id: nmMonitor
         command: ["nmcli", "monitor"]
         running: true
-        stdout: StdioCollector {
-            onStreamFinished: root.refresh()
+        stdout: SplitParser {
+            onRead: root.refresh()
+        }
+    }
+
+    Timer {
+        interval: 5000
+        running: !nmMonitor.running
+        onTriggered: {
+            nmMonitor.running = true;
+            root.refresh();
         }
     }
 }
