@@ -16,5 +16,6 @@
     ./containers/zot
     ./containers/bookorbit
     ./containers/home-assistant
+    ./containers/paperless
   ];
 }

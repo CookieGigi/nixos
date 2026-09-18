@@ -33,6 +33,10 @@
     homeassistant.cookiegigi.com {
       reverse_proxy 10.89.100.1:8123
     }
+
+    paperless.cookiegigi.com {
+      reverse_proxy 192.168.1.49:8000
+    }
   '';
 in {
   environment.etc = {
