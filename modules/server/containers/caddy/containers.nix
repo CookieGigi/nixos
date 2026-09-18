@@ -37,6 +37,10 @@
     paperless.cookiegigi.com {
       reverse_proxy 192.168.1.49:8000
     }
+
+    jellyfin.cookiegigi.com {
+      reverse_proxy 192.168.1.49:8096
+    }
   '';
 in {
   environment.etc = {

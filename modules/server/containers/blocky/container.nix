@@ -38,6 +38,7 @@
         fileflows.cookiegigi.com: 192.168.1.49
         homeassistant.cookiegigi.com: 192.168.1.49
         paperless.cookiegigi.com: 192.168.1.49
+        jellyfin.cookiegigi.com: 192.168.1.49
 
     statistics:
       enable: true

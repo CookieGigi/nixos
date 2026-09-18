@@ -17,5 +17,6 @@
     ./containers/bookorbit
     ./containers/home-assistant
     ./containers/paperless
+    ./containers/jellyfin
   ];
 }
