@@ -18,7 +18,7 @@
       User=405
       Group=405
       Volume=/persist/paperless/postgres:/var/lib/postgresql
-      Tmpfs=/var/run/postgresql:uid=405,gid=405,mode=0770
+      Mount=type=tmpfs,destination=/var/run/postgresql,tmpfs-mode=0770,U=true
       EnvironmentFile=/run/secrets/paperless-db-env
       Environment=POSTGRES_USER=paperless
       Environment=POSTGRES_DB=paperless
