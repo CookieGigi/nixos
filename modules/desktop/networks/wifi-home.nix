@@ -3,6 +3,8 @@
     profiles."Cencurut" = {
       connection = {
         id = "Cencurut";
+        # Reuse the saved connection's identity instead of creating a duplicate.
+        uuid = "fbdb310d-f0a5-4134-a036-32cc5c7dd237";
         type = "wifi";
         autoconnect = true;
         permissions = "";
@@ -13,6 +15,7 @@
       };
       wifi-security = {
         key-mgmt = "wpa-psk";
+        # Supplied by the system nm-file-secret-agent, not a desktop keyring.
         psk-flags = "1";
       };
       ipv4 = {method = "auto";};

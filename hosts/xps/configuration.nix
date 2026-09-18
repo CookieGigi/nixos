@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/desktop
+    ../../modules/desktop/networks/wifi-home.nix
     ../../modules/home
     ./tpm.nix
   ];
