@@ -14,6 +14,8 @@ PopupBase {
     anchorLeft: false
     anchorRight: true
 
+    onOpened: NetworkStatus.refresh()
+
     content: ColumnLayout {
 
         spacing: 8
@@ -24,9 +26,10 @@ PopupBase {
 
         LabelValue {
             label: "Name"
-            value: NetworkStatus.connectionName
+            value: NetworkStatus.hasConnection ? NetworkStatus.connectionName : "Disconnected"
         }
         LabelValue {
+            visible: NetworkStatus.hasConnection
             label: "Device"
             value: NetworkStatus.connectionType + "(" + NetworkStatus.device + ")"
         }

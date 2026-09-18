@@ -30,16 +30,17 @@ Singleton {
     }
 
     // ── connection state ────────────────────────────────
-    readonly property bool isConnected: Bluetooth.devices.count > 0
-    readonly property string deviceName: isConnected ? Bluetooth.devices.objectAt(0).name : ""
-    readonly property string deviceAddress: isConnected ? Bluetooth.devices.objectAt(0).address : ""
-    readonly property string deviceIcon: isConnected ? Bluetooth.devices.objectAt(0).icon : ""
-    readonly property int deviceBattery: isConnected && Bluetooth.devices.objectAt(0).batteryAvailable ? Math.round(Bluetooth.devices.objectAt(0).battery * 100) : -1
-    readonly property bool deviceBatteryAvailable: isConnected && Bluetooth.devices.objectAt(0).batteryAvailable
+    readonly property var connectedDevices: Bluetooth.devices.values.filter(device => device.connected)
+    readonly property bool isConnected: connectedCount > 0
+    readonly property string deviceName: isConnected ? connectedDevices[0].name : ""
+    readonly property string deviceAddress: isConnected ? connectedDevices[0].address : ""
+    readonly property string deviceIcon: isConnected ? connectedDevices[0].icon : ""
+    readonly property int deviceBattery: deviceBatteryAvailable ? Math.round(connectedDevices[0].battery * 100) : -1
+    readonly property bool deviceBatteryAvailable: isConnected && connectedDevices[0].batteryAvailable
     readonly property string deviceState: {
         if (!isConnected)
             return "";
-        switch (Bluetooth.devices.objectAt(0).state) {
+        switch (connectedDevices[0].state) {
         case BluetoothDeviceState.Connected:
             return "connected";
         case BluetoothDeviceState.Connecting:
@@ -52,5 +53,5 @@ Singleton {
     }
 
     // ── count of connected devices ──────────────────────
-    readonly property int connectedCount: Bluetooth.devices.count
+    readonly property int connectedCount: connectedDevices.length
 }

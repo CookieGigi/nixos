@@ -11,9 +11,23 @@ PopupBase {
     implicitHeight: monthView.implicitHeight + 32
 
     property var today: new Date()
-    property var selectedDate: new Date(today)
+    property var selectedDate: new Date()
+
+    function updateToday() {
+        const now = new Date();
+        if (now.toDateString() !== today.toDateString())
+            today = now;
+    }
+
+    Timer {
+        interval: 60 * 1000
+        running: true
+        repeat: true
+        onTriggered: root.updateToday()
+    }
 
     onOpened: {
+        root.updateToday();
         controller.handleLeftRight = true;
         controller.navigateLeft.connect(monthView.previousMonth);
         controller.navigateRight.connect(monthView.nextMonth);

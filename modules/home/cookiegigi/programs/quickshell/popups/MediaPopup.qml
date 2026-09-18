@@ -46,8 +46,8 @@ PopupBase {
                 required property int index
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property var player: modelData
-                property real currentPosition: player.position
-                property real currentVolume: player.volume
+                readonly property real currentPosition: player.position
+                readonly property real currentVolume: player.volume
 
                 width: parent.width
                 implicitHeight: cardContent.implicitHeight + 16
@@ -318,12 +318,7 @@ PopupBase {
                     interval: 1000
                     running: player && player.playbackState === MprisPlaybackState.Playing
                     repeat: true
-                    onTriggered: {
-                        if (player) {
-                            parent.currentPosition = player.position;
-                            parent.currentVolume = player.volume;
-                        }
-                    }
+                    onTriggered: player.positionChanged()
                 }
 
                 // Hover and click handling for list selection.

@@ -21,8 +21,8 @@ Button {
         spacing: 6
 
         Icon {
-            accentColor: root.isHover ? Theme.accentColor : Theme.text
-            text: NetworkStatus.connectionType === "wifi" ? "" : ""
+            accentColor: root.isHover ? Theme.accentColor : NetworkStatus.hasConnection ? Theme.text : Theme.overlay0
+            text: !NetworkStatus.hasConnection ? "󰖪" : NetworkStatus.connectionType === "wifi" ? "" : ""
         }
     }
 
