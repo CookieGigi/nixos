@@ -94,6 +94,13 @@ Scope {
             alignment: "right"
         }
 
+        NotificationCenter {
+            id: notificationCenter
+            screen: modelData
+            anchorWidget: notificationWidget
+            alignment: "left"
+        }
+
         FlexboxLayout {
             id: barRow
             direction: FlexboxLayout.Row
@@ -106,7 +113,7 @@ Scope {
                 rightMargin: 16
             }
 
-            // Left: clock + prayer
+            // Left: clock + prayer + notifications
             FlexboxLayout {
                 justifyContent: FlexboxLayout.JustifyStart
                 columnGap: 8
@@ -120,6 +127,11 @@ Scope {
                 }
                 PrayerWidget {
                     id: prayerWidget
+                    Layout.fillHeight: true
+                    screen: modelData
+                }
+                NotificationWidget {
+                    id: notificationWidget
                     Layout.fillHeight: true
                     screen: modelData
                 }
@@ -193,5 +205,6 @@ Scope {
         PopupRegistry.register(modelData, "media", mediaPopup);
         PopupRegistry.register(modelData, "volume", volumePopup);
         PopupRegistry.register(modelData, "battery", batteryPopup);
+        PopupRegistry.register(modelData, "notifications", notificationCenter);
     }
 }

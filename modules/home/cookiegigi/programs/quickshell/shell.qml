@@ -88,4 +88,12 @@ ShellRoot {
             modelData: modelData
         }
     }
+
+    IpcHandler {
+        target: "notifications"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggle(screen, "notifications");
+        }
+    }
 }

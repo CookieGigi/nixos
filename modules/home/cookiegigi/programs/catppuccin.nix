@@ -91,6 +91,10 @@ in {
     font = "JetBrains Mono 10";
     default-timeout = 5000;
     group-by = "summary";
+    max-history = 100;
+    "mode=do-not-disturb" = {
+      invisible = 1;
+    };
   };
 
   # ── Swaylock (screen locker) ─────────────────────────────────
