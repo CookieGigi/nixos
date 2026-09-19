@@ -5,12 +5,12 @@ import "../theme"
 import "../components"
 import "../services"
 
-// Bluetooth widget: shows when the adapter is powered.
+// Keep settings accessible even when the adapter is powered off.
 // Icon changes when a device is connected.
 Button {
     id: root
 
-    visible: BluetoothStatus.hasAdapter && BluetoothStatus.isPowered
+    visible: BluetoothStatus.hasAdapter
     property var screen: null
 
     implicitWidth: btLayout.implicitWidth + Theme.paddingH * 2
@@ -22,8 +22,8 @@ Button {
         spacing: 6
 
         Icon {
-            accentColor: root.isHover ? Theme.accentColor : Theme.text
-            text: BluetoothStatus.isConnected ? "󰂱" : ""
+            accentColor: root.isHover ? Theme.accentColor : (BluetoothStatus.isPowered ? Theme.text : Theme.overlay0)
+            text: !BluetoothStatus.isPowered ? "󰂲" : (BluetoothStatus.isConnected ? "󰂱" : "")
         }
     }
 

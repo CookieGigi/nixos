@@ -22,6 +22,8 @@ PanelWindow {
     property string popupId: ""
 
     property int popupWidth: 500
+    readonly property real screenWidth: screen?.width ?? popupWidth
+    readonly property int effectivePopupWidth: Math.max(1, Math.min(popupWidth, screenWidth))
 
     // Positioning
     property bool anchorTop: true
@@ -31,8 +33,8 @@ PanelWindow {
 
     property int marginTop: 15
     property int marginBottom: 0
-    property int marginLeft: anchorWidget ? computeLeft(anchorWidget) : (screen.width - popupWidth) / 2
-    property int marginRight: screen.width - marginLeft - popupWidth
+    property int marginLeft: Math.round(Math.max(0, Math.min(screenWidth - effectivePopupWidth, computeLeft(anchorWidget))))
+    property int marginRight: Math.max(0, screenWidth - marginLeft - effectivePopupWidth)
 
     property alias content: popupShell.children
     property alias controller: keyController
@@ -63,7 +65,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     exclusiveZone: 0
 
-    implicitWidth: popupWidth
+    implicitWidth: effectivePopupWidth
     color: "transparent"
 
     signal opened
@@ -71,16 +73,17 @@ PanelWindow {
     signal unhandledKeyPressed(var event)
 
     function computeLeft(w) {
-        if (!anchorWidget)
-            return (screen.width - popupWidth) / 2;
-        void anchorWidget.x;  // force dependency
-        void anchorWidget.width;
-        const pos = anchorWidget.mapToItem(null, 0, 0);
+        if (!w)
+            return (screenWidth - effectivePopupWidth) / 2;
+        // mapToItem does not establish dependencies on ancestor positions.
+        for (let item = w; item; item = item.parent)
+            void item.x;
+        const pos = w.mapToItem(null, 0, 0);
         if (alignment === "left")
             return pos.x;
         if (alignment === "right")
-            return pos.x + anchorWidget.width - popupWidth;
-        return pos.x + anchorWidget.width / 2 - popupWidth / 2;
+            return pos.x + w.width - effectivePopupWidth;
+        return pos.x + w.width / 2 - effectivePopupWidth / 2;
     }
     function closePopup() {
         isOpen = false;

@@ -9,17 +9,31 @@ PopupBase {
     title: "Prayer Times"
     popupId: "prayer"
     popupWidth: 280
-    implicitHeight: 280
+    implicitHeight: prayerContent.implicitHeight + 32
+    onOpened: {
+        PrayerTimes._updateNextPrayer();
+        if (!PrayerTimes.ready)
+            PrayerTimes.refresh();
+    }
 
     content: ColumnLayout {
+        id: prayerContent
         anchors {
             fill: parent
             margins: 16
         }
         spacing: 12
 
+        StyledText {
+            visible: !PrayerTimes.ready
+            text: PrayerTimes.loading ? "Loading prayer times..." : "Prayer times unavailable"
+            color: Theme.subtext0
+            Layout.alignment: Qt.AlignHCenter
+        }
+
         // Hijri date header
         ColumnLayout {
+            visible: PrayerTimes.ready
             Layout.alignment: Qt.AlignHCenter
             spacing: 2
 
@@ -41,6 +55,7 @@ PopupBase {
 
         // Separator
         Rectangle {
+            visible: PrayerTimes.ready
             Layout.fillWidth: true
             height: 1
             color: Theme.surface0
@@ -48,23 +63,28 @@ PopupBase {
 
         // Prayer list
         ColumnLayout {
+            visible: PrayerTimes.ready
             spacing: 6
             Layout.fillWidth: true
 
             Repeater {
-                model: PrayerTimes.prayers
+                model: !PrayerTimes.ready ? [] : PrayerTimes.nextPrayerName === "Fajr (tomorrow)" ? PrayerTimes.prayers.concat([
+                    {
+                        name: PrayerTimes.nextPrayerName,
+                        time: PrayerTimes.nextPrayerTime
+                    }
+                ]) : PrayerTimes.prayers
 
                 RowLayout {
                     spacing: 8
                     Layout.fillWidth: true
 
-                    readonly property bool isNext: modelData.name === PrayerTimes.nextPrayerName.replace(" (tomorrow)", "")
+                    readonly property bool isNext: modelData.name === PrayerTimes.nextPrayerName
 
                     StyledText {
                         text: modelData.name
                         styledBold: isNext
                         color: isNext ? Theme.accentColor : Theme.text
-                        Layout.preferredWidth: 80
                     }
 
                     StyledText {

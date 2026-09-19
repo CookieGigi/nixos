@@ -42,6 +42,7 @@ PopupBase {
             spacing: 8
 
             itemDelegate: Rectangle {
+                id: playerCard
                 required property var modelData
                 required property int index
                 readonly property bool isCurrent: ListView.isCurrentItem
@@ -51,7 +52,7 @@ PopupBase {
 
                 width: parent.width
                 implicitHeight: cardContent.implicitHeight + 16
-                color: isCurrent ? Theme.popupItemHover : "transparent"
+                color: isCurrent || cardMouse.containsMouse ? Theme.popupItemHover : "transparent"
                 radius: 6
 
                 ColumnLayout {
@@ -84,6 +85,7 @@ PopupBase {
 
                             MouseArea {
                                 anchors.fill: parent
+                                enabled: player.canRaise
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: MprisService.raise(player)
                             }
@@ -126,7 +128,7 @@ PopupBase {
                         visible: player.lengthSupported && player.positionSupported
 
                         StyledText {
-                            text: MprisService.formatTime(parent.parent.parent.currentPosition)
+                            text: MprisService.formatTime(playerCard.currentPosition)
                             styledSize: 10
                             color: Theme.overlay0
                         }
@@ -145,13 +147,14 @@ PopupBase {
                                     top: parent.top
                                     bottom: parent.bottom
                                 }
-                                width: player.length > 0 ? parent.width * (parent.parent.parent.parent.currentPosition / player.length) : 0
+                                width: Number.isFinite(playerCard.currentPosition) && Number.isFinite(player.length) && player.length > 0 ? parent.width * Math.max(0, Math.min(1, playerCard.currentPosition / player.length)) : 0
                                 radius: 3
                                 color: Theme.accentColor
                             }
 
                             MouseArea {
                                 anchors.fill: parent
+                                enabled: player.canControl && player.canSeek && player.positionSupported && Number.isFinite(player.length) && player.length > 0
                                 onClicked: mouse => {
                                     if (player.length > 0) {
                                         const ratio = Math.max(0, Math.min(1, mouse.x / progressTrack.width));
@@ -184,6 +187,7 @@ PopupBase {
                             implicitWidth: 28
                             implicitHeight: 28
                             visible: player.canGoPrevious
+                            enabled: player.canControl && player.canGoPrevious
                             onClicked: MprisService.previous(player)
 
                             Icon {
@@ -198,6 +202,7 @@ PopupBase {
                         Button {
                             implicitWidth: 32
                             implicitHeight: 32
+                            enabled: player.canControl && player.canTogglePlaying
                             onClicked: MprisService.togglePlaying(player)
 
                             Icon {
@@ -213,6 +218,7 @@ PopupBase {
                             implicitWidth: 28
                             implicitHeight: 28
                             visible: player.canGoNext
+                            enabled: player.canControl && player.canGoNext
                             onClicked: MprisService.next(player)
 
                             Icon {
@@ -228,6 +234,7 @@ PopupBase {
                             implicitWidth: 28
                             implicitHeight: 28
                             visible: player.loopSupported
+                            enabled: player.canControl && player.loopSupported
                             onClicked: MprisService.cycleLoopState(player)
 
                             Icon {
@@ -243,6 +250,7 @@ PopupBase {
                             implicitWidth: 28
                             implicitHeight: 28
                             visible: player.shuffleSupported
+                            enabled: player.canControl && player.shuffleSupported
                             onClicked: MprisService.toggleShuffle(player)
 
                             Icon {
@@ -261,14 +269,9 @@ PopupBase {
                         Button {
                             implicitWidth: 28
                             implicitHeight: 28
-                            visible: player.canControl
-                            onClicked: {
-                                if (player.volume > 0) {
-                                    MprisService.setVolume(player, 0);
-                                } else {
-                                    MprisService.setVolume(player, 0.5);
-                                }
-                            }
+                            visible: player.volumeSupported
+                            enabled: player.canControl && player.volumeSupported
+                            onClicked: MprisService.toggleMute(player)
 
                             Icon {
                                 anchors.centerIn: parent
@@ -281,6 +284,8 @@ PopupBase {
                         // Volume slider
                         Rectangle {
                             id: volTrack
+                            visible: player.volumeSupported
+                            enabled: player.canControl && player.volumeSupported
                             implicitWidth: 70
                             implicitHeight: 6
                             radius: 3
@@ -292,7 +297,7 @@ PopupBase {
                                     top: parent.top
                                     bottom: parent.bottom
                                 }
-                                width: parent.width * parent.parent.parent.parent.currentVolume
+                                width: Number.isFinite(playerCard.currentVolume) ? parent.width * Math.max(0, Math.min(1, playerCard.currentVolume)) : 0
                                 radius: 3
                                 color: Theme.accentColor
                             }
@@ -316,7 +321,7 @@ PopupBase {
 
                 Timer {
                     interval: 1000
-                    running: player && player.playbackState === MprisPlaybackState.Playing
+                    running: root.visible && player && player.positionSupported && player.playbackState === MprisPlaybackState.Playing
                     repeat: true
                     onTriggered: player.positionChanged()
                 }
@@ -326,19 +331,10 @@ PopupBase {
                 // receive their own mouse events first; we only handle clicks on
                 // non-interactive areas (text, margins) and hover highlighting.
                 MouseArea {
+                    id: cardMouse
                     anchors.fill: parent
                     z: -1
                     hoverEnabled: true
-                    onEntered: {
-                        if (index !== playerList.currentIndex) {
-                            parent.color = Theme.popupItemHover;
-                        }
-                    }
-                    onExited: {
-                        if (index !== playerList.currentIndex) {
-                            parent.color = "transparent";
-                        }
-                    }
                     onClicked: {
                         playerList.currentIndex = index;
                     }
@@ -381,7 +377,7 @@ PopupBase {
         if (playerList.currentIndex < 0)
             return;
         const player = MprisService.activePlayers[playerList.currentIndex];
-        if (!player)
+        if (!root.visible || !player || !player.canControl)
             return;
 
         if (event.key === Qt.Key_Left) {
@@ -395,12 +391,12 @@ PopupBase {
                 event.accepted = true;
             }
         } else if (event.key === Qt.Key_Plus || event.key === Qt.Key_Equal) {
-            if (player.canControl) {
+            if (player.volumeSupported) {
                 MprisService.setVolume(player, player.volume + 0.05);
                 event.accepted = true;
             }
         } else if (event.key === Qt.Key_Minus) {
-            if (player.canControl) {
+            if (player.volumeSupported) {
                 MprisService.setVolume(player, player.volume - 0.05);
                 event.accepted = true;
             }
@@ -425,12 +421,8 @@ PopupBase {
                 event.accepted = true;
             }
         } else if (event.key === Qt.Key_M) {
-            if (player.canControl) {
-                if (player.volume > 0) {
-                    MprisService.setVolume(player, 0);
-                } else {
-                    MprisService.setVolume(player, 0.5);
-                }
+            if (player.volumeSupported) {
+                MprisService.toggleMute(player);
                 event.accepted = true;
             }
         }

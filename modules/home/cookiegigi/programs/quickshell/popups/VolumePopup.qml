@@ -37,7 +37,7 @@ PopupBase {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                width: parent.width * (Pipewire.defaultAudioSink?.audio.volume ?? 0)
+                width: parent.width * Math.max(0, Math.min(1, Pipewire.defaultAudioSink?.audio.volume ?? 0))
                 radius: 10
                 color: Theme.accentColor
             }

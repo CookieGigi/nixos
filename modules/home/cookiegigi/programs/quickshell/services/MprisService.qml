@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Services.Mpris
 
 // MprisService — singleton wrapper around Quickshell.Services.Mpris.
-// Exposes filtered/deduplicated active players and helper methods for
+// Exposes active players and helper methods for
 // playback control, volume, seeking, loop/shuffle, and window management.
 Singleton {
     id: root
@@ -12,21 +12,8 @@ Singleton {
     // -- Raw players from Quickshell --
     readonly property var allPlayers: Mpris.players.values
 
-    // -- Filtered / deduplicated active players (not stopped) --
-    readonly property var activePlayers: {
-        const seen = new Set();
-        const players = allPlayers.filter(p => {
-            const state = p.playbackState;
-            const isStopped = state === MprisPlaybackState.Stopped;
-            const id = (p.identity || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-            if (isStopped || seen.has(id)) {
-                return false;
-            }
-            seen.add(id);
-            return true;
-        });
-        return players;
-    }
+    // Identity is a display name, not a unique player identifier.
+    readonly property var activePlayers: allPlayers.filter(p => p.playbackState !== MprisPlaybackState.Stopped)
 
     readonly property bool hasActivePlayers: activePlayers.length > 0
     readonly property var primaryPlayer: hasActivePlayers ? activePlayers[0] : null
@@ -60,7 +47,7 @@ Singleton {
 
     // -- Time formatting --
     function formatTime(seconds) {
-        if (!seconds || !isFinite(seconds) || seconds < 0)
+        if (typeof seconds !== "number" || !isFinite(seconds) || seconds < 0)
             return "--:--";
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -73,44 +60,74 @@ Singleton {
 
     // -- Playback control --
     function togglePlaying(player) {
-        if (player && player.canTogglePlaying)
+        if (player && player.canControl && player.canTogglePlaying)
             player.togglePlaying();
     }
     function play(player) {
-        if (player && player.canPlay)
+        if (player && player.canControl && player.canPlay)
             player.play();
     }
     function pause(player) {
-        if (player && player.canPause)
+        if (player && player.canControl && player.canPause)
             player.pause();
     }
     function stop(player) {
-        if (player && player.canStop)
+        if (player && player.canControl)
             player.stop();
     }
     function next(player) {
-        if (player && player.canGoNext)
+        if (player && player.canControl && player.canGoNext)
             player.next();
     }
     function previous(player) {
-        if (player && player.canGoPrevious)
+        if (player && player.canControl && player.canGoPrevious)
             player.previous();
     }
 
     // -- Seek / Position --
     function seek(player, offset) {
-        if (player && player.canSeek)
+        if (player && player.canControl && player.canSeek && Number.isFinite(offset))
             player.seek(offset);
     }
     function setPosition(player, position) {
-        if (player && player.canSeek && player.positionSupported)
+        if (player && player.canControl && player.canSeek && player.positionSupported && Number.isFinite(position) && position >= 0)
             player.position = position;
     }
 
     // -- Volume (per source!) --
+    // Weak keys do not keep disconnected players alive. Watch all players so
+    // external volume changes and stopped players retain their last nonzero level.
+    readonly property var lastVolumes: new WeakMap()
+
+    Variants {
+        model: root.allPlayers
+        delegate: Connections {
+            required property var modelData
+            target: modelData
+            function onVolumeChanged() {
+                root.rememberVolume(modelData);
+            }
+            Component.onCompleted: root.rememberVolume(modelData)
+        }
+    }
+
+    function rememberVolume(player) {
+        if (player && player.volumeSupported && Number.isFinite(player.volume) && player.volume > 0)
+            lastVolumes.set(player, player.volume);
+    }
+
     function setVolume(player, volume) {
-        if (player && player.canControl)
+        if (player && player.canControl && player.volumeSupported && Number.isFinite(volume)) {
+            rememberVolume(player);
             player.volume = Math.max(0.0, Math.min(1.0, volume));
+        }
+    }
+
+    function toggleMute(player) {
+        if (!player || !player.canControl || !player.volumeSupported)
+            return;
+        rememberVolume(player);
+        player.volume = player.volume > 0 ? 0 : (lastVolumes.get(player) ?? 0.5);
     }
 
     // -- Loop / Shuffle --

@@ -1,4 +1,5 @@
 import QtQuick.Layouts
+import Quickshell.Services.UPower
 import "../components"
 import "../theme"
 import "../services"
@@ -26,11 +27,22 @@ PopupBase {
             value: {
                 if (!BatteryStatus.ready)
                     return "N/A";
-                if (BatteryStatus.full)
+                switch (BatteryStatus.status) {
+                case UPowerDeviceState.FullyCharged:
                     return "Fully Charged";
-                if (BatteryStatus.charging)
+                case UPowerDeviceState.Charging:
                     return "Charging";
-                return "Discharging";
+                case UPowerDeviceState.Discharging:
+                    return "Discharging";
+                case UPowerDeviceState.Empty:
+                    return "Empty";
+                case UPowerDeviceState.PendingCharge:
+                    return "Pending Charge";
+                case UPowerDeviceState.PendingDischarge:
+                    return "Pending Discharge";
+                default:
+                    return "Unknown";
+                }
             }
         }
 

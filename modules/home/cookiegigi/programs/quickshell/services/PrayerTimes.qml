@@ -11,6 +11,7 @@ Singleton {
 
     // ── Public API ────────────────────────────────────────
     readonly property bool ready: _ready
+    readonly property bool loading: fetchProcess.running
     readonly property string nextPrayerName: _nextPrayerName
     readonly property string nextPrayerTime: _nextPrayerTime
     readonly property var prayers: _prayers
@@ -71,12 +72,15 @@ Singleton {
         onExited: exitCode => {
             if (exitCode !== 0) {
                 console.warn("PrayerTimes: prayer-times-json exited with code", exitCode);
+                root._ready = false;
+                root._updateNextPrayer();
             }
         }
     }
 
     // ── Refresh triggers ──────────────────────────────────
     function refresh() {
+        root._updateNextPrayer();
         if (!fetchProcess.running)
             fetchProcess.running = true;
     }

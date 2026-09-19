@@ -42,7 +42,7 @@ PopupBase {
     ]
 
     onOpened: {
-        menuList.currentIndex = 0;
+        menuList.currentIndex = root.actions.findIndex(action => action.cmd === null);
     }
 
     Component.onCompleted: {
