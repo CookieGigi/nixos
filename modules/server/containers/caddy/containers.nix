@@ -99,10 +99,11 @@ in {
       [Container]
       Image=zot.cookiegigi.com:5050/caddy-cloudflare:2.11.4
       ContainerName=caddy
+      # Keep a single default-route network for symmetric published-port replies.
       Network=caddy.network
       Network=authelia.network
-      Network=blocky.network
-      Network=fileflows.network
+      Network=blocky-proxy.network
+      Network=fileflows-proxy.network
       Network=home-assistant-proxy.network:ip=10.89.100.2
       PublishPort=80:80
       PublishPort=443:443

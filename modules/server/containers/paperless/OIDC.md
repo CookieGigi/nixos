@@ -21,7 +21,7 @@ Authelia client requirements:
   secret because runtime template substitution does not JSON-escape secrets.
   Authelia needs its digest; Paperless needs the original value.
 - The existing root-only runtime `paperless-app-env` template supplies the provider
-  JSON and restarts `paperless.service` when changed. No plaintext secret is placed
+  JSON. Manually restart `paperless.service` after deploying changes. No plaintext secret is placed
   in the Nix store. As with existing DB credentials, the container environment is
   visible to privileged container administrators.
 - Local login remains enabled. Local and social signups and automatic social

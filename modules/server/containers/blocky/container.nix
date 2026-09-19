@@ -59,6 +59,12 @@
   '';
 in {
   environment.etc = {
+    "containers/systemd/blocky-proxy.network".text = ''
+      [Network]
+      NetworkName=blocky-proxy
+      Internal=true
+    '';
+
     "containers/systemd/blocky.network".text = ''
       [Network]
       NetworkName=blocky
@@ -75,6 +81,7 @@ in {
       [Container]
       Image=ghcr.io/0xerr0r/blocky:latest
       Network=blocky.network
+      Network=blocky-proxy.network
       ContainerName=blocky
       PublishPort=127.0.0.1:53:53/tcp
       PublishPort=127.0.0.1:53:53/udp

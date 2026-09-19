@@ -1,5 +1,6 @@
 {config, ...}: {
   sops = {
+    # Quadlet units are generated at runtime; restart them manually after switching.
     secrets = {
       "bookorbit-db-password" = {};
       "bookorbit-jwt-secret" = {};
@@ -12,7 +13,6 @@
       '';
       path = "/run/secrets/bookorbit-db-env";
       mode = "0400";
-      restartUnits = ["bookorbit-db.service"];
     };
 
     templates."bookorbit-app-env" = {
@@ -23,7 +23,6 @@
       '';
       path = "/run/secrets/bookorbit-app-env";
       mode = "0400";
-      restartUnits = ["bookorbit.service"];
     };
   };
 }

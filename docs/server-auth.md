@@ -36,6 +36,15 @@ Caddy reaches the four applications by container DNS. Ports 4000, 5000, 2283 and
 networks. Blocky's TCP/UDP DNS port 53 remains available. Container administrators
 and containers sharing a backend network remain inside the trust boundary.
 
+Caddy's only default-route network is `caddy`. Its Authelia, Blocky, FileFlows and
+Home Assistant connections use internal networks, which add no default routes.
+Blocky and FileFlows retain their own egress networks and each shares a separate
+internal proxy network with Caddy. Attaching Caddy directly to their egress
+networks creates competing default routes: published-port replies can leave via
+the wrong bridge and be dropped by the host's strict reverse-path filter.
+Keep that filter enabled. When migrating to these proxy networks, restart Blocky,
+FileFlows and Caddy after switching; no existing networks need to be deleted.
+
 Immich and Paperless reach the HTTPS issuer through an explicit host mapping;
 normal TLS verification stays enabled. Caddy strips incoming identity headers
 before its auth request and copies them only from a successful Authelia response.
@@ -93,12 +102,26 @@ nix flake check path:.
 Only then schedule the normal server rebuild with explicit operator approval.
 No rebuild or activation is performed by bootstrap. Quadlet files are generated
 from `/etc/containers/systemd`; on an existing server, make sure changed units have
-actually restarted, not merely that their source files changed. If necessary:
+actually restarted, not merely that their source files changed. For this rollout:
 
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl restart authelia immich-server paperless blocky fileflows caddy
 ```
+
+Do not set SOPS `restartUnits` to Quadlet-generated services: NixOS 26.11's
+activation restart handling looks for static unit files in the new generation,
+where these units do not exist. After future secret/template updates, explicitly
+restart the affected consumers after switching. This includes Authelia, Immich,
+Paperless and BookOrbit, and their database containers when DB credentials change.
+Changing an environment-file password alone does not rotate an existing database
+role's password; database credential rotation needs a coordinated procedure.
+
+If a switch already failed on a missing generated unit, inspect
+`/run/nixos/activation-restart-list` on the server before retrying. The failed switch
+can leave obsolete Quadlet restart requests there. Remove only those obsolete
+entries while preserving unrelated pending actions; removing the SOPS hooks alone
+does not clear an existing queue. Do not delete all NixOS recovery lists.
 
 Restarting Blocky briefly interrupts DNS. Do this from a retained SSH session and
 check service status/journals before closing that session.

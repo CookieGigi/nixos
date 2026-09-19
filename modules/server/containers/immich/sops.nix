@@ -1,23 +1,20 @@
 {config, ...}: {
   sops = {
+    # Quadlet units are generated at runtime; restart them manually after switching.
     secrets = {
       "immich-db-password" = {
         owner = "root";
         group = "immich-services";
         mode = "0440";
-        restartUnits = ["immich-server.service" "immich-database.service"];
       };
 
       "authelia-immich-client-secret" = {};
-      "immich-settings" = {
-        restartUnits = ["immich-server.service"];
-      };
+      "immich-settings" = {};
     };
 
     templates."immich-config.json" = {
       owner = "immich";
       mode = "0400";
-      restartUnits = ["immich-server.service"];
       # Merged over the encrypted export of existing settings before startup.
       content = builtins.toJSON {
         passwordLogin.enabled = true;

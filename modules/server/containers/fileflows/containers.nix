@@ -1,5 +1,11 @@
 _: {
   environment.etc = {
+    "containers/systemd/fileflows-proxy.network".text = ''
+      [Network]
+      NetworkName=fileflows-proxy
+      Internal=true
+    '';
+
     "containers/systemd/fileflows.network".text = ''
       [Network]
       NetworkName=fileflows
@@ -17,6 +23,7 @@ _: {
       Image=docker.io/revenz/fileflows:latest
       ContainerName=fileflows
       Network=fileflows.network
+      Network=fileflows-proxy.network
       Volume=/persist/fileflows/data:/app/Data
       Volume=/persist/fileflows/logs:/app/Logs
       Volume=/persist/fileflows/temp:/temp

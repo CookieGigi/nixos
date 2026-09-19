@@ -46,8 +46,10 @@ Changing the issuer/client subject mapping later requires deliberate relinking.
   configuration is not overwritten. Protect and remove the plaintext export after
   confirming the encrypted baseline is correct.
 - The rendered config is read-only, owned by UID 300 with mode 0400, and mounted
-  from `/run/immich-config/config.json`. Baseline and OAuth-template changes restart
-  `immich-server.service`. The merged plaintext is never written to the Nix store.
+  from `/run/immich-config/config.json`. After baseline or OAuth-template changes,
+  manually restart `immich-server.service` after switching. Also restart
+  `immich-database.service` when its credentials change. The merged plaintext is
+  never written to the Nix store.
 - Containers resolve `auth.cookiegigi.com` to `192.168.1.49` via `AddHost` while
   retaining HTTPS hostname and certificate validation. Authelia's LAN HTTPS proxy
   must accept traffic from the container network. Browsers/mobile devices also

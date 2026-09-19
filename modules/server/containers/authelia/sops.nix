@@ -11,6 +11,6 @@
     ] (_: {
       owner = "authelia";
       mode = "0400";
-      restartUnits = ["authelia.service"];
+      # Quadlet units are generated at runtime; restart Authelia after switching.
     });
 }

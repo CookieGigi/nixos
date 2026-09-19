@@ -98,7 +98,7 @@ in {
       Environment=IMMICH_LOG_LEVEL=log
       Environment=MACHINE_LEARNING_CACHE_FOLDER=/cache
       Environment=HOME=/cache
-      HealthCmd=curl -fsS http://localhost:3003/ping || exit 1
+      HealthCmd=python3 healthcheck.py
       HealthInterval=30s
       HealthTimeout=10s
       HealthRetries=5
@@ -144,7 +144,7 @@ in {
       Environment=IMMICH_MEDIA_LOCATION=/data
       Volume=/run/immich-config/config.json:/run/secrets/immich-config.json:ro
       Environment=IMMICH_CONFIG_FILE=/run/secrets/immich-config.json
-      HealthCmd=/usr/src/app/bin/immich-healthcheck
+      HealthCmd=immich-healthcheck
       HealthInterval=30s
       HealthTimeout=5s
       HealthRetries=5

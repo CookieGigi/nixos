@@ -1,5 +1,6 @@
 {config, ...}: {
   sops = {
+    # Quadlet units are generated at runtime; restart them manually after switching.
     secrets = {
       "paperless-db-password".sopsFile = ../../../../secrets/paperless.yaml;
       "paperless-secret-key".sopsFile = ../../../../secrets/paperless.yaml;
@@ -12,7 +13,6 @@
       '';
       path = "/run/secrets/paperless-db-env";
       mode = "0400";
-      restartUnits = ["paperless-db.service"];
     };
 
     templates."paperless-app-env" = {
@@ -41,7 +41,6 @@
       '';
       path = "/run/secrets/paperless-app-env";
       mode = "0400";
-      restartUnits = ["paperless.service"];
     };
   };
 }
