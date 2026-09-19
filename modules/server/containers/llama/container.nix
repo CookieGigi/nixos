@@ -100,6 +100,7 @@ in {
       "--jinja"
     ];
     extraOptions = [
+      "--network=caddy"
       "--device=nvidia.com/gpu=all"
       "--user=303:202"
     ];
@@ -147,8 +148,8 @@ in {
     };
 
     podman-llama = {
-      after = ["llama-model-migrate.service"];
-      requires = ["llama-model-migrate.service"];
+      after = ["llama-model-migrate.service" "caddy-network.service"];
+      requires = ["llama-model-migrate.service" "caddy-network.service"];
       environment = {
         TMPDIR = "/persist/tmp";
       };

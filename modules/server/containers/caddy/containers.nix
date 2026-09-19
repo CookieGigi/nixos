@@ -10,6 +10,10 @@
       }
     }
 
+    ai.cookiegigi.com {
+      reverse_proxy llama:8080
+    }
+
     zot.cookiegigi.com {
       reverse_proxy 192.168.1.49:5050
     }
