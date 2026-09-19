@@ -95,30 +95,30 @@ Singleton {
     }
 
     // -- Volume (per source!) --
-    // Weak keys do not keep disconnected players alive. Watch all players so
-    // external volume changes and stopped players retain their last nonzero level.
-    readonly property var lastVolumes: new WeakMap()
-
+    // Keep volume state with each player delegate, avoiding Qt's WeakMap crash.
+    // Watch stopped players too, and discard state when a player disconnects.
     Variants {
+        id: volumeWatchers
         model: root.allPlayers
         delegate: Connections {
             required property var modelData
+            property real lastVolume: 0.5
             target: modelData
-            function onVolumeChanged() {
-                root.rememberVolume(modelData);
-            }
-            Component.onCompleted: root.rememberVolume(modelData)
-        }
-    }
 
-    function rememberVolume(player) {
-        if (player && player.volumeSupported && Number.isFinite(player.volume) && player.volume > 0)
-            lastVolumes.set(player, player.volume);
+            function rememberVolume() {
+                if (modelData && modelData.volumeSupported && Number.isFinite(modelData.volume) && modelData.volume > 0)
+                    lastVolume = modelData.volume;
+            }
+
+            function onVolumeChanged() {
+                rememberVolume();
+            }
+            Component.onCompleted: rememberVolume()
+        }
     }
 
     function setVolume(player, volume) {
         if (player && player.canControl && player.volumeSupported && Number.isFinite(volume)) {
-            rememberVolume(player);
             player.volume = Math.max(0.0, Math.min(1.0, volume));
         }
     }
@@ -126,8 +126,8 @@ Singleton {
     function toggleMute(player) {
         if (!player || !player.canControl || !player.volumeSupported)
             return;
-        rememberVolume(player);
-        player.volume = player.volume > 0 ? 0 : (lastVolumes.get(player) ?? 0.5);
+        const watcher = volumeWatchers.instances.find(instance => instance.modelData === player);
+        player.volume = player.volume > 0 ? 0 : (watcher ? watcher.lastVolume : 0.5);
     }
 
     // -- Loop / Shuffle --
