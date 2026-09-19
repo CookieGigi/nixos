@@ -4,7 +4,7 @@
       connection = {
         id = "Cencurut";
         # Reuse the saved connection's identity instead of creating a duplicate.
-        uuid = "fbdb310d-f0a5-4134-a036-32cc5c7dd237";
+        uuid = "2f1fecda-8f6f-4e37-8ba1-5262424a5eb8";
         type = "wifi";
         autoconnect = true;
         permissions = "";
@@ -26,8 +26,9 @@
         file = config.sops.secrets."wifi-home-password".path;
         key = "psk";
         matchId = "Cencurut";
-        matchSetting = "wifi-security";
-        matchType = "wifi";
+        # Secret requests use D-Bus names, not the keyfile aliases above.
+        matchSetting = "802-11-wireless-security";
+        matchType = "802-11-wireless";
       }
     ];
   };
