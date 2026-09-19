@@ -1,4 +1,19 @@
-{config, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: let
+  prepareConfig = pkgs.writeShellScript "immich-prepare-config" ''
+    set -eu
+    umask 077
+    ${pkgs.jq}/bin/jq -s '.[0] * .[1]' \
+      ${config.sops.secrets."immich-settings".path} \
+      ${config.sops.templates."immich-config.json".path} \
+      > /run/immich-config/config.json
+    ${pkgs.coreutils}/bin/chown immich:immich /run/immich-config/config.json
+    ${pkgs.coreutils}/bin/chmod 0400 /run/immich-config/config.json
+  '';
+in {
   environment.etc = {
     "containers/systemd/immich-internal.network".text = ''
       [Network]
@@ -112,8 +127,9 @@
       GroupAdd=201
       Network=immich-internal.network
       Network=immich.network
+      Network=caddy.network
+      AddHost=auth.cookiegigi.com:192.168.1.49
       AddDevice=nvidia.com/gpu=all
-      PublishPort=2283:2283
       Volume=/persist/immich/library:/data
       Volume=/etc/localtime:/etc/localtime:ro
       Volume=/media/pictures:/media/pictures:ro
@@ -126,6 +142,8 @@
       Environment=REDIS_HOSTNAME=immich-redis
       Environment=IMMICH_VERSION=v3
       Environment=IMMICH_MEDIA_LOCATION=/data
+      Volume=/run/immich-config/config.json:/run/secrets/immich-config.json:ro
+      Environment=IMMICH_CONFIG_FILE=/run/secrets/immich-config.json
       HealthCmd=/usr/src/app/bin/immich-healthcheck
       HealthInterval=30s
       HealthTimeout=5s
@@ -133,6 +151,9 @@
       HealthStartPeriod=60s
 
       [Service]
+      RuntimeDirectory=immich-config
+      RuntimeDirectoryMode=0755
+      ExecStartPre=${prepareConfig}
       RestartSec=5
       Restart=always
 

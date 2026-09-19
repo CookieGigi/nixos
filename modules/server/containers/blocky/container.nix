@@ -32,6 +32,7 @@
 
     customDNS:
       mapping:
+        auth.cookiegigi.com: 192.168.1.49
         ai.cookiegigi.com: 192.168.1.49
         photo.cookiegigi.com: 192.168.1.49
         zot.cookiegigi.com: 192.168.1.49
@@ -79,7 +80,6 @@ in {
       PublishPort=127.0.0.1:53:53/udp
       PublishPort=192.168.1.49:53:53/tcp
       PublishPort=192.168.1.49:53:53/udp
-      PublishPort=192.168.1.49:4000:4000
       Volume=${blockyConf}:/app/config.yml:ro
       UserNS=keep-id:uid=53,gid=53
       Environment=TZ=Europe/Paris

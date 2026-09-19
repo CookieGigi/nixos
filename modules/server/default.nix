@@ -13,6 +13,7 @@
     ./containers/fileflows
     ./containers/blocky
     ./containers/caddy
+    ./containers/authelia
     ./containers/zot
     ./containers/bookorbit
     ./containers/home-assistant

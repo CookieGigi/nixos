@@ -1,0 +1,86 @@
+server:
+  address: tcp://:9091/
+log:
+  level: info
+theme: auto
+default_2fa_method: totp
+totp:
+  issuer: cookiegigi.com
+authentication_backend:
+  password_reset:
+    disable: true
+  password_change:
+    disable: true
+  file:
+    path: /secrets/authelia-users
+access_control:
+  default_policy: deny
+  rules:
+    - domain:
+        - blocky.cookiegigi.com
+        - fileflows.cookiegigi.com
+      subject: group:admins
+      policy: two_factor
+session:
+  secret: '{{ secret "/secrets/authelia-session-secret" }}'
+  cookies:
+    - domain: cookiegigi.com
+      authelia_url: https://auth.cookiegigi.com
+      same_site: lax
+      inactivity: 15m
+      expiration: 8h
+      remember_me: -1
+storage:
+  encryption_key: '{{ secret "/secrets/authelia-storage-encryption-key" }}'
+  local:
+    path: /data/db.sqlite3
+notifier:
+  filesystem:
+    filename: /data/notification.txt
+# The isolated proxy network has no Internet route; time is managed by NixOS.
+ntp:
+  disable_startup_check: true
+regulation:
+  max_retries: 5
+  find_time: 2m
+  ban_time: 5m
+identity_providers:
+  oidc:
+    hmac_secret: '{{ secret "/secrets/authelia-oidc-hmac-secret" }}'
+    jwks:
+      - key_id: authelia-rsa
+        algorithm: RS256
+        use: sig
+        key: {{ secret "/secrets/authelia-jwks" | mindent 10 "|" | msquote }}
+    clients:
+      - client_id: immich
+        client_name: Immich
+        client_secret: '{{ secret "/secrets/authelia-immich-client-digest" }}'
+        public: false
+        authorization_policy: two_factor
+        require_pkce: true
+        pkce_challenge_method: S256
+        redirect_uris:
+          - https://photo.cookiegigi.com/auth/login
+          - https://photo.cookiegigi.com/user-settings
+          - app.immich:///oauth-callback
+        # No email claim: require explicit linking rather than Immich's email auto-link.
+        scopes: [openid]
+        response_types: [code]
+        grant_types: [authorization_code]
+        token_endpoint_auth_method: client_secret_post
+        userinfo_signed_response_alg: none
+      - client_id: paperless
+        client_name: Paperless
+        client_secret: '{{ secret "/secrets/authelia-paperless-client-digest" }}'
+        public: false
+        authorization_policy: two_factor
+        require_pkce: true
+        pkce_challenge_method: S256
+        redirect_uris:
+          - https://paperless.cookiegigi.com/accounts/oidc/authelia/login/callback/
+        scopes: [openid, profile, email]
+        response_types: [code]
+        grant_types: [authorization_code]
+        token_endpoint_auth_method: client_secret_basic
+        userinfo_signed_response_alg: none

@@ -17,7 +17,6 @@ _: {
       Image=docker.io/revenz/fileflows:latest
       ContainerName=fileflows
       Network=fileflows.network
-      PublishPort=5000:5000
       Volume=/persist/fileflows/data:/app/Data
       Volume=/persist/fileflows/logs:/app/Logs
       Volume=/persist/fileflows/temp:/temp

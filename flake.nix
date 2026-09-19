@@ -159,7 +159,14 @@
     };
 
     packages.x86_64-linux = {
-      disko = disko.packages.x86_64-linux.disko;
+      disko = disko.packages.x86_64-linux.disko.override {
+        # The pinned Disko package still reads the deprecated stdenv alias.
+        stdenv =
+          nixpkgs.legacyPackages.x86_64-linux.stdenv
+          // {
+            inherit (nixpkgs.legacyPackages.x86_64-linux.stdenv.hostPlatform) isDarwin;
+          };
+      };
     };
 
     devShells.x86_64-linux.default = let
@@ -168,6 +175,7 @@
 
       # Project-specific Neovim with qmlls for QML development in this repo
       projectNvim = nixvim.legacyPackages.x86_64-linux.makeNixvim {
+        nixpkgs.source = nixpkgs.outPath;
         imports = [
           ./modules/home/cookiegigi/programs/nixvim/base.nix
         ];
@@ -207,8 +215,29 @@
           ]);
       };
 
+    apps.x86_64-linux.bootstrap-authelia = {
+      type = "app";
+      meta.description = "Bootstrap encrypted Authelia credentials and Immich settings";
+      program = let
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      in
+        pkgs.lib.getExe (pkgs.writeShellApplication {
+          name = "bootstrap-authelia";
+          runtimeInputs = with pkgs; [
+            sops
+            authelia
+            openssl
+            jq
+            coreutils
+            (python3.withPackages (ps: [ps.argon2-cffi]))
+          ];
+          text = builtins.readFile ./scripts/bootstrap-authelia.sh;
+        });
+    };
+
     apps.x86_64-linux.edit-secrets = {
       type = "app";
+      meta.description = "Edit SOPS-encrypted secrets using the configured age key";
       program = let
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
       in

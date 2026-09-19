@@ -79,7 +79,8 @@
       Image=ghcr.io/paperless-ngx/paperless-ngx:latest
       ContainerName=paperless
       Network=paperless.network
-      PublishPort=192.168.1.49:8000:8000
+      Network=caddy.network
+      AddHost=auth.cookiegigi.com:192.168.1.49
       User=404
       Group=200
       Volume=/persist/paperless/data:/usr/src/paperless/data
@@ -94,6 +95,12 @@
       Environment=PAPERLESS_DBNAME=paperless
       Environment=PAPERLESS_DBUSER=paperless
       Environment=PAPERLESS_URL=https://paperless.cookiegigi.com
+      Environment=PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
+      Environment=PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=false
+      Environment=PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=false
+      Environment=PAPERLESS_SOCIAL_AUTO_SIGNUP=false
+      Environment=PAPERLESS_DISABLE_REGULAR_LOGIN=false
+      Environment=PAPERLESS_REDIRECT_LOGIN_TO_SSO=false
       Environment=PAPERLESS_TIME_ZONE=Europe/Paris
       Environment=PAPERLESS_OCR_LANGUAGE=fra+eng
       Environment=TZ=Europe/Paris
