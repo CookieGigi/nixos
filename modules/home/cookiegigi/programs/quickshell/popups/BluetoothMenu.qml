@@ -9,7 +9,7 @@ PopupBase {
     title: "Bluetooth"
     popupId: "bluetooth"
     popupWidth: 250
-    implicitHeight: 150
+    implicitHeight: 220
 
     anchorLeft: false
     anchorRight: true
