@@ -3,6 +3,9 @@ _: {
   networking.firewall = {
     enable = true;
     allowPing = true;
+    # Caddy is connected to multiple Podman bridges, so replies may use a
+    # different bridge from ingress. Loose mode still rejects unroutable sources.
+    checkReversePath = "loose";
   };
 
   # SSH hardening

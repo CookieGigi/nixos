@@ -17,7 +17,7 @@ access_control:
   default_policy: deny
   rules:
     - domain:
-        - ai.cookiegigi.com
+        - llama-cpp.cookiegigi.com
         - blocky.cookiegigi.com
         - fileflows.cookiegigi.com
         - zot.cookiegigi.com

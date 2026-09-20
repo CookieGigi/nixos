@@ -34,7 +34,7 @@
       }
     }
 
-    ai.cookiegigi.com {
+    llama-cpp.cookiegigi.com {
       route {
         import private_only
         import authelia
