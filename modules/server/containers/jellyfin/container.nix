@@ -16,7 +16,6 @@
       Image=docker.io/jellyfin/jellyfin:latest
       ContainerName=jellyfin
       Network=jellyfin.network
-      PublishPort=192.168.1.49:8096:8096
       User=407
       Group=200
       Volume=/persist/jellyfin/config:/config

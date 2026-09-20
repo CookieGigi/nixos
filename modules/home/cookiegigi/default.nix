@@ -1,4 +1,13 @@
-{inputs, ...}: {
+{
+  config,
+  inputs,
+  ...
+}: {
+  sops.secrets."hf-token" = {
+    owner = config.users.users.cookiegigi.name;
+    mode = "0400";
+  };
+
   home-manager.extraSpecialArgs = {inherit inputs;};
 
   home-manager.users.cookiegigi = {

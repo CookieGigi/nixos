@@ -46,7 +46,6 @@
       Image=ghcr.io/bookorbit/bookorbit:latest
       ContainerName=bookorbit
       Network=bookorbit.network
-      PublishPort=192.168.1.49:3000:3000
       Volume=/persist/bookorbit/app:/data
       Volume=/media/documents/books:/books
       EnvironmentFile=/run/secrets/bookorbit-app-env

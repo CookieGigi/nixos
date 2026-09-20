@@ -74,7 +74,8 @@ in {
       Image=ghcr.io/project-zot/zot:latest
       ContainerName=zot
       Network=zot.network
-      PublishPort=5050:5000
+      # Keep bootstrap and pull-through mirrors local; Caddy uses zot.network.
+      PublishPort=127.0.0.1:5050:5000
       Volume=${zotConf}:/etc/zot/config.json:ro
       Volume=/persist/zot/registry:/var/lib/registry
       UserNS=keep-id:uid=50,gid=50

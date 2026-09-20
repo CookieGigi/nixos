@@ -17,8 +17,10 @@ access_control:
   default_policy: deny
   rules:
     - domain:
+        - ai.cookiegigi.com
         - blocky.cookiegigi.com
         - fileflows.cookiegigi.com
+        - zot.cookiegigi.com
       subject: group:admins
       policy: two_factor
 session:
@@ -83,4 +85,17 @@ identity_providers:
         response_types: [code]
         grant_types: [authorization_code]
         token_endpoint_auth_method: client_secret_basic
+        userinfo_signed_response_alg: none
+      - client_id: bookorbit
+        client_name: BookOrbit
+        public: true
+        authorization_policy: two_factor
+        require_pkce: true
+        pkce_challenge_method: S256
+        redirect_uris:
+          - https://bookorbit.cookiegigi.com/oauth2-callback
+        scopes: [openid, profile, email, groups]
+        response_types: [code]
+        grant_types: [authorization_code]
+        token_endpoint_auth_method: none
         userinfo_signed_response_alg: none

@@ -224,59 +224,83 @@ opencode models [provider]
 
 ## Server-Side llama.cpp Backend
 
-The `server` host runs `llama.cpp` as a systemd service (`services.llama-cpp`) with CUDA support, exposing an OpenAI-compatible API on port `8080`.
+The `server` host runs the CUDA-enabled `llama.cpp` server image in the
+`podman-llama.service` container. It exposes an OpenAI-compatible API on
+`127.0.0.1:8080`; Caddy is the only network ingress.
 
 ### Multi-Model Mode
 
 `llama.cpp` is configured in **router / multi-model mode**:
 
-- `models-dir` points to `/var/lib/llama-cpp/models`
-- **No default `model`** is hardcoded in the llama.cpp settings, so the server does not preload a single model at startup. Any `.gguf` file in the directory can be selected at runtime via the `model` parameter in API requests.
-- Each model has its own `llama-cpp-model-download-<name>.service` that downloads the GGUF before `llama-cpp.service` starts.
+- Model presets are generated from `modules/server/models.nix`.
+- Model weights live in `/media/ai/llama-models`; multimodal projectors live in
+  `/media/ai/llama-mmproj`.
+- Models are loaded on demand and only one request slot is enabled, preserving
+  VRAM for context.
+- Flash Attention and Q8 KV caches reduce context memory use. The server uses a
+  `1024` logical batch and `256` physical micro-batch to avoid the large CUDA
+  buffers created by the previous `4096` values.
 
-### Currently Served Models
+### Recommended Models
 
-| Model | Repo | File | Size | Description |
-|-------|------|------|------|-------------|
-| Qwen 3.5 14B A3B | `brunopio/...` | `qwen3.5-14b-a3b-...-q4_k_m.gguf` | ~8.7 GB | Reasoning / coding (default) |
-| Gemma 4 12B IT | `bartowski/gemma-4-12B-it-GGUF` | `gemma-4-12B-it-Q4_K_M.gguf` | ~7.7 GB | Multimodal (text + image) |
+For an RTX 3080 Ti with 12 GB VRAM:
 
-Both models are downloaded automatically on first boot or rebuild. Models persist under `/var/lib/llama-cpp/models` (BTRFS `@persist`).
+| Use case | Model preset | Quantization | Configured context | Notes |
+|----------|--------------|--------------|--------------------|-------|
+| Tool agent / Hermes-like agent | `qwen-3.5-9b` | Q4_K_M | 65,536 | Stronger current tool-use choice than the older Hermes 3 8B; supports vision when its projector is installed |
+| Coding assistant | `qwen-3.5-9b` | Q4_K_M | 65,536 | Best quality/context balance among the configured models |
+| Small coding agent | `qwen-3.5-4b` | Q6_K | 131,072 | About 3.5 GB of weights, leaving substantially more VRAM for long contexts |
+| Everyday chat | `qwen-3.5-9b` | Q4_K_M | 65,536 | Use the 4B preset instead when another workload needs GPU memory |
+
+Qwen 3.5 supports up to 262,144 tokens natively, but the configured limits are
+deliberately lower to fit weights, CUDA buffers, and KV cache in 12 GB. A model
+cannot fully offload while other processes consume most of the GPU. Stop or
+reschedule competing GPU workloads before diagnosing llama.cpp performance.
+
+The registry retains older models for now because activation removes GGUF files
+that are not listed. Remove obsolete entries only when deleting their downloaded
+weights is intentional.
 
 ### Selecting a Model in OpenCode
 
-On the server, OpenCode is configured with a `local` provider that points to `http://localhost:8080/v1`. Both models are listed under `provider.local.models`. Change the active model by setting:
+The server-side OpenCode module derives its `local` provider model list from the
+same registry and points to `http://localhost:8080/v1`. Change the active model
+by setting:
 
 ```json
 {
-  "model": "local/gemma",
-  "small_model": "local/gemma"
+  "model": "local/qwen-3.5-9b",
+  "small_model": "local/qwen-3.5-4b"
 }
 ```
 
-Or use the TUI (`opencode` → models menu) to switch at runtime.
+Or use the TUI models menu to switch at runtime. The server OpenCode module must
+be imported by the server user's Home Manager configuration before this generated
+configuration takes effect.
 
 ### Downloading a New Model
 
 To add another model:
 
-1. Add an entry to the `models` list in `modules/server/llama-cpp.nix`.
-2. Rebuild: `sudo nixos-rebuild switch --flake .#server`
-3. The new `llama-cpp-model-download-<name>.service` will fetch the GGUF on next boot.
-4. Add a corresponding entry to `modules/home/cookiegigi/programs/opencode/server-config.nix` under `provider.local.models`.
+1. Add an entry to `modules/server/models.nix`.
+2. Apply the NixOS configuration.
+3. Run `llama-model-download-all` on the server.
+4. Restart `podman-llama.service` if it is already running.
 
 ### Manual Model Management
 
 ```bash
 # List downloaded models
-ls -lh /var/lib/llama-cpp/models
+ls -lh /media/ai/llama-models /media/ai/llama-mmproj
 
-# Download a model manually (e.g. for testing)
-export HF_TOKEN=$(cat /persist/...)  # or use the shellInit hook
-huggingface-cli download <repo> <file> --local-dir /var/lib/llama-cpp/models
+# Download every missing registry model and projector
+llama-model-download-all
 
 # Check which models llama.cpp sees
 curl http://localhost:8080/v1/models
+
+# Inspect the container logs
+journalctl -u podman-llama.service
 ```
 
 ---

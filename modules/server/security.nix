@@ -3,7 +3,6 @@ _: {
   networking.firewall = {
     enable = true;
     allowPing = true;
-    allowedTCPPorts = [8042];
   };
 
   # SSH hardening

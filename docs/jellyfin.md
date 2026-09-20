@@ -7,15 +7,16 @@ The server runs the official Jellyfin image as a Podman Quadlet, configured in
 
 Open `https://jellyfin.cookiegigi.com` after deployment and complete the setup
 wizard immediately to create the administrator account. Blocky provides DNS
-and Caddy terminates HTTPS, proxying to `192.168.1.49:8096`.
+and Caddy terminates HTTPS, proxying over Jellyfin's private container network.
+Port 8096 is not published directly on the LAN.
 
 Add video libraries using paths under `/media/videos` and a music library at
 `/media/music`. Both trees are mounted read-only; metadata stays in Jellyfin's
 configuration directory rather than beside media files.
 
-In Dashboard > Networking, configure Known Proxies with Caddy's actual source
-IP before relying on forwarded client addresses or local/remote access rules.
-Do not trust the whole LAN. Caddy's bridge address is dynamically allocated;
+In Dashboard > Networking, configure Known Proxies with Caddy's address on the
+Jellyfin network before relying on forwarded client addresses or local/remote
+access rules. Do not trust the whole LAN. The address is dynamically allocated;
 verify it again if that network is recreated.
 
 ## Storage

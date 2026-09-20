@@ -2,7 +2,7 @@
   base = import ./config.nix {inherit pkgs;};
 
   # Centralized model registry shared with llama-cpp.nix
-  models = import ../../../../common/llama/models.nix;
+  models = import ../../../../server/models.nix;
 
   modelStem = file: pkgs.lib.removeSuffix ".gguf" file;
 
@@ -36,8 +36,8 @@ in {
   config =
     base.config
     // {
-      model = "local/qwen";
-      small_model = "local/qwen";
+      model = "local/qwen-3.5-9b";
+      small_model = "local/qwen-3.5-4b";
 
       provider = {
         local = {

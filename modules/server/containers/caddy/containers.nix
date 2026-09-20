@@ -35,11 +35,27 @@
     }
 
     ai.cookiegigi.com {
-      reverse_proxy llama:8080
+      route {
+        import private_only
+        import authelia
+        reverse_proxy llama:8080
+      }
+    }
+
+    hermes.cookiegigi.com {
+      route {
+        import private_only
+        import authelia
+        reverse_proxy hermes:9119
+      }
     }
 
     zot.cookiegigi.com {
-      reverse_proxy 192.168.1.49:5050
+      route {
+        import private_only
+        import authelia
+        reverse_proxy zot:5000
+      }
     }
 
     blocky.cookiegigi.com {
@@ -66,11 +82,17 @@
     }
 
     bookorbit.cookiegigi.com {
-      reverse_proxy 192.168.1.49:3000
+      route {
+        import private_only
+        reverse_proxy bookorbit:3000
+      }
     }
 
     homeassistant.cookiegigi.com {
-      reverse_proxy 10.89.100.1:8123
+      route {
+        import private_only
+        reverse_proxy 10.89.100.1:8123
+      }
     }
 
     paperless.cookiegigi.com {
@@ -81,7 +103,10 @@
     }
 
     jellyfin.cookiegigi.com {
-      reverse_proxy 192.168.1.49:8096
+      route {
+        import private_only
+        reverse_proxy jellyfin:8096
+      }
     }
   '';
 in {
@@ -103,8 +128,11 @@ in {
       Network=caddy.network
       Network=authelia.network
       Network=blocky-proxy.network
+      Network=bookorbit.network
       Network=fileflows-proxy.network
       Network=home-assistant-proxy.network:ip=10.89.100.2
+      Network=jellyfin.network
+      Network=zot.network
       PublishPort=80:80
       PublishPort=443:443
       PublishPort=443:443/udp
