@@ -6,5 +6,6 @@
     '';
     path = "/run/secrets/hermes-dashboard-env";
     mode = "0400";
+    restartUnits = ["hermes.service"];
   };
 }

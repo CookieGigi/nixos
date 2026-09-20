@@ -1,5 +1,10 @@
-{pkgs, ...}: let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   base = import ./config.nix {inherit pkgs;};
+  agents = import ./agents {};
 
   # Centralized model registry shared with llama-cpp.nix
   models = import ../../../../server/models.nix;
@@ -32,12 +37,14 @@
       };
     };
   };
-in {
-  config =
+
+  serverConfig =
     base.config
     // {
-      model = "local/qwen-3.5-9b";
+      "$schema" = "https://opencode.ai/config.json";
+      model = "local/ornith-1.5-9b";
       small_model = "local/qwen-3.5-4b";
+      agent = agents;
 
       provider = {
         local = {
@@ -52,4 +59,10 @@ in {
         };
       };
     };
+
+  opencodeJson = (pkgs.formats.json {}).generate "opencode-server.json" serverConfig;
+in {
+  imports = [./default.nix];
+
+  xdg.configFile."opencode/opencode.json".source = lib.mkForce opencodeJson;
 }

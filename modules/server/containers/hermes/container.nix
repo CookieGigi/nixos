@@ -2,7 +2,7 @@
   initialConfig = (pkgs.formats.yaml {}).generate "hermes-config.yaml" {
     model = {
       provider = "custom";
-      default = "Qwen3.5-4B-Q6_K";
+      default = "Ornith-1.5-9B-Q5_K_M";
       base_url = "http://llama:8080/v1";
       api_key = "none";
       api_mode = "chat_completions";
@@ -19,14 +19,18 @@
     if [ ! -e /persist/hermes/config.yaml ]; then
       ${pkgs.coreutils}/bin/install -o 409 -g 409 -m 0600 \
         ${initialConfig} /persist/hermes/config.yaml
+    else
+      ${pkgs.gnused}/bin/sed -i -E \
+        's|^([[:space:]]*default:[[:space:]]*)Qwen3\.5-4B-Q6_K([[:space:]]*)$|\1Ornith-1.5-9B-Q5_K_M\2|' \
+        /persist/hermes/config.yaml
     fi
   '';
 in {
   environment.etc."containers/systemd/hermes.container".text = ''
     [Unit]
     Description=Hermes Agent
-    After=network-online.target caddy-network.service podman-llama.service sops-install-secrets.service
-    Requires=caddy-network.service podman-llama.service sops-install-secrets.service
+    After=network-online.target caddy-network.service podman-llama.service
+    Requires=caddy-network.service podman-llama.service
     RequiresMountsFor=/persist/hermes
 
     [Container]

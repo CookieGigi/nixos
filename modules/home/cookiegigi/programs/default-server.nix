@@ -10,5 +10,6 @@
     ./proton.nix
     ./unzip.nix
     ./rclone.nix
+    ./opencode/server-config.nix
   ];
 }

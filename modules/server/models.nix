@@ -4,6 +4,17 @@
 # are generated from this single source of truth.
 [
   {
+    name = "ornith-1.5-9b";
+    repo = "ornith-ai/Ornith-1.5-9B-GGUF";
+    file = "Ornith-1.5-9B-Q5_K_M.gguf";
+    displayName = "Ornith 1.5 9B Q5 (local)";
+    family = "qwen";
+    vision = false;
+    toolCall = true;
+    reasoning = true;
+    ctxSize = 65536;
+  }
+  {
     name = "qwen";
     repo = "brunopio/Qwen3.5-14B-A3B-Claude-4.6-Opus-Reasoning-Distilled-reap-Q4_K_M-GGUF";
     file = "qwen3.5-14b-a3b-claude-4.6-opus-reasoning-distilled-reap-q4_k_m.gguf";

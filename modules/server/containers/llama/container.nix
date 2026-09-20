@@ -100,9 +100,9 @@ in {
       "--cache-type-v"
       "q8_0"
       "--ubatch-size"
-      "256"
+      "512"
       "--batch-size"
-      "1024"
+      "2048"
       "--jinja"
     ];
     extraOptions = [

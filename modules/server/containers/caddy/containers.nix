@@ -114,6 +114,7 @@ in {
     "containers/systemd/caddy.network".text = ''
       [Network]
       NetworkName=caddy
+      Options=metric=10
     '';
 
     "containers/systemd/caddy.container".text = ''
