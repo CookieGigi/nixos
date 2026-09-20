@@ -9,6 +9,7 @@
     ./container.nix
     ./containers/immich
     ./containers/llama
+    ./containers/hermes
     ./containers/proton-drive
     ./containers/fileflows
     ./containers/blocky
