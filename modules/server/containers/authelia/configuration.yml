@@ -18,6 +18,7 @@ access_control:
   rules:
     - domain:
         - llama-cpp.cookiegigi.com
+        - hermes.cookiegigi.com
         - blocky.cookiegigi.com
         - fileflows.cookiegigi.com
         - zot.cookiegigi.com
