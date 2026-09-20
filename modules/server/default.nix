@@ -10,6 +10,7 @@
     ./containers/immich
     ./containers/llama
     ./containers/hermes
+    ./containers/signal-cli
     ./containers/proton-drive
     ./containers/fileflows
     ./containers/blocky
