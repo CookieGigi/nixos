@@ -15,6 +15,17 @@
   "skills": {
     "paths": [".opencode/skills", "/home/cookiegigi/.config/opencode/skills"]
   },
+  "mcp": {
+    "huggingface": {
+      "type": "remote",
+      "url": "https://huggingface.co/mcp",
+      "headers": {
+        "Authorization": "Bearer {file:/run/secrets/hf-token}"
+      },
+      "enabled": true,
+      "timeout": 30000
+    }
+  },
   "plugin": ["@tarquinen/opencode-dcp@latest"],
   "instructions": [
     "AGENTS.md",

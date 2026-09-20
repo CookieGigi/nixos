@@ -24,7 +24,18 @@
     vision = true;
     toolCall = true;
     reasoning = true;
-    ctxSize = 16384;
+    ctxSize = 65536;
+  }
+  {
+    name = "qwen-3.5-4b";
+    repo = "unsloth/Qwen3.5-4B-GGUF";
+    file = "Qwen3.5-4B-Q6_K.gguf";
+    displayName = "Qwen 3.5 4B Q6 (local)";
+    family = "qwen";
+    vision = false;
+    toolCall = true;
+    reasoning = true;
+    ctxSize = 131072;
   }
   {
     name = "gemma-4-12b";

@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  models = import ./models.nix;
+  models = import ../../models.nix;
 
   modelStem = file: lib.removeSuffix ".gguf" file;
 
@@ -19,7 +19,7 @@
         [${modelStem model.file}]
         model = /models/${model.file}
         ctx-size = ${toString (model.ctxSize or 8192)}
-        n-gpu-layers = 999
+        n-gpu-layers = all
         ${lib.optionalString (mmproj != null) "mmproj = /mmproj/${mmproj}"}
 
       '')
@@ -93,10 +93,16 @@ in {
       "8080"
       "--parallel"
       "1"
+      "--flash-attn"
+      "on"
+      "--cache-type-k"
+      "q8_0"
+      "--cache-type-v"
+      "q8_0"
       "--ubatch-size"
-      "4096"
+      "256"
       "--batch-size"
-      "4096"
+      "1024"
       "--jinja"
     ];
     extraOptions = [
