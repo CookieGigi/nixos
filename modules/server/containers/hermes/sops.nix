@@ -10,7 +10,6 @@
       '';
       path = "/run/secrets/hermes-dashboard-env";
       mode = "0400";
-      restartUnits = ["hermes.service"];
     };
 
     templates."hermes-anysearch-env" = {
@@ -21,7 +20,6 @@
       owner = "hermes";
       group = "hermes";
       mode = "0400";
-      restartUnits = ["hermes.service"];
     };
   };
 }
