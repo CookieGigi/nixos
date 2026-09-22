@@ -9,6 +9,7 @@
     ./container.nix
     ./containers/immich
     ./containers/llama
+    ./containers/open-webui
     ./containers/hermes
     ./containers/signal-cli
     ./containers/proton-drive

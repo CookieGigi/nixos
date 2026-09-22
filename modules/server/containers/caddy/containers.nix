@@ -42,6 +42,14 @@
       }
     }
 
+    openwebui.cookiegigi.com {
+      route {
+        import private_only
+        import authelia
+        reverse_proxy open-webui:8080
+      }
+    }
+
     hermes.cookiegigi.com {
       route {
         import private_only
