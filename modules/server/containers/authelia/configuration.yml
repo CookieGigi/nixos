@@ -19,6 +19,7 @@ access_control:
     - domain:
         - llama-cpp.cookiegigi.com
         - openwebui.cookiegigi.com
+        - comfyui.cookiegigi.com
         - hermes.cookiegigi.com
         - search.cookiegigi.com
         - blocky.cookiegigi.com
