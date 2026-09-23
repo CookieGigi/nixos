@@ -32,7 +32,11 @@ in {
   environment.persistence."/persist".directories = ["/var/lib/prometheus2" "/var/lib/private/alloy"];
 
   systemd = {
-    tmpfiles.rules = ["d /run/node-exporter 0755 root root -"];
+    tmpfiles.rules = [
+      "d /run/node-exporter 0755 root root -"
+      "d /var/lib/private 0700 root root -"
+      "d /persist/var/lib/private 0700 root root -"
+    ];
     services.podman-textfile-metrics = {
       description = "Collect rootful Podman container resource metrics";
       serviceConfig = {

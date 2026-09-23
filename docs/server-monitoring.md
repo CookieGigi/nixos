@@ -31,6 +31,13 @@ still blocks migration, remove it with `sudo rmdir /var/lib/alloy` (only when
 empty) before starting Alloy. Verify that `/var/lib/alloy` is a symlink and
 `var-lib-private-alloy.mount` is active.
 
+The impermanence mount can create `/var/lib/private` with mode `0755` on
+activation, which systemd rejects for `DynamicUser` state (`238/STATE_DIRECTORY`).
+The server tmpfiles rules set it and its `/persist` backing directory to
+`0700`. To recover the current generation immediately, run
+`sudo chmod 0700 /var/lib/private /persist/var/lib/private` on the server,
+then `sudo systemctl restart alloy.service`.
+
 The dashboard shows host CPU, memory and filesystems, Podman container CPU,
 memory and process counts, GPU utilization and VRAM, scrape health, alert
 state, and recent journal logs. The `llama` scrape reads the `/metrics`
