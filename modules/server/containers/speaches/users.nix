@@ -1,19 +1,13 @@
 {pkgs, ...}: {
-  users.groups.speaches.gid = 412;
-  users.users.speaches = {
-    isSystemUser = true;
-    uid = 412;
-    group = "speaches";
-  };
-
   systemd.tmpfiles.rules = [
-    "d /persist/speaches       0750 speaches speaches -"
-    "d /persist/speaches/cache 0700 speaches speaches -"
+    # The upstream image runs as its fixed, non-root `ubuntu` user (UID 1000).
+    "d /persist/speaches       0750 cookiegigi users -"
+    "d /persist/speaches/cache 0700 cookiegigi users -"
   ];
 
   system.activationScripts.speaches-ownership-migration = ''
     if [ -d /persist/speaches ]; then
-      ${pkgs.coreutils}/bin/chown -R speaches:speaches /persist/speaches
+      ${pkgs.coreutils}/bin/chown -R cookiegigi:users /persist/speaches
     fi
   '';
 }

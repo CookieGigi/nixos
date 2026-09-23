@@ -4,6 +4,9 @@ Speaches provides the server's internal, OpenAI-compatible speech API. It uses
 CUDA for both transcription and synthesis and persists downloaded models in
 `/persist/speaches/cache`.
 
+The upstream image requires its built-in non-root `ubuntu` user (UID 1000), so
+the cache is owned by the server's `cookiegigi` account, which has that UID.
+
 The API is deliberately private: only containers attached to `caddy.network`
 can reach it at `http://speaches:8000/v1`. It is not exposed through Caddy or
 the firewall.
