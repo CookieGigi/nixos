@@ -21,8 +21,8 @@
   environment.etc."containers/systemd/open-webui.container".text = ''
     [Unit]
     Description=Open WebUI
-    After=network-online.target caddy-network.service podman-llama.service open-webui-secret.service
-    Requires=caddy-network.service podman-llama.service open-webui-secret.service
+    After=network-online.target caddy-network.service podman-llama.service speaches.service open-webui-secret.service
+    Requires=caddy-network.service podman-llama.service speaches.service open-webui-secret.service
     RequiresMountsFor=/persist/open-webui
 
     [Container]
@@ -37,6 +37,15 @@
     Environment=ENABLE_OPENAI_API=True
     Environment=OPENAI_API_BASE_URLS=http://llama:8080/v1
     Environment=OPENAI_API_KEYS=none
+    Environment=AUDIO_STT_ENGINE=openai
+    Environment=AUDIO_STT_OPENAI_API_BASE_URL=http://speaches:8000/v1
+    Environment=AUDIO_STT_OPENAI_API_KEY=not-needed
+    Environment=AUDIO_STT_MODEL=Systran/faster-distil-whisper-large-v3
+    Environment=AUDIO_TTS_ENGINE=openai
+    Environment=AUDIO_TTS_OPENAI_API_BASE_URL=http://speaches:8000/v1
+    Environment=AUDIO_TTS_OPENAI_API_KEY=not-needed
+    Environment=AUDIO_TTS_MODEL=speaches-ai/Kokoro-82M-v1.0-ONNX
+    Environment=AUDIO_TTS_VOICE=af_heart
     Environment=ENABLE_PERSISTENT_CONFIG=False
     Environment=OFFLINE_MODE=True
     Environment=WEBUI_AUTH=True
