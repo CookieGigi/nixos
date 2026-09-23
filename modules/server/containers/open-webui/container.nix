@@ -61,9 +61,9 @@
     Environment=OAUTH_CLIENT_ID=open-webui
     Environment=OPENID_PROVIDER_URL=https://auth.cookiegigi.com/.well-known/openid-configuration
     Environment=OAUTH_PROVIDER_NAME=Authelia
-    Environment=OAUTH_SCOPES=openid email profile
+    Environment="OAUTH_SCOPES=openid email profile"
     Environment=OAUTH_CODE_CHALLENGE_METHOD=S256
-    Environment=OAUTH_REDIRECT_URI=https://openwebui.cookiegigi.com/oauth/oidc/callback
+    Environment=OPENID_REDIRECT_URI=https://openwebui.cookiegigi.com/oauth/oidc/callback
     Environment=CORS_ALLOW_ORIGIN=https://openwebui.cookiegigi.com
     Environment=TZ=Europe/Paris
 

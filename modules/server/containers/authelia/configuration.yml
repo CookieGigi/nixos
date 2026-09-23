@@ -20,6 +20,7 @@ access_control:
         - llama-cpp.cookiegigi.com
         - openwebui.cookiegigi.com
         - hermes.cookiegigi.com
+        - search.cookiegigi.com
         - blocky.cookiegigi.com
         - fileflows.cookiegigi.com
         - zot.cookiegigi.com
