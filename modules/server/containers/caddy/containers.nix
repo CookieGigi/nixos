@@ -56,6 +56,14 @@
       }
     }
 
+    comfyui.cookiegigi.com {
+      route {
+        import private_only
+        import authelia
+        reverse_proxy comfyui:8188
+      }
+    }
+
     hermes.cookiegigi.com {
       route {
         import private_only
