@@ -14,6 +14,7 @@
     {
       "id": 2, "type": "stat", "title": "NVMe / HDD free", "gridPos": {"x": 8, "y": 0, "w": 8, "h": 5},
       "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "options": {"colorMode": "none"},
       "fieldConfig": {"defaults": {"unit": "bytes"}},
       "targets": [{"expr": "node_filesystem_avail_bytes{mountpoint=~\"/persist|/media\",fstype=\"btrfs\"}", "legendFormat": "{{mountpoint}}", "refId": "A"}]
     },

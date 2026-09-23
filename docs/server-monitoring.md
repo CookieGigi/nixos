@@ -47,10 +47,12 @@ registered model with `autoload=false`: unloaded models return a failed scrape
 instead of triggering model loads. The llama server alert checks its systemd
 unit, not those expected unloaded-model scrape failures. Podman stats are
 captured every minute into node exporter's textfile directory; if its timer
-fails, the textfile age alert becomes active. The collector runs as root to
-inspect rootful Podman containers but does not grant Grafana Podman socket access. Loki logs
-may contain DNS queries, user information, or authentication events: restrict
-Grafana accounts accordingly.
+fails or yields no running containers, the textfile age alert becomes active.
+The collector runs as root to inspect rootful Podman containers but does not
+grant Grafana Podman socket access. Loki binds and advertises gRPC on loopback
+so the single-node ring can communicate internally. Loki logs may contain DNS
+queries, user information, or authentication events: restrict Grafana accounts
+accordingly.
 
 The server-wide Podman default log driver is journald. Newly started
 containers use it; existing containers may need recreation for their logging
@@ -60,6 +62,8 @@ under `/persist` (for example, FileFlows' own log directory).
 Grafana evaluates provisioned disk, CPU, RAM, node exporter, GPU exporter,
 llama, and collector staleness rules every minute. A permanent mute timing
 suppresses notification delivery while leaving firing state visible in Grafana.
+Both policy routes use a provisioned loopback-only webhook sink rather than an
+external destination, even if an alert bypasses the muted child route.
 Do not add direct contact points or modify notification policies without
 reviewing this choice. UI-only alerts cannot report a full host/Grafana failure
 from the failed host.
@@ -69,7 +73,7 @@ After a user-approved deployment, check:
 1. `systemctl status prometheus grafana loki alloy prometheus-node-exporter prometheus-nvidia-gpu-exporter podman-textfile-metrics.timer`
 2. `curl -fsS http://127.0.0.1:9090/-/ready` and `curl -fsS http://127.0.0.1:3100/ready`
 3. Grafana's Connections > Data sources, Dashboards > Homelab, and Alerting > Alert rules.
-4. Prometheus targets `node`, `nvidia`, `llama`, `prometheus` and the `node_textfile_mtime_seconds{file="podman.prom"}` series. Unloaded llama models normally show as failed scrapes.
+4. Prometheus targets `node`, `nvidia`, `llama`, `prometheus` and the `node_textfile_mtime_seconds{file="/run/node-exporter/podman.prom"}` series. Unloaded llama models normally show as failed scrapes.
 5. Grafana Explore with `{host="server"}` to confirm Alloy delivers journal entries.
 
 If any target is down, check its systemd journal and exporter endpoint from

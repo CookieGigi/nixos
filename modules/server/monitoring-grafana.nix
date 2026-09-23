@@ -137,6 +137,22 @@ in {
         ];
       };
       alerting = {
+        contactPoints.settings = {
+          apiVersion = 1;
+          contactPoints = [
+            {
+              orgId = 1;
+              name = "ui-only-sink";
+              receivers = [
+                {
+                  uid = "ui_only_sink";
+                  type = "webhook";
+                  settings.url = "http://127.0.0.1:9/";
+                }
+              ];
+            }
+          ];
+        };
         rules.settings = {
           apiVersion = 1;
           groups = [
@@ -152,7 +168,7 @@ in {
                 (alert "cpu_high" "CPU busy over 90%" "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))" 0.9)
                 (alert "gpu_missing" "NVIDIA exporter unavailable" "up{job=\"nvidia\"} == bool 0" 0)
                 (alert "llama_missing" "llama.cpp server stopped" "1 - node_systemd_unit_state{name=\"podman-llama.service\",state=\"active\"}" 0)
-                (alert "podman_missing" "Podman stats collector stale" "time() - node_textfile_mtime_seconds{file=\"podman.prom\"}" 180)
+                (alert "podman_missing" "Podman stats collector stale" "time() - node_textfile_mtime_seconds{file=\"/run/node-exporter/podman.prom\"}" 180)
               ];
             }
           ];
@@ -181,10 +197,10 @@ in {
           policies = [
             {
               orgId = 1;
-              receiver = "grafana-default-email";
+              receiver = "ui-only-sink";
               routes = [
                 {
-                  receiver = "grafana-default-email";
+                  receiver = "ui-only-sink";
                   object_matchers = [["alertname" "=~" ".+"]];
                   mute_time_intervals = ["ui-only"];
                 }

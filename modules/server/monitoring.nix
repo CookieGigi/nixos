@@ -10,19 +10,23 @@
     tmp=$(mktemp /run/node-exporter/podman.prom.XXXXXX)
     stats=$(mktemp)
     trap 'rm -f "$tmp" "$stats"' EXIT
-    ${pkgs.podman}/bin/podman stats --all --no-stream --format '{{.Name}} {{.CPUNano}} {{.MemUsageBytes}} {{.PIDs}}' > "$stats"
+    ${pkgs.podman}/bin/podman stats --no-stream --format '{{.Name}} {{.CPUNano}} {{.ContainerStats.MemUsage}} {{.PIDs}}' > "$stats"
+    [[ -s "$stats" ]] || exit 1
+    count=0
     {
       printf '# HELP homelab_podman_cpu_seconds_total Container CPU time in seconds.\n# TYPE homelab_podman_cpu_seconds_total counter\n'
       printf '# HELP homelab_podman_memory_bytes Container memory usage in bytes.\n# TYPE homelab_podman_memory_bytes gauge\n'
       printf '# HELP homelab_podman_pids Container process count.\n# TYPE homelab_podman_pids gauge\n'
       while read -r name cpu memory pids; do
         [[ "$name" =~ ^[a-zA-Z0-9_.-]+$ && "$cpu" =~ ^[0-9]+$ && "$memory" =~ ^[0-9]+$ && "$pids" =~ ^[0-9]+$ ]] || continue
+        count=$((count + 1))
         printf 'homelab_podman_cpu_seconds_total{container="%s"} %se-9\n' "$name" "$cpu"
         printf 'homelab_podman_memory_bytes{container="%s"} %s\n' "$name" "$memory"
         printf 'homelab_podman_pids{container="%s"} %s\n' "$name" "$pids"
       done < "$stats"
       printf 'homelab_podman_collection_success 1\n'
     } > "$tmp"
+    (( count > 0 )) || exit 1
     chmod 0644 "$tmp"
     mv "$tmp" "$output"
   '';
@@ -114,6 +118,7 @@ in {
         };
         common = {
           path_prefix = "/persist/loki";
+          instance_addr = "127.0.0.1";
           replication_factor = 1;
           ring.kvstore.store = "inmemory";
         };
