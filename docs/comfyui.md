@@ -17,3 +17,20 @@ The model download must finish before ComfyUI starts. Check its progress with
 `journalctl -u comfyui-model-download.service -f` and the container logs with
 `journalctl -u comfyui.service -f`. Model and service declarations are in
 `modules/server/containers/comfyui/`.
+
+## Open WebUI
+
+Open WebUI connects directly to `http://comfyui:8188` over the private Podman
+network, not through Caddy/Authelia. Its SD1.5 text-to-image workflow and node
+mappings are declared in `modules/server/containers/open-webui/`; the checkpoint,
+512x512 size, and 20 sampling steps are defaults. With
+`ENABLE_PERSISTENT_CONFIG=False`, changes made in the Open WebUI admin Images
+page are not retained after a restart; edit the Nix configuration instead.
+
+After rebuilding the server, open a chat in Open WebUI, enable **Image** in the
+message input's **Integrations** menu, and ask for an image. Generation can take
+minutes on CPU. If the option is missing, check the model's Image Generation
+capability and your role's image generation permission. For failures, inspect
+`journalctl -u open-webui.service -f` and `journalctl -u comfyui.service -f`.
+Open WebUI image editing remains disabled: it requires a separate ComfyUI
+workflow with an input-image node.

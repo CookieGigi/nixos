@@ -1,4 +1,45 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  comfyuiEnv = pkgs.writeText "open-webui-comfyui.env" ''
+    COMFYUI_WORKFLOW=${builtins.toJSON (import ./comfyui-workflow.nix)}
+    COMFYUI_WORKFLOW_NODES=${builtins.toJSON [
+      {
+        type = "model";
+        key = "ckpt_name";
+        node_ids = ["4"];
+      }
+      {
+        type = "prompt";
+        key = "text";
+        node_ids = ["6"];
+      }
+      {
+        type = "width";
+        key = "width";
+        node_ids = ["5"];
+      }
+      {
+        type = "height";
+        key = "height";
+        node_ids = ["5"];
+      }
+      {
+        type = "n";
+        key = "batch_size";
+        node_ids = ["5"];
+      }
+      {
+        type = "steps";
+        key = "steps";
+        node_ids = ["3"];
+      }
+      {
+        type = "seed";
+        key = "seed";
+        node_ids = ["3"];
+      }
+    ]}
+  '';
+in {
   # Generate the signing key once. Keeping it outside the container data prevents
   # image updates from invalidating existing Open WebUI sessions.
   systemd.services.open-webui-secret = {
@@ -35,6 +76,7 @@
     Volume=/persist/open-webui/data:/app/backend/data
     EnvironmentFile=/persist/open-webui/open-webui.env
     EnvironmentFile=/run/secrets/open-webui-oidc-env
+    EnvironmentFile=${comfyuiEnv}
     Environment=ENABLE_OLLAMA_API=False
     Environment=ENABLE_OPENAI_API=True
     Environment=OPENAI_API_BASE_URLS=http://llama:8080/v1
@@ -48,6 +90,12 @@
     Environment=AUDIO_TTS_OPENAI_API_KEY=not-needed
     Environment=AUDIO_TTS_MODEL=speaches-ai/Kokoro-82M-v1.0-ONNX
     Environment=AUDIO_TTS_VOICE=af_heart
+    Environment=ENABLE_IMAGE_GENERATION=True
+    Environment=IMAGE_GENERATION_ENGINE=comfyui
+    Environment=IMAGE_GENERATION_MODEL=v1-5-pruned-emaonly.safetensors
+    Environment=IMAGE_SIZE=512x512
+    Environment=IMAGE_STEPS=20
+    Environment=COMFYUI_BASE_URL=http://comfyui:8188
     Environment=ENABLE_PERSISTENT_CONFIG=False
     Environment=ENABLE_VERSION_UPDATE_CHECK=False
     Environment=RAG_EMBEDDING_MODEL_AUTO_UPDATE=False
