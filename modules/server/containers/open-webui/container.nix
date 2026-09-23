@@ -21,8 +21,8 @@
   environment.etc."containers/systemd/open-webui.container".text = ''
     [Unit]
     Description=Open WebUI
-    After=network-online.target caddy-network.service podman-llama.service speaches.service open-webui-secret.service
-    Requires=caddy-network.service podman-llama.service speaches.service open-webui-secret.service
+    After=network-online.target caddy-network.service podman-llama.service speaches.service speaches-model-download.service open-webui-secret.service
+    Requires=caddy-network.service podman-llama.service speaches.service speaches-model-download.service open-webui-secret.service
     RequiresMountsFor=/persist/open-webui
 
     [Container]
