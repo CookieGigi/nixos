@@ -7,6 +7,7 @@
     before = ["open-webui.service"];
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true;
       TimeoutStartSec = "infinity";
       Restart = "on-failure";
       RestartSec = "10s";
