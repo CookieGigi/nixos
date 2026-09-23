@@ -1,0 +1,4 @@
+name: comfyui-local
+version: 1.0.0
+description: Generate images with the local CPU ComfyUI service
+kind: backend

@@ -19,18 +19,18 @@
     if [ ! -e /persist/hermes/config.yaml ]; then
       ${pkgs.coreutils}/bin/install -o 409 -g 409 -m 0600 \
         ${initialConfig} /persist/hermes/config.yaml
-    else
-      ${pkgs.gnused}/bin/sed -i -E \
-        's|^([[:space:]]*default:[[:space:]]*)Qwen3\.5-4B-Q6_K([[:space:]]*)$|\1Ornith-1.5-9B-Q5_K_M\2|' \
-        /persist/hermes/config.yaml
     fi
+    ${pkgs.python3.withPackages (ps: [ps.pyyaml])}/bin/python \
+      ${./seed-config.py} /persist/hermes/config.yaml
   '';
+  workflow = pkgs.writeText "hermes-comfyui-workflow.json" (builtins.toJSON (import ../open-webui/comfyui-workflow.nix));
 in {
   environment.etc."containers/systemd/hermes.container".text = ''
     [Unit]
     Description=Hermes Agent
-    After=network-online.target caddy-network.service podman-llama.service
+    After=network-online.target caddy-network.service podman-llama.service searxng.service comfyui.service
     Requires=caddy-network.service podman-llama.service
+    Wants=searxng.service comfyui.service
     RequiresMountsFor=/persist/hermes
 
     [Container]
@@ -38,11 +38,15 @@ in {
     ContainerName=hermes
     Network=caddy.network
     Volume=/persist/hermes:/opt/data
+    Volume=${./image-gen}:/opt/data/plugins/image_gen/comfyui-local:ro
+    Volume=${workflow}:/opt/data/comfyui-workflow.json:ro
     Environment=HERMES_UID=409
     Environment=HERMES_GID=409
     Environment=HERMES_DASHBOARD=1
     Environment=HERMES_GATEWAY_BOOTSTRAP_STATE=running
     Environment=TZ=Europe/Paris
+    Environment=SEARXNG_URL=http://searxng:8080
+    Environment=COMFYUI_URL=http://comfyui:8188
     EnvironmentFile=/run/secrets/hermes-dashboard-env
     Exec=gateway run
 

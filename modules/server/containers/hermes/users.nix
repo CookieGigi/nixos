@@ -8,6 +8,8 @@
 
   systemd.tmpfiles.rules = [
     "d /persist/hermes 0700 hermes hermes -"
+    "d /persist/hermes/plugins 0700 hermes hermes -"
+    "d /persist/hermes/plugins/image_gen 0700 hermes hermes -"
   ];
 
   system.activationScripts.hermes-env-migration = ''
