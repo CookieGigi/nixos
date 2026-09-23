@@ -34,6 +34,7 @@
       mapping:
         auth.cookiegigi.com: 192.168.1.49
         llama-cpp.cookiegigi.com: 192.168.1.49
+        search.cookiegigi.com: 192.168.1.49
         photo.cookiegigi.com: 192.168.1.49
         zot.cookiegigi.com: 192.168.1.49
         blocky.cookiegigi.com: 192.168.1.49

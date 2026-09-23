@@ -11,6 +11,7 @@
     ./containers/llama
     ./containers/speaches
     ./containers/open-webui
+    ./containers/searxng
     ./containers/hermes
     ./containers/signal-cli
     ./containers/proton-drive

@@ -69,7 +69,8 @@
         "geo.enabled" = false;
         "device.sensors.enabled" = false;
         "dom.battery.enabled" = false;
-        "media.navigator.enabled" = false;
+        # Keep microphone access available for trusted HTTPS applications.
+        "media.navigator.enabled" = true;
 
         # Fingerprinting resistance
         "privacy.resistFingerprinting" = true;

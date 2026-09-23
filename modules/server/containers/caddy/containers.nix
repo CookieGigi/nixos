@@ -58,6 +58,14 @@
       }
     }
 
+    search.cookiegigi.com {
+      route {
+        import private_only
+        import authelia
+        reverse_proxy searxng:8080
+      }
+    }
+
     zot.cookiegigi.com {
       route {
         import private_only

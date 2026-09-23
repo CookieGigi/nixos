@@ -21,8 +21,8 @@
   environment.etc."containers/systemd/open-webui.container".text = ''
     [Unit]
     Description=Open WebUI
-    After=network-online.target caddy-network.service podman-llama.service speaches.service speaches-model-download.service open-webui-secret.service
-    Requires=caddy-network.service podman-llama.service speaches.service speaches-model-download.service open-webui-secret.service
+    After=network-online.target caddy-network.service podman-llama.service speaches.service speaches-model-download.service searxng.service open-webui-secret.service
+    Requires=caddy-network.service podman-llama.service speaches.service speaches-model-download.service searxng.service open-webui-secret.service
     RequiresMountsFor=/persist/open-webui
 
     [Container]
@@ -47,8 +47,13 @@
     Environment=AUDIO_TTS_MODEL=speaches-ai/Kokoro-82M-v1.0-ONNX
     Environment=AUDIO_TTS_VOICE=af_heart
     Environment=ENABLE_PERSISTENT_CONFIG=False
-    Environment=OFFLINE_MODE=True
+    Environment=ENABLE_VERSION_UPDATE_CHECK=False
+    Environment=RAG_EMBEDDING_MODEL_AUTO_UPDATE=False
+    Environment=ENABLE_WEB_SEARCH=True
+    Environment=WEB_SEARCH_ENGINE=searxng
+    Environment=SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
     Environment=WEBUI_AUTH=True
+    Environment=CORS_ALLOW_ORIGIN=https://openwebui.cookiegigi.com
     Environment=TZ=Europe/Paris
 
     [Service]
