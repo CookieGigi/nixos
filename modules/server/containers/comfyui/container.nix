@@ -60,7 +60,7 @@ in {
     Environment=PYTHONPYCACHEPREFIX=/root/.cache/pycache
 
     [Service]
-    MemoryMax=9G
+    MemoryMax=6G
     CPUQuota=400%
     Restart=always
     RestartSec=5
