@@ -1,4 +1,30 @@
-{
+{pkgs, ...}: {
+  systemd.services.speaches-model-download = {
+    description = "Download the Speaches STT and TTS models";
+    wantedBy = ["multi-user.target"];
+    requires = ["speaches.service"];
+    after = ["speaches.service"];
+    before = ["open-webui.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      TimeoutStartSec = "infinity";
+      Restart = "on-failure";
+      RestartSec = "10s";
+    };
+    script = ''
+      set -euo pipefail
+
+      until ${pkgs.podman}/bin/podman exec speaches curl -fsS http://127.0.0.1:8000/health >/dev/null; do
+        sleep 2
+      done
+
+      ${pkgs.podman}/bin/podman exec speaches curl -fsS -X POST \
+        http://127.0.0.1:8000/v1/models/Systran/faster-distil-whisper-large-v3
+      ${pkgs.podman}/bin/podman exec speaches curl -fsS -X POST \
+        http://127.0.0.1:8000/v1/models/speaches-ai/Kokoro-82M-v1.0-ONNX
+    '';
+  };
+
   environment.etc."containers/systemd/speaches.container".text = ''
     [Unit]
     Description=Speaches OpenAI-compatible STT and TTS API
@@ -17,7 +43,6 @@
     Environment=WHISPER__COMPUTE_TYPE=float16
     Environment=STT_MODEL_TTL=300
     Environment=TTS_MODEL_TTL=300
-    Environment=PRELOAD_MODELS=[\"Systran/faster-distil-whisper-large-v3\",\"speaches-ai/Kokoro-82M-v1.0-ONNX\"]
     Environment=ENABLE_UI=false
     Environment=LOG_LEVEL=info
     AddDevice=nvidia.com/gpu=all

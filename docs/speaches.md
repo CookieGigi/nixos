@@ -4,6 +4,10 @@ Speaches provides the server's internal, OpenAI-compatible speech API. It uses
 CUDA for both transcription and synthesis and persists downloaded models in
 `/persist/speaches/cache`.
 
+The `speaches-model-download` systemd unit downloads the configured STT and
+TTS models after the API is healthy. It is idempotent and completes before Open
+WebUI starts.
+
 The upstream image requires its built-in non-root `ubuntu` user (UID 1000), so
 the cache is owned by the server's `cookiegigi` account, which has that UID.
 
