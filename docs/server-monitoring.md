@@ -18,7 +18,18 @@ on first startup in `/persist/grafana`. Keep this directory persistent and
 private; losing or rotating `secret_key` can make encrypted Grafana data
 unreadable. Prometheus data is persisted at `/var/lib/prometheus2` via
 impermanence; Loki uses `/persist/loki`, and Alloy's journal cursor is
-persisted at `/var/lib/alloy` via impermanence.
+persisted at `/var/lib/private/alloy` via impermanence. Alloy uses systemd's
+`DynamicUser`, so `/var/lib/alloy` must remain a systemd-managed symlink, not
+an impermanence bind mount.
+
+When upgrading from the original monitoring declaration, the old
+`var-lib-alloy.mount` may still be mounted. If Alloy continues to fail with
+`238/STATE_DIRECTORY` after switching, stop Alloy and the obsolete mount,
+then start Alloy again: `sudo systemctl stop alloy.service var-lib-alloy.mount`
+and `sudo systemctl start alloy.service`. If the unmounted public directory
+still blocks migration, remove it with `sudo rmdir /var/lib/alloy` (only when
+empty) before starting Alloy. Verify that `/var/lib/alloy` is a symlink and
+`var-lib-private-alloy.mount` is active.
 
 The dashboard shows host CPU, memory and filesystems, Podman container CPU,
 memory and process counts, GPU utilization and VRAM, scrape health, alert

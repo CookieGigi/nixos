@@ -29,7 +29,7 @@
 in {
   virtualisation.containers.containersConf.settings.containers.log_driver = "journald";
 
-  environment.persistence."/persist".directories = ["/var/lib/prometheus2" "/var/lib/alloy"];
+  environment.persistence."/persist".directories = ["/var/lib/prometheus2" "/var/lib/private/alloy"];
 
   systemd = {
     tmpfiles.rules = ["d /run/node-exporter 0755 root root -"];
