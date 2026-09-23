@@ -29,10 +29,12 @@
     Image=ghcr.io/open-webui/open-webui:main
     ContainerName=open-webui
     Network=caddy.network
+    AddHost=auth.cookiegigi.com:192.168.1.49
     User=411
     Group=411
     Volume=/persist/open-webui/data:/app/backend/data
     EnvironmentFile=/persist/open-webui/open-webui.env
+    EnvironmentFile=/run/secrets/open-webui-oidc-env
     Environment=ENABLE_OLLAMA_API=False
     Environment=ENABLE_OPENAI_API=True
     Environment=OPENAI_API_BASE_URLS=http://llama:8080/v1
@@ -53,6 +55,15 @@
     Environment=WEB_SEARCH_ENGINE=searxng
     Environment=SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
     Environment=WEBUI_AUTH=True
+    Environment=WEBUI_URL=https://openwebui.cookiegigi.com
+    Environment=ENABLE_OAUTH_SIGNUP=True
+    Environment=OAUTH_MERGE_ACCOUNTS_BY_EMAIL=False
+    Environment=OAUTH_CLIENT_ID=open-webui
+    Environment=OPENID_PROVIDER_URL=https://auth.cookiegigi.com/.well-known/openid-configuration
+    Environment=OAUTH_PROVIDER_NAME=Authelia
+    Environment=OAUTH_SCOPES=openid email profile
+    Environment=OAUTH_CODE_CHALLENGE_METHOD=S256
+    Environment=OAUTH_REDIRECT_URI=https://openwebui.cookiegigi.com/oauth/oidc/callback
     Environment=CORS_ALLOW_ORIGIN=https://openwebui.cookiegigi.com
     Environment=TZ=Europe/Paris
 

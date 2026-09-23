@@ -8,6 +8,7 @@
       "authelia-jwks"
       "authelia-immich-client-digest"
       "authelia-paperless-client-digest"
+      "authelia-open-webui-client-digest"
     ] (_: {
       owner = "authelia";
       mode = "0400";

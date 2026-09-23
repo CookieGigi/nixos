@@ -88,6 +88,20 @@ identity_providers:
         grant_types: [authorization_code]
         token_endpoint_auth_method: client_secret_basic
         userinfo_signed_response_alg: none
+      - client_id: open-webui
+        client_name: Open WebUI
+        client_secret: '{{ secret "/secrets/authelia-open-webui-client-digest" }}'
+        public: false
+        authorization_policy: two_factor
+        require_pkce: true
+        pkce_challenge_method: S256
+        redirect_uris:
+          - https://openwebui.cookiegigi.com/oauth/oidc/callback
+        scopes: [openid, profile, email]
+        response_types: [code]
+        grant_types: [authorization_code]
+        token_endpoint_auth_method: client_secret_basic
+        userinfo_signed_response_alg: none
       - client_id: bookorbit
         client_name: BookOrbit
         public: true

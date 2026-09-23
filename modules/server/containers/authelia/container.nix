@@ -11,6 +11,7 @@
     "authelia-jwks"
     "authelia-immich-client-digest"
     "authelia-paperless-client-digest"
+    "authelia-open-webui-client-digest"
   ];
 in {
   environment.etc = {
