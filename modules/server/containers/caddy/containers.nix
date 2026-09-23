@@ -45,8 +45,14 @@
     openwebui.cookiegigi.com {
       route {
         import private_only
-        import authelia
-        reverse_proxy open-webui:8080
+        # Pyodide runs in an opaque-origin sandbox, so its requests carry no auth cookie.
+        handle /pyodide/* {
+          reverse_proxy open-webui:8080
+        }
+        handle {
+          import authelia
+          reverse_proxy open-webui:8080
+        }
       }
     }
 
