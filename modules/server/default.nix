@@ -5,6 +5,8 @@
     ./core-server.nix
     ./security.nix
     ./nvidia.nix
+    ./monitoring.nix
+    ./monitoring-grafana.nix
     ./storage-layout.nix
     ./container.nix
     ./containers/immich

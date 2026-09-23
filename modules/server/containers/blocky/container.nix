@@ -38,6 +38,7 @@
         photo.cookiegigi.com: 192.168.1.49
         zot.cookiegigi.com: 192.168.1.49
         blocky.cookiegigi.com: 192.168.1.49
+        grafana.cookiegigi.com: 192.168.1.49
         bookorbit.cookiegigi.com: 192.168.1.49
         fileflows.cookiegigi.com: 192.168.1.49
         homeassistant.cookiegigi.com: 192.168.1.49

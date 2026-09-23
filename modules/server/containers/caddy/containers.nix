@@ -96,6 +96,14 @@
       }
     }
 
+    grafana.cookiegigi.com {
+      route {
+        import private_only
+        import authelia
+        reverse_proxy 10.89.100.1:3000
+      }
+    }
+
     fileflows.cookiegigi.com {
       route {
         import private_only

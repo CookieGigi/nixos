@@ -1,0 +1,72 @@
+{
+  "uid": "homelab-server",
+  "title": "Server and AI",
+  "tags": ["homelab"],
+  "schemaVersion": 40,
+  "refresh": "30s",
+  "time": {"from": "now-6h", "to": "now"},
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Scrape targets up", "gridPos": {"x": 0, "y": 0, "w": 8, "h": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(up)", "refId": "A"}]
+    },
+    {
+      "id": 2, "type": "stat", "title": "NVMe / HDD free", "gridPos": {"x": 8, "y": 0, "w": 8, "h": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "bytes"}},
+      "targets": [{"expr": "node_filesystem_avail_bytes{mountpoint=~\"/persist|/media\",fstype=\"btrfs\"}", "legendFormat": "{{mountpoint}}", "refId": "A"}]
+    },
+    {
+      "id": 3, "type": "alertlist", "title": "Alert state", "gridPos": {"x": 16, "y": 0, "w": 8, "h": 5},
+      "options": {"viewMode": "list", "groupMode": "default", "sortOrder": 1, "maxItems": 10}
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "CPU and available memory", "gridPos": {"x": 0, "y": 5, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}},
+      "targets": [
+        {"expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))", "legendFormat": "CPU", "refId": "A"},
+        {"expr": "node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes", "legendFormat": "RAM available", "refId": "B"}
+      ]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Container memory", "gridPos": {"x": 12, "y": 5, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "bytes"}},
+      "targets": [{"expr": "homelab_podman_memory_bytes", "legendFormat": "{{container}}", "refId": "A"}]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Container CPU", "gridPos": {"x": 0, "y": 13, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "rate(homelab_podman_cpu_seconds_total[5m])", "legendFormat": "{{container}}", "refId": "A"}]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "GPU utilization / VRAM", "gridPos": {"x": 12, "y": 13, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "nvidia_smi_utilization_gpu_ratio", "legendFormat": "GPU utilization", "refId": "A"},
+        {"expr": "nvidia_smi_memory_used_bytes / nvidia_smi_memory_total_bytes", "legendFormat": "VRAM used", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "percentunit"}}
+    },
+    {
+      "id": 8, "type": "logs", "title": "Server journal", "gridPos": {"x": 0, "y": 21, "w": 24, "h": 10},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [{"expr": "{host=\"server\"}", "refId": "A"}]
+    },
+    {
+      "id": 9, "type": "timeseries", "title": "llama.cpp tokens per second", "gridPos": {"x": 0, "y": 31, "w": 24, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "sum by (model) (rate(llamacpp:tokens_predicted_total[5m]))", "legendFormat": "{{model}} generated", "refId": "A"},
+        {"expr": "sum by (model) (rate(llamacpp:prompt_tokens_total[5m]))", "legendFormat": "{{model}} prompt", "refId": "B"}
+      ]
+    },
+    {
+      "id": 10, "type": "timeseries", "title": "Container processes", "gridPos": {"x": 0, "y": 39, "w": 24, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "homelab_podman_pids", "legendFormat": "{{container}}", "refId": "A"}]
+    }
+  ]
+}

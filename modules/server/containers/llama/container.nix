@@ -104,6 +104,7 @@ in {
       "--batch-size"
       "2048"
       "--jinja"
+      "--metrics"
     ];
     extraOptions = [
       "--network=caddy"

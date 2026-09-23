@@ -23,6 +23,7 @@ access_control:
         - hermes.cookiegigi.com
         - search.cookiegigi.com
         - blocky.cookiegigi.com
+        - grafana.cookiegigi.com
         - fileflows.cookiegigi.com
         - zot.cookiegigi.com
       subject: group:admins
