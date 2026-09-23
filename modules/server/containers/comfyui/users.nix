@@ -9,6 +9,7 @@
 
   systemd.tmpfiles.rules = [
     "d /persist/comfyui                 0700 comfyui comfyui -"
+    "d /persist/comfyui/ComfyUI         0700 comfyui comfyui -"
     "d /media/ai/comfyui-checkpoints   2770 root ai -"
   ];
 
