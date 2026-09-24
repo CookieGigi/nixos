@@ -100,6 +100,8 @@
 
         # Media
         "media.hardwaremediakeys.enabled" = true;
+        # Allow trusted HTTPS applications to select an audio output device.
+        "media.setsinkid.enabled" = true;
       };
 
       # -- Search engine defaults --------------------------------------
