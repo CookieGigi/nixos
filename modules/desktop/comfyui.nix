@@ -11,6 +11,7 @@ in {
     "d /persist/comfyui/input              0700 root root -"
     "d /persist/comfyui/output             0700 root root -"
     "d /persist/comfyui/user               0700 root root -"
+    "d /persist/comfyui/tmp                0700 root root -"
   ];
 
   systemd.services.comfyui-model-download = {
@@ -54,6 +55,7 @@ in {
     Environment="CLI_ARGS=--listen 0.0.0.0"
 
     [Service]
+    Environment=TMPDIR=/persist/comfyui/tmp
     Restart=always
     RestartSec=5
 
