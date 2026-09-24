@@ -4,6 +4,7 @@
     ./sops.nix
     ./core-server.nix
     ./security.nix
+    ./cloudflared.nix
     ./nvidia.nix
     ./monitoring.nix
     ./monitoring-grafana.nix
