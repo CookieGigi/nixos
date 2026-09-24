@@ -28,9 +28,9 @@ in {
   environment.etc."containers/systemd/hermes.container".text = ''
     [Unit]
     Description=Hermes Agent
-    After=network-online.target caddy-network.service podman-llama.service searxng.service comfyui.service
+    After=network-online.target caddy-network.service podman-llama.service searxng.service
     Requires=caddy-network.service podman-llama.service
-    Wants=searxng.service comfyui.service
+    Wants=searxng.service
     RequiresMountsFor=/persist/hermes
 
     [Container]
@@ -46,7 +46,7 @@ in {
     Environment=HERMES_GATEWAY_BOOTSTRAP_STATE=running
     Environment=TZ=Europe/Paris
     Environment=SEARXNG_URL=http://searxng:8080
-    Environment=COMFYUI_URL=http://comfyui:8188
+    Environment=COMFYUI_URL=http://192.168.1.14:8188
     EnvironmentFile=/run/secrets/hermes-dashboard-env
     Exec=gateway run
 

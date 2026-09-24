@@ -92,10 +92,10 @@ in {
     Environment=AUDIO_TTS_VOICE=af_heart
     Environment=ENABLE_IMAGE_GENERATION=True
     Environment=IMAGE_GENERATION_ENGINE=comfyui
-    Environment=IMAGE_GENERATION_MODEL=v1-5-pruned-emaonly.safetensors
-    Environment=IMAGE_SIZE=512x512
-    Environment=IMAGE_STEPS=20
-    Environment=COMFYUI_BASE_URL=http://comfyui:8188
+    Environment=IMAGE_GENERATION_MODEL=sd_xl_base_1.0.safetensors
+    Environment=IMAGE_SIZE=768x768
+    Environment=IMAGE_STEPS=25
+    Environment=COMFYUI_BASE_URL=http://192.168.1.14:8188
     Environment=ENABLE_PERSISTENT_CONFIG=False
     Environment=ENABLE_VERSION_UPDATE_CHECK=False
     Environment=RAG_EMBEDDING_MODEL_AUTO_UPDATE=False

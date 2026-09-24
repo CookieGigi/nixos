@@ -1,4 +1,4 @@
-"""Hermes image_generate provider for the local ComfyUI API."""
+"""Hermes image_generate provider for the laptop ComfyUI API."""
 
 import json
 import os
@@ -23,7 +23,7 @@ class ComfyUIProvider(ImageGenProvider):
         return "comfyui-local"
 
     def default_model(self):
-        return "v1-5-pruned-emaonly.safetensors"
+        return "sd_xl_base_1.0.safetensors"
 
     def is_available(self):
         return bool(os.environ.get("COMFYUI_URL"))
@@ -55,9 +55,9 @@ class ComfyUIProvider(ImageGenProvider):
             workflow["6"]["inputs"]["text"] = prompt.strip()
             workflow["3"]["inputs"]["seed"] = secrets.randbelow(2**53)
             width, height = {
-                "landscape": (640, 384),
-                "portrait": (384, 640),
-                "square": (512, 512),
+                "landscape": (1024, 640),
+                "portrait": (640, 1024),
+                "square": (768, 768),
             }[aspect_ratio]
             workflow["5"]["inputs"].update(width=width, height=height)
             workflow["9"]["inputs"]["filename_prefix"] = "Hermes"

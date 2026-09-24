@@ -11,7 +11,6 @@
     ./container.nix
     ./containers/immich
     ./containers/llama
-    ./containers/comfyui
     ./containers/speaches
     ./containers/open-webui
     ./containers/searxng

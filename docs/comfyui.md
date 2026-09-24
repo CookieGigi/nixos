@@ -1,36 +1,35 @@
-# CPU-only image generation
+# Laptop GPU image generation
 
-The server runs ComfyUI at `https://comfyui.cookiegigi.com`, restricted to
-LAN/VPN clients and protected by Authelia. It uses the CPU-only
-`yanwk/comfyui-boot:cpu` container without NVIDIA device access, so llama.cpp
-can continue using the GPU. The service is limited to 4 CPU cores and 9 GiB of
-RAM; if memory is tight, stop it with `sudo systemctl stop comfyui.service`.
+ComfyUI runs on the `xps` laptop's RTX 4070 (8 GiB VRAM), not on the server.
+The server's CPU-only SD 1.5 service exceeded its 6 GiB limit and is no longer
+declared. The server's GPU remains available to llama.cpp. Image generation is
+unavailable whenever the laptop is offline or asleep.
 
-The Stable Diffusion 1.5 checkpoint is downloaded automatically to
-`/media/ai/comfyui-checkpoints/v1-5-pruned-emaonly.safetensors`. ComfyUI state,
-uploaded images, and generated output persist in `/persist/comfyui/ComfyUI/`.
-The first start downloads about 4.3 GB. Start with a 512x512 text-to-image
-workflow; use the image-to-image or inpainting workflow with an input image and
-mask to edit images. CPU generation can take minutes per image.
+The laptop downloads the SDXL base checkpoint to
+`/persist/comfyui/models/checkpoints/sd_xl_base_1.0.safetensors` on first start
+(about 6.9 GB). Inputs, outputs, model files and Podman images persist across
+reboots under `/persist`. Inspect startup with
+`journalctl -u comfyui-model-download.service -f` and
+`journalctl -u comfyui.service -f`. Use a batch size of 1; larger workflows may
+offload to laptop RAM when the 8 GiB GPU fills up.
 
-The model download must finish before ComfyUI starts. Check its progress with
-`journalctl -u comfyui-model-download.service -f` and the container logs with
-`journalctl -u comfyui.service -f`. Model and service declarations are in
-`modules/server/containers/comfyui/`.
+The laptop currently uses DHCP address `192.168.1.14`. Reserve this address for
+the laptop in the router before deploying the server config. If it changes,
+update the upstream in `modules/server/containers/caddy/containers.nix` and the
+URLs in `modules/server/containers/{open-webui,hermes}/container.nix`. The
+laptop firewall permits the unauthenticated ComfyUI API on port 8188 only from
+the server at `192.168.1.49`. Do not expose port 8188 to the internet.
 
-## Open WebUI
+The user-facing `https://comfyui.cookiegigi.com` stays on the server's Caddy
+proxy with LAN/VPN access and Authelia. Open WebUI and Hermes contact the laptop
+directly from their server containers; their shared SDXL workflow is declared
+in `modules/server/containers/open-webui/comfyui-workflow.nix`. Open WebUI uses
+768x768 and 25 steps by default. With `ENABLE_PERSISTENT_CONFIG=False`, changes
+made in its admin Images page are not retained after restart; edit the Nix
+configuration instead. Hermes supports text-to-image, not editing.
 
-Open WebUI connects directly to `http://comfyui:8188` over the private Podman
-network, not through Caddy/Authelia. Its SD1.5 text-to-image workflow and node
-mappings are declared in `modules/server/containers/open-webui/`; the checkpoint,
-512x512 size, and 20 sampling steps are defaults. With
-`ENABLE_PERSISTENT_CONFIG=False`, changes made in the Open WebUI admin Images
-page are not retained after a restart; edit the Nix configuration instead.
-
-After rebuilding the server, open a chat in Open WebUI, enable **Image** in the
-message input's **Integrations** menu, and ask for an image. Generation can take
-minutes on CPU. If the option is missing, check the model's Image Generation
-capability and your role's image generation permission. For failures, inspect
-`journalctl -u open-webui.service -f` and `journalctl -u comfyui.service -f`.
-Open WebUI image editing remains disabled: it requires a separate ComfyUI
-workflow with an input-image node.
+For connectivity, check the laptop's `comfyui.service` and try reaching
+`http://192.168.1.14:8188/system_stats` from the server. Inspect
+`journalctl -u open-webui.service -f` and `journalctl -u hermes.service -f`
+for client errors. The old server checkpoint and output data remain on disk;
+the NixOS changes do not delete them.

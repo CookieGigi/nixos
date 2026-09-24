@@ -60,7 +60,7 @@
       route {
         import private_only
         import authelia
-        reverse_proxy comfyui:8188
+        reverse_proxy 192.168.1.14:8188
       }
     }
 

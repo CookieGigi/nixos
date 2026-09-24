@@ -3,8 +3,8 @@
     class_type = "KSampler";
     inputs = {
       seed = 0;
-      steps = 20;
-      cfg = 7.5;
+      steps = 25;
+      cfg = 7;
       sampler_name = "euler";
       scheduler = "normal";
       denoise = 1;
@@ -16,13 +16,13 @@
   };
   "4" = {
     class_type = "CheckpointLoaderSimple";
-    inputs.ckpt_name = "v1-5-pruned-emaonly.safetensors";
+    inputs.ckpt_name = "sd_xl_base_1.0.safetensors";
   };
   "5" = {
     class_type = "EmptyLatentImage";
     inputs = {
-      width = 512;
-      height = 512;
+      width = 768;
+      height = 768;
       batch_size = 1;
     };
   };
