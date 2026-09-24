@@ -9,8 +9,7 @@
     description = "Cloudflare Tunnel";
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
-    after = ["network-online.target" "sops-install-secrets.service"];
-    requires = ["sops-install-secrets.service"];
+    after = ["network-online.target"];
     serviceConfig = {
       DynamicUser = true;
       LoadCredential = "tunnel-token:${config.sops.secrets."cloudflared-tunnel-token".path}";
