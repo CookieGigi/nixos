@@ -27,6 +27,7 @@
       ip = "ip -color=auto";
       diff = "diff --color=auto";
       mkdir = "mkdir -p";
+      hermes-tui = "ssh -t server 'sudo podman exec -it hermes hermes --tui'";
     };
 
     # ── Oh-My-Zsh ────────────────────────────────────────────────
