@@ -22,5 +22,6 @@
     ./codex.nix
     ./obsidian.nix
     ./devenv.nix
+    ./vim.nix
   ];
 }
