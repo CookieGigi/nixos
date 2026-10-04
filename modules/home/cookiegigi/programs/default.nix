@@ -15,6 +15,7 @@
     ./chromium.nix
     ./devtools.nix
     ./heroic.nix
+    ./prismlauncher.nix
     ./proton.nix
     ./wifitui.nix
     ./unzip.nix
