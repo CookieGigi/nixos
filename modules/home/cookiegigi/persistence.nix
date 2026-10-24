@@ -20,6 +20,8 @@ _: {
       "Games/Steam"
       # dev
       ".cache/"
+      # uv Python toolchains and state
+      ".local/share/uv"
     ];
   };
 }
