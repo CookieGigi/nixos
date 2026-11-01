@@ -41,8 +41,9 @@ The module installs and configures `pass` (password-store) + GnuPG:
   talks Wayland natively.
 - Persistent paths (on top of the LUKS volume):
   - `~/.config/himalaya` — wizard-written account config
-  - `~/.password-store` — encrypted secrets
-  - `~/.gnupg` — GPG key and trust database
+  - `~/.password-store` — encrypted secrets (`0700`)
+  - `~/.gnupg` — GPG key and trust database (`0700`, required: GnuPG
+    refuses a group/world-readable homedir)
 
 ### One-time setup
 

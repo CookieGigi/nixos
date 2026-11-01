@@ -32,9 +32,16 @@
       # Wizard-written account config (includes the password command).
       ".config/himalaya"
       # Encrypted password store.
-      ".password-store"
-      # GPG key + trustdb protecting the store.
-      ".gnupg"
+      {
+        directory = ".password-store";
+        mode = "0700";
+      }
+      # GPG key + trustdb protecting the store. GnuPG rejects a group/world
+      # readable homedir, so it must not use impermanence's 0755 default.
+      {
+        directory = ".gnupg";
+        mode = "0700";
+      }
     ];
   };
 }
