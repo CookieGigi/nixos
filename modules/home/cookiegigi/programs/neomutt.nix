@@ -1,7 +1,9 @@
 {pkgs, ...}: let
   # OpenPGP key protecting both transport encryption and the password store
   # (see ./gpg.nix). This is the fingerprint `pass init` was given.
-  key = "0CED606EA710CFB8F3E0D3EA4A33EE78D76EF538";
+  # Posteo rejects keys whose UID contains a real name, so this key uses the
+  # email address as the Real name with an empty Comment.
+  key = "AA1D7C396291AE68384FB36B3CAE98FFEDCE1EF1";
 
   address = "gcreusot@posteo.com";
 

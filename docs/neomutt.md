@@ -90,6 +90,20 @@ use the himalaya config as a cross-check.
 
 ## Posteo inbound encryption
 
+Posteo only accepts public keys whose user ID does **not** contain a real name.
+The key must use an empty name or the email address itself as the Real name
+(with an empty Comment). If you previously created a key with a name such as
+`gcreusot (mail) <gcreusot@posteo.com>`, create a new one with Real name
+`gcreusot@posteo.com`, then re-encrypt the password store:
+
+```sh
+# The fingerprint of the nameless key configured in this module:
+pass init AA1D7C396291AE68384FB36B3CAE98FFEDCE1EF1
+```
+
+`pass init` re-encrypts every entry in the store to the new key, so
+`pass show mail/posteo` will ask for the new passphrase from now on.
+
 Sending the public key to `keys@posteo.de` only *publishes* it in the Posteo key
 directory. Inbound encryption is a separate switch under Settings → Key
 administration, and activating it means:
