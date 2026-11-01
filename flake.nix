@@ -38,6 +38,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Not packaged in nixpkgs yet (v0.x, no releases).
+    himalaya-tui = {
+      url = "github:pimalaya/himalaya-tui";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.fenix.inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";

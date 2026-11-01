@@ -24,5 +24,6 @@
     ./obsidian.nix
     ./devenv.nix
     ./vim.nix
+    ./himalaya.nix
   ];
 }
