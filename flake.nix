@@ -38,11 +38,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Rust toolchain for himalaya-tui. Pinned separately so we can pull the
+    # fix for the deprecated stdenv.isLinux / stdenv.isDarwin warnings.
+    fenix = {
+      url = "github:nix-community/fenix/monthly";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Not packaged in nixpkgs yet (v0.x, no releases).
     himalaya-tui = {
       url = "github:pimalaya/himalaya-tui";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.fenix.inputs.nixpkgs.follows = "nixpkgs";
+      inputs.fenix.follows = "fenix";
     };
 
     nixvim = {
