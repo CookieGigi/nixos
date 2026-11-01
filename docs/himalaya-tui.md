@@ -101,6 +101,19 @@ himalaya-tui --no-config     # wizard, without reading config.toml
 The TUI writes no local mail cache, so only the three paths above need to
 persist.
 
+> **First-switch gotcha:** the bind mounts for these paths are created by this
+> rebuild. Home Manager activation can run before the new mount units are up,
+> so `~/.gnupg/gpg.conf` / `gpg-agent.conf` land *under* the mount and appear
+> missing until the next boot, and `gpg-agent` falls back to the store-path
+> pinentry. Fix without rebooting by re-running activation:
+>
+> ```sh
+> sudo systemctl restart home-manager-cookiegigi.service
+> ```
+>
+> (or simply reboot once). `ls -la ~/.gnupg` should show `gpg.conf` and
+> `gpg-agent.conf` symlinks.
+
 ## Rebuild
 
 ```sh
