@@ -58,6 +58,12 @@ pass init <KEY_ID or email>
 pass insert mail/<account>
 ```
 
+`pass insert` prompts **twice** (`Enter password`, then `Retype password`) and
+uses `read -s`, so nothing echoes while you type or paste — that is normal, not
+a hang. Use `pass insert --echo mail/<account>` if you want visible feedback.
+No pinentry window appears on insert: encryption only needs the public key.
+Pinentry shows up on `pass show`, i.e. when the password is actually decrypted.
+
 ### Point himalaya at pass
 
 First run of `himalaya-tui` opens the account wizard (server discovery,
@@ -68,25 +74,40 @@ command** option and enter:
 pass show mail/<account>
 ```
 
-The wizard writes that as `password.command` (a shell command) into
-`~/.config/himalaya/config.toml`, e.g.:
+The wizard writes the result into `~/.config/himalaya/config.toml`. A working
+Posteo account looks like this:
 
 ```toml
-[accounts.example]
+[accounts.posteo]
 default = true
-from = "user@example.com"
 
-imap.server = "imap.example.com"
-imap.sasl.plain.username = "user@example.com"
-imap.sasl.plain.password.command = "pass show mail/example"
+email = "user@posteo.com"
 
-smtp.server = "smtp.example.com"
-smtp.sasl.plain.username = "user@example.com"
-smtp.sasl.plain.password.command = "pass show mail/example"
+imap.server = "imaps://posteo.de:993"
+imap.sasl.plain.authcid = "user@posteo.com"
+imap.sasl.plain.passwd.command = ["pass", "show", "mail/posteo"]
+
+smtp.server = "smtps://posteo.de:465"
+smtp.sasl.plain.authcid = "user@posteo.com"
+smtp.sasl.plain.passwd.command = ["pass", "show", "mail/posteo"]
+
+mailbox.alias.inbox = "INBOX"
 ```
 
-If the wizard stored `password.raw` instead, replace each `raw` key with the
-`command` form above — never leave a plaintext password in the config.
+Things that are easy to get wrong:
+
+- **Scheme, not just host:** use `imaps://` / `smtps://` for implicit TLS on
+  ports 993 / 465. Plain `imap://` with STARTTLS does not work against Posteo.
+- **`authcid`, not `username`**, and **`passwd.command`, not `password.command`**
+  — the wizard emits the v2 schema.
+- **The command is an array** (`["pass", "show", "..."]`). A bare shell string
+  is not executed.
+- `sasl.plain` is correct even if the wizard's SASL selector was set to
+  `LOGIN`: both are username+password over TLS.
+
+If the wizard stored `passwd.raw` (or `password.raw` in older versions)
+instead, replace it with the `command` form above — never leave a plaintext
+password in the config.
 
 Any shell command works, so another password manager can be swapped in
 without touching this module.
