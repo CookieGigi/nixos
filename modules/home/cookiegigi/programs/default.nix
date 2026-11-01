@@ -26,5 +26,6 @@
     ./vim.nix
     ./gpg.nix
     ./himalaya.nix
+    ./neomutt.nix
   ];
 }

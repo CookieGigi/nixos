@@ -123,6 +123,10 @@ himalaya-tui --no-config     # wizard, without reading config.toml
 The TUI writes no local mail cache, so only the three paths above need to
 persist.
 
+> **No OpenPGP:** neither `himalaya-tui` 0.1.0 nor `himalaya` v2 implements
+> OpenPGP (v2 dropped it in the rewrite), so inbound-encrypted mail is
+> unreadable here. Use `neomutt` for encrypted mail — see `docs/neomutt.md`.
+
 > **First-switch gotcha:** the bind mounts for these paths are created by this
 > rebuild. Home Manager activation can run before the new mount units are up,
 > so `~/.gnupg/gpg.conf` / `gpg-agent.conf` land *under* the mount and appear
