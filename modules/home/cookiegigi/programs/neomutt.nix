@@ -37,6 +37,52 @@
     set postponed = "+Drafts"
     set trash = "+Trash"
 
+    # ── Sidebar ───────────────────────────────────────────────────────────
+    set sidebar_visible = yes
+    set sidebar_width = 24
+    set sidebar_format = "%D%?F? [%F]?%* %?N?(%N)?"
+    set sidebar_folder_indent = yes
+    set sidebar_indent_string = "  "
+    set sidebar_short_path = yes
+    mailboxes = +INBOX +Sent +Drafts +Trash
+    bind index,pager \Cp sidebar-prev
+    bind index,pager \Cn sidebar-next
+    bind index,pager \Co sidebar-open
+    macro index,pager B "<sidebar-toggle-visible>" "toggle sidebar"
+
+    # ── Index / reading ───────────────────────────────────────────────────
+    set sort = reverse-date
+    set sort_aux = date
+    set index_format = "%4C %Z %{%b %d} %-15.15L %s"
+    set status_on_top = yes
+    set pager_index_lines = 8
+    set menu_scroll = yes
+    set markers = no
+    set smart_wrap = yes
+    set wrap = 80
+
+    # ── Color theme (dark terminal) ───────────────────────────────────────
+    color normal      default default
+    color indicator   default color8
+    color error       brightred default
+    color status      brightblue default
+    color tree        cyan default
+    color tilde       blue default
+    color signature   cyan default
+    color quoted      green default
+    color quoted1     cyan default
+    color quoted2     yellow default
+    color quoted3     red default
+    color index       default default ~A
+    color index       brightgreen default ~N
+    color index       brightyellow default ~F
+    color index       brightblack default ~T
+    color sidebar_divider   color8 default
+    color sidebar_highlight default color8
+    color sidebar_indicator default color8
+    color sidebar_new       brightgreen default
+    color sidebar_unread    brightyellow default
+
     # ── OpenPGP (GPGME -> gpg-agent -> pinentry-qt) ───────────────────────
     set crypt_use_gpgme = yes
     set pgp_default_key = "${key}"

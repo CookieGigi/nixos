@@ -51,6 +51,18 @@ Reading encrypted mail is automatic: GPGME decrypts it, pinentry-qt asks for the
 passphrase if the agent cache is cold, and the signature status appears in the
 status bar.
 
+### Interface
+
+A left sidebar lists the main Posteo folders (`INBOX`, `Sent`, `Drafts`,
+`Trash`). Key bindings while reading or in the index:
+
+- `Ctrl-p` / `Ctrl-n` — previous / next folder in the sidebar
+- `Ctrl-o` — open the selected folder
+- `B` — toggle the sidebar visibility
+
+The default theme is a simple dark-terminal scheme; colors are set in the
+module and can be edited there.
+
 ### Sending encrypted mail
 
 In the compose screen press `p` to open the PGP menu and pick the operation
