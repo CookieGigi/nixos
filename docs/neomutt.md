@@ -51,6 +51,21 @@ Reading encrypted mail is automatic: GPGME decrypts it, pinentry-qt asks for the
 passphrase if the agent cache is cold, and the signature status appears in the
 status bar.
 
+### HTML and images
+
+NeoMutt renders HTML and image parts through external viewers configured in
+`~/.config/neomutt/mailcap`:
+
+- **HTML** is converted to plain text with `w3m -dump`.
+- **Images** are rendered inline with `chafa`:
+  - `--format sixel` for terminals that support SIXEL (your terminal `foot`
+    does).
+  - `--symbols block` as a plain-Unicode fallback.
+
+`allow_ansi = yes` lets those viewers emit terminal escape sequences. In the
+message index, press `v` to see the attachment list, select an image, and press
+Enter to view it.
+
 ### Interface
 
 A left sidebar lists the main Posteo folders (`INBOX`, `Sent`, `Drafts`,

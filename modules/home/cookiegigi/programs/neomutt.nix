@@ -62,6 +62,8 @@
     set markers = no
     set smart_wrap = yes
     set wrap = 80
+    # Let external viewers (w3m, chafa) emit ANSI/SIXEL sequences to the terminal.
+    set allow_ansi = yes
 
     # ── Color theme (dark terminal) ───────────────────────────────────────
     color normal      default default
@@ -103,17 +105,24 @@
     # ── HTML mail ─────────────────────────────────────────────────────────
     set mailcap_path = "~/.config/neomutt/mailcap:/etc/mailcap"
     set implicit_auto_view = yes
+    # Prefer the rendered HTML part when a message offers both plain and HTML.
+    alternative_order text/html text/plain text/enriched
+    auto_view text/html
   '';
 in {
   home.packages = [
     pkgs.neomutt
     # HTML part renderer referenced by the mailcap below.
     pkgs.w3m
+    # Image → terminal rendering (sixel for foot, fallback to Unicode blocks).
+    pkgs.chafa
   ];
 
   xdg.configFile."neomutt/neomuttrc".text = neomuttrc;
 
   xdg.configFile."neomutt/mailcap".text = ''
-    text/html; ${pkgs.w3m}/bin/w3m -dump -T text/html %s; copiousoutput
+    text/html; ${pkgs.w3m}/bin/w3m -dump -T text/html -O UTF-8 %s; nametemplate=%s.html; copiousoutput
+    image/*; ${pkgs.chafa}/bin/chafa --format sixel %s; copiousoutput
+    image/*; ${pkgs.chafa}/bin/chafa --symbols block %s; copiousoutput
   '';
 }
