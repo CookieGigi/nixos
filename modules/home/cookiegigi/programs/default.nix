@@ -25,7 +25,6 @@
     ./devenv.nix
     ./vim.nix
     ./gpg.nix
-    ./himalaya.nix
     ./neomutt.nix
     ./thunderbird.nix
   ];

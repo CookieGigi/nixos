@@ -8,20 +8,6 @@ client on this host that can do OpenPGP.
 - Module: `modules/home/cookiegigi/programs/neomutt.nix`
 - Generated config: `~/.config/neomutt/neomuttrc` (store symlink, do not edit)
 
-## Why not himalaya
-
-Neither `himalaya-tui` 0.1.0 nor `himalaya` v2 has any OpenPGP support:
-
-- `himalaya-tui`'s `Cargo.lock` contains no PGP crate at all, and the binary
-  carries the literal error `no PGP backend available to sign or encrypt`.
-- `himalaya` v2.2.1 (the version in nixpkgs) dropped PGP entirely when it was
-  rewritten; its `Cargo.toml` has no `pgp` feature and no gpg dependency. PGP
-  only existed in the v0.x/v1 line via `email-lib` + gpgme.
-
-So `himalaya-tui` stays as the fast TUI for reading plain mail, and encrypted
-mail goes through neomutt. Both share the same GnuPG key and the same `pass`
-store.
-
 ## Shared secret material
 
 `pass`, `gpg` and `gpg-agent` are declared in
@@ -101,7 +87,7 @@ names its IMAP folders after the webmail language, so a German account exposes
 until the names are corrected in the module.
 
 To list the real names, start neomutt and press `?` in the folder browser, or
-use the himalaya config as a cross-check.
+check the folder names in Thunderbird or Posteo webmail.
 
 ## Posteo inbound encryption
 
@@ -142,5 +128,5 @@ mailbox password.
 - **pinentry does not appear** — `gpg-agent` must inherit `WAYLAND_DISPLAY` /
   `DISPLAY`; it does through `systemctl --user`, so a cold agent started outside
   the session is the usual cause. Restarting the session fixes it.
-- **`pass show` fails** — see `docs/himalaya-tui.md`, `pass insert` prompts
-  twice and echoes nothing.
+- **`pass show` fails** — re-insert the entry with `pass insert mail/posteo`;
+  `pass insert` prompts twice and echoes nothing.

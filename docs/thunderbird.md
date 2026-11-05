@@ -10,12 +10,8 @@ inline images matter more than a terminal workflow.
 
 ## Why thunderbird
 
-`himalaya-tui` and `neomutt` are fast and keyboard-driven, but neither gives a
-full HTML + image rendering experience:
-
-- `himalaya-tui` has no OpenPGP support at all.
-- `neomutt` delegates HTML to `w3m -dump`, which intentionally strips images and
-  shows only alt text like `[Image 1]`.
+`neomutt` is fast and keyboard-driven, but it delegates HTML to `w3m -dump`,
+which intentionally strips images and shows only alt text like `[Image 1]`.
 
 Thunderbird is the fallback for rich newsletters, verification emails with
 inline images, and anything that needs to look like a web page.

@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   # Password strategy: pass (password-store), backed by GnuPG.
-  # Shared by every mail client (neomutt, himalaya-tui): the store holds the
-  # mailbox passwords and the GPG key decrypts them.
+  # Used by neomutt: the store holds the mailbox passwords and the GPG key
+  # decrypts them.
   programs.password-store.enable = true;
 
   programs.gpg.enable = true;
