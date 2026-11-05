@@ -27,5 +27,6 @@
     ./gpg.nix
     ./himalaya.nix
     ./neomutt.nix
+    ./thunderbird.nix
   ];
 }
