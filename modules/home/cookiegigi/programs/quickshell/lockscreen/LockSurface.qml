@@ -77,10 +77,9 @@ Rectangle {
     MouseArea {
         anchors.fill: lockBar
         acceptedButtons: Qt.AllButtons
-        hoverEnabled: true
+        hoverEnabled: false
         onPressed: root.registerActivity(true)
         onClicked: root.registerActivity(true)
-        onPositionChanged: root.registerActivity(false)
         onWheel: root.registerActivity(true)
     }
 
@@ -197,10 +196,9 @@ Rectangle {
         anchors.fill: parent
         z: -1
         acceptedButtons: Qt.AllButtons
-        hoverEnabled: true
+        hoverEnabled: false
         onPressed: root.registerActivity(true)
         onClicked: root.registerActivity(true)
-        onPositionChanged: root.registerActivity(false)
         onWheel: root.registerActivity(true)
     }
 
