@@ -140,8 +140,7 @@ Scope {
             // Center: window title (clickable → launcher, or search input when open)
             FlexboxLayout {
                 justifyContent: FlexboxLayout.JustifyCenter
-                Layout.preferredWidth: columnWidth
-                Layout.maximumWidth: columnWidth
+                Layout.fillWidth: true
                 Layout.fillHeight: true
                 WindowTitleWidget {
                     id: titleWidget

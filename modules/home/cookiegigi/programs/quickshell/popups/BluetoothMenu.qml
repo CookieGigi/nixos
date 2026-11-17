@@ -9,15 +9,18 @@ PopupBase {
     title: "Bluetooth"
     popupId: "bluetooth"
     popupWidth: 250
-    implicitHeight: 220
+    implicitHeight: contentColumn.implicitHeight + 24
 
     anchorLeft: false
     anchorRight: true
 
     content: ColumnLayout {
+        id: contentColumn
         spacing: 8
         anchors {
-            fill: parent
+            left: parent.left
+            right: parent.right
+            top: parent.top
             margins: 12
         }
 

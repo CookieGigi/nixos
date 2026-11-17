@@ -33,7 +33,13 @@ ListView {
     spacing: 2
     model: items
     delegate: itemDelegate
-    currentIndex: -1
+    currentIndex: count > 0 ? 0 : -1
+
+    onCountChanged: {
+        currentIndex = count > 0 ? 0 : -1;
+        if (currentIndex >= 0)
+            positionViewAtBeginning();
+    }
 
     function incrementCurrent() {
         if (root.count === 0)
