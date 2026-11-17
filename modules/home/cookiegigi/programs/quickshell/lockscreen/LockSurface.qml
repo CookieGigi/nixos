@@ -1,104 +1,214 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Controls.Fusion
-import Quickshell.Wayland
+import Quickshell
+import Quickshell.Io
+import "components"
+import "theme"
 
 Rectangle {
-	id: root
-	required property LockContext context
-	readonly property ColorGroup colors: Window.active ? palette.active : palette.inactive
+    id: root
+    required property var context
+    required property var screen
 
-	color: colors.window
+    color: Theme.base
 
-	Button {
-		text: "Its not working, let me out"
-		onClicked: context.unlocked();
-	}
+    property bool monitorsOff: false
 
-	Label {
-		id: clock
-		property var date: new Date()
+    Process {
+        id: powerOffProc
+        command: ["niri", "msg", "action", "power-off-monitors"]
+        onExited: root.monitorsOff = true
+    }
 
-		anchors {
-			horizontalCenter: parent.horizontalCenter
-			top: parent.top
-			topMargin: 100
-		}
+    Process {
+        id: powerOnProc
+        command: ["niri", "msg", "action", "power-on-monitors"]
+        onExited: root.monitorsOff = false
+    }
 
-		// The native font renderer tends to look nicer at large sizes.
-		renderType: Text.NativeRendering
-		font.pointSize: 80
+    Timer {
+        id: inactivityTimer
+        interval: 30000
+        repeat: false
+        running: true
+        onTriggered: {
+            if (!root.monitorsOff) {
+                powerOffProc.running = false;
+                powerOffProc.running = true;
+            }
+        }
+    }
 
-		// updates the clock every second
-		Timer {
-			running: true
-			repeat: true
-			interval: 1000
+    function registerActivity(showPrompt) {
+        inactivityTimer.restart();
+        if (root.monitorsOff) {
+            powerOnProc.running = false;
+            powerOnProc.running = true;
+        }
+        if (showPrompt)
+            context.revealPrompt();
+    }
 
-			onTriggered: clock.date = new Date();
-		}
+    Image {
+        anchors.fill: parent
+        source: "file:///home/cookiegigi/nixos/modules/home/cookiegigi/wallpapers/voyager-4.jpg"
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        cache: true
+    }
 
-		// updated when the date changes
-		text: {
-			const hours = this.date.getHours().toString().padStart(2, '0');
-			const minutes = this.date.getMinutes().toString().padStart(2, '0');
-			return `${hours}:${minutes}`;
-		}
-	}
+    Rectangle {
+        anchors.fill: parent
+        color: "#40000000"
+    }
 
-	ColumnLayout {
-		// Uncommenting this will make the password entry invisible except on the active monitor.
-		// visible: Window.active
+    // Actual quickshell bar (visual), with all interactions disabled.
+    LockBar {
+        id: lockBar
+        screen: root.screen
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+    }
 
-		anchors {
-			horizontalCenter: parent.horizontalCenter
-			top: parent.verticalCenter
-		}
+    MouseArea {
+        anchors.fill: lockBar
+        acceptedButtons: Qt.AllButtons
+        hoverEnabled: true
+        onPressed: root.registerActivity(true)
+        onClicked: root.registerActivity(true)
+        onPositionChanged: root.registerActivity(false)
+        onWheel: root.registerActivity(true)
+    }
 
-		RowLayout {
-			TextField {
-				id: passwordBox
+    // Password prompt popup below the "Locked" title, styled like PopupBase/PopupShell.
+    Item {
+        id: promptPopup
+        visible: context.promptVisible
+        z: 20
+        width: popupContent.implicitWidth
+        height: popupContent.implicitHeight
 
-				implicitWidth: 400
-				padding: 10
+        readonly property point anchorPos: {
+            const item = lockBar.lockTitleItem;
+            if (!item)
+                return Qt.point((root.width - width) / 2, lockBar.height + 15);
+            // establish dependencies
+            void item.x;
+            void item.y;
+            void item.width;
+            const p = item.mapToItem(root, 0, 0);
+            return Qt.point(p.x + item.width / 2 - width / 2, p.y + item.height + 15);
+        }
+        x: Math.max(8, Math.min(root.width - width - 8, anchorPos.x))
+        y: anchorPos.y
 
-				focus: true
-				enabled: !root.context.unlockInProgress
-				echoMode: TextInput.Password
-				inputMethodHints: Qt.ImhSensitiveData
+        PopupShell {
+            id: popupContent
+            implicitWidth: promptColumn.implicitWidth + 32
+            implicitHeight: promptColumn.implicitHeight + 32
 
-				// Update the text in the context when the text in the box changes.
-				onTextChanged: root.context.currentText = this.text;
+            ColumnLayout {
+                id: promptColumn
+                anchors.centerIn: parent
+                spacing: 12
 
-				// Try to unlock when enter is pressed.
-				onAccepted: root.context.tryUnlock();
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Enter password"
+                    color: Theme.text
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.pixelSize
+                }
 
-				// Update the text in the box to match the text in the context.
-				// This makes sure multiple monitors have the same text.
-				Connections {
-					target: root.context
+                TextField {
+                    id: passwordBox
+                    Layout.alignment: Qt.AlignHCenter
+                    implicitWidth: 320
+                    padding: 10
+                    focus: context.promptVisible
+                    enabled: !context.unlockInProgress
+                    echoMode: TextInput.Password
+                    inputMethodHints: Qt.ImhSensitiveData
+                    color: Theme.text
+                    placeholderTextColor: Theme.subtext0
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.pixelSize
 
-					function onCurrentTextChanged() {
-						passwordBox.text = root.context.currentText;
-					}
-				}
-			}
+                    background: Rectangle {
+                        color: Theme.surface0
+                        radius: 6
+                        border.color: passwordBox.activeFocus ? Theme.teal : Theme.surface1
+                        border.width: 1
+                    }
 
-			Button {
-				text: "Unlock"
-				padding: 10
+                    onTextChanged: context.currentText = text
+                    onAccepted: context.tryUnlock()
 
-				// don't steal focus from the text box
-				focusPolicy: Qt.NoFocus
+                    Connections {
+                        target: context
+                        function onCurrentTextChanged() {
+                            passwordBox.text = context.currentText;
+                        }
+                        function onPromptVisibleChanged() {
+                            if (context.promptVisible)
+                                passwordBox.forceActiveFocus();
+                        }
+                    }
+                }
 
-				enabled: !root.context.unlockInProgress && root.context.currentText !== "";
-				onClicked: root.context.tryUnlock();
-			}
-		}
+                Button {
+                    Layout.alignment: Qt.AlignHCenter
+                    implicitWidth: unlockLabel.implicitWidth + Theme.paddingH * 2
+                    implicitHeight: unlockLabel.implicitHeight + Theme.paddingV * 2
+                    opacity: (!context.unlockInProgress && context.currentText !== "") ? 1.0 : 0.5
 
-		Label {
-			visible: root.context.showFailure
-			text: "Incorrect password"
-		}
-	}
+                    StyledText {
+                        id: unlockLabel
+                        anchors.centerIn: parent
+                        text: "Unlock"
+                        styledBold: true
+                        color: Theme.text
+                    }
+
+                    onClicked: {
+                        if (!context.unlockInProgress && context.currentText !== "")
+                            context.tryUnlock();
+                    }
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: context.showFailure
+                    text: "Incorrect password"
+                    color: Theme.red
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.pixelSize
+                }
+            }
+        }
+    }
+
+    // Catch activity anywhere else.
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+        acceptedButtons: Qt.AllButtons
+        hoverEnabled: true
+        onPressed: root.registerActivity(true)
+        onClicked: root.registerActivity(true)
+        onPositionChanged: root.registerActivity(false)
+        onWheel: root.registerActivity(true)
+    }
+
+    Keys.onPressed: event => {
+        root.registerActivity(true);
+        event.accepted = false;
+    }
+
+    focus: true
+    Component.onCompleted: forceActiveFocus()
 }

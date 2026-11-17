@@ -3,52 +3,50 @@ import Quickshell
 import Quickshell.Services.Pam
 
 Scope {
-	id: root
-	signal unlocked()
-	signal failed()
+    id: root
+    signal unlocked
+    signal failed
 
-	// These properties are in the context and not individual lock surfaces
-	// so all surfaces can share the same state.
-	property string currentText: ""
-	property bool unlockInProgress: false
-	property bool showFailure: false
+    property string currentText: ""
+    property bool unlockInProgress: false
+    property bool showFailure: false
+    property bool promptVisible: false
 
-	// Clear the failure text once the user starts typing.
-	onCurrentTextChanged: showFailure = false;
+    onCurrentTextChanged: showFailure = false
 
-	function tryUnlock() {
-		if (currentText === "") return;
+    function revealPrompt() {
+        promptVisible = true;
+    }
 
-		root.unlockInProgress = true;
-		pam.start();
-	}
+    function tryUnlock() {
+        if (currentText === "")
+            return;
 
-	PamContext {
-		id: pam
+        root.unlockInProgress = true;
+        pam.start();
+    }
 
-		// Its best to have a custom pam config for quickshell, as the system one
-		// might not be what your interface expects, and break in some way.
-		// This particular example only supports passwords.
-		configDirectory: "pam"
-		config: "password.conf"
+    PamContext {
+        id: pam
 
-		// pam_unix will ask for a response for the password prompt
-		onPamMessage: {
-			if (this.responseRequired) {
-				this.respond(root.currentText);
-			}
-		}
+        configDirectory: "pam"
+        config: "password.conf"
 
-		// pam_unix won't send any important messages so all we need is the completion status.
-		onCompleted: result => {
-			if (result == PamResult.Success) {
-				root.unlocked();
-			} else {
-				root.currentText = "";
-				root.showFailure = true;
-			}
+        onPamMessage: {
+            if (this.responseRequired) {
+                this.respond(root.currentText);
+            }
+        }
 
-			root.unlockInProgress = false;
-		}
-	}
+        onCompleted: result => {
+            if (result == PamResult.Success) {
+                root.unlocked();
+            } else {
+                root.currentText = "";
+                root.showFailure = true;
+            }
+
+            root.unlockInProgress = false;
+        }
+    }
 }
