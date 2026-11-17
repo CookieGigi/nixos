@@ -140,7 +140,7 @@ Rectangle {
                     background: Rectangle {
                         color: Theme.surface0
                         radius: 6
-                        border.color: passwordBox.activeFocus ? Theme.teal : Theme.surface1
+                        border.color: context.showFailure ? Theme.red : (passwordBox.activeFocus ? Theme.teal : Theme.surface1)
                         border.width: 1
                     }
 
@@ -159,34 +159,7 @@ Rectangle {
                     }
                 }
 
-                Button {
-                    Layout.alignment: Qt.AlignHCenter
-                    implicitWidth: unlockLabel.implicitWidth + Theme.paddingH * 2
-                    implicitHeight: unlockLabel.implicitHeight + Theme.paddingV * 2
-                    opacity: (!context.unlockInProgress && context.currentText !== "") ? 1.0 : 0.5
-
-                    StyledText {
-                        id: unlockLabel
-                        anchors.centerIn: parent
-                        text: "Unlock"
-                        styledBold: true
-                        color: Theme.text
-                    }
-
-                    onClicked: {
-                        if (!context.unlockInProgress && context.currentText !== "")
-                            context.tryUnlock();
-                    }
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    visible: context.showFailure
-                    text: "Incorrect password"
-                    color: Theme.red
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.pixelSize
-                }
+                // Unlock via Enter (TextField.onAccepted)
             }
         }
     }
