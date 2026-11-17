@@ -1,8 +1,4 @@
-{
-  lib,
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   # Locks only while running on battery; a no-op when plugged into AC.
   # Falls back to locking when no battery status can be read.
   idleLock = pkgs.writeShellScript "idle-lock" ''
@@ -19,15 +15,11 @@
     }
 
     if lock_on_battery; then
-      exec ${pkgs.swaylock}/bin/swaylock -f
+      exec ${pkgs.quickshell}/bin/qs -n -c lockscreen
     fi
   '';
 in {
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
-
-  programs = {
-    swaylock.enable = true;
-  };
 
   services = {
     mako.enable = true;
@@ -36,10 +28,10 @@ in {
       timeouts = [
         {
           timeout = 300;
-          command = lib.getExe' idleLock "idle-lock";
+          command = "${idleLock}";
         }
       ];
-      events.before-sleep = "${pkgs.swaylock}/bin/swaylock -f";
+      events.before-sleep = "${pkgs.quickshell}/bin/qs -n -c lockscreen";
     };
   };
 

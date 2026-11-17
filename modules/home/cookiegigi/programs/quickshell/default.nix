@@ -14,9 +14,15 @@
     source = pkgs.lib.cleanSourceWith {
       src = ./.;
       filter = path: type:
-        pkgs.lib.hasSuffix ".qml" path
+        (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path)
         || type == "directory";
     };
+    recursive = true;
+  };
+
+  # Separate lockscreen config, launched with `qs -c lockscreen`.
+  xdg.configFile."quickshell/lockscreen" = {
+    source = ./lockscreen;
     recursive = true;
   };
 }

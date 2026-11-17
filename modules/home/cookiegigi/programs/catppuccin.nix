@@ -97,30 +97,6 @@ in {
     };
   };
 
-  # ── Swaylock (screen locker) ─────────────────────────────────
-  programs.swaylock = {
-    settings = {
-      color = "${c.base}";
-      inside-color = "${c.surface0}ff";
-      line-color = "${c.surface1}ff";
-      ring-color = "${c.teal}ff";
-      separator-color = "00000000";
-      inside-ver-color = "${c.blue}ff";
-      ring-ver-color = "${c.sapphire}ff";
-      inside-wrong-color = "${c.red}ff";
-      ring-wrong-color = "${c.maroon}ff";
-      key-hl-color = "${c.teal}ff";
-      bs-hl-color = "${c.overlay0}ff";
-      text-color = "${c.text}ff";
-      text-ver-color = "${c.text}ff";
-      text-wrong-color = "${c.text}ff";
-      font = "JetBrains Mono";
-      indicator-radius = 100;
-      indicator-thickness = 10;
-      show-failed-attempts = true;
-    };
-  };
-
   # ── Persistence ──────────────────────────────────────────────
   home.persistence."/persist" = {
     directories = [
