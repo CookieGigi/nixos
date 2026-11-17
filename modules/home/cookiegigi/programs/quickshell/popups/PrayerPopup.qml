@@ -8,7 +8,7 @@ PopupBase {
     id: root
     title: "Prayer Times"
     popupId: "prayer"
-    popupWidth: 280
+    popupWidth: 300
     implicitHeight: prayerContent.implicitHeight + 32
     onOpened: {
         PrayerTimes._updateNextPrayer();
@@ -76,7 +76,7 @@ PopupBase {
                 ]) : PrayerTimes.prayers
 
                 RowLayout {
-                    spacing: 8
+                    spacing: 12
                     Layout.fillWidth: true
 
                     readonly property bool isNext: modelData.name === PrayerTimes.nextPrayerName
@@ -85,15 +85,16 @@ PopupBase {
                         text: modelData.name
                         styledBold: isNext
                         color: isNext ? Theme.accentColor : Theme.text
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
                     }
 
                     StyledText {
                         text: modelData.time
                         styledBold: isNext
                         color: isNext ? Theme.accentColor : Theme.subtext0
-                        Layout.alignment: Qt.AlignRight
-                        Layout.fillWidth: true
                         horizontalAlignment: Text.AlignRight
+                        Layout.alignment: Qt.AlignRight
                     }
                 }
             }
