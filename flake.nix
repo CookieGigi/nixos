@@ -43,6 +43,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    mistral-vibe.url = "github:mistralai/mistral-vibe/v3.1.3";
+
     devenv.url = "github:cachix/devenv/v2.2.2";
   };
 
