@@ -21,6 +21,7 @@
     ./unzip.nix
     ./oculante.nix
     ./codex.nix
+    ./mistral-vibe.nix
     ./obsidian.nix
     ./devenv.nix
     ./vim.nix
