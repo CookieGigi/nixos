@@ -6,6 +6,8 @@ _: {
       "projects"
       ".opencode"
       ".config/opencode"
+      # GitHub Copilot CLI state
+      ".copilot"
       # GNOME Keyring (secret service) persistence for proton-pass-cli
       ".local/share/keyrings"
       # pass + GPG for proton-drive CLI

@@ -22,6 +22,8 @@ _: {
       ".cache/"
       # uv Python toolchains and state
       ".local/share/uv"
+      # GitHub Copilot CLI state
+      ".copilot"
     ];
   };
 }
