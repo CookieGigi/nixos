@@ -124,15 +124,51 @@
         :root {
           --toolbar-bgcolor: ${config.cookiegigi.theme.backgroundColor} !important;
           --toolbar-color: #cad3f5 !important;
-          --tab-selected-bgcolor: ${config.cookiegigi.theme.backgroundColor} !important;
+          --lwt-text-color: #cad3f5 !important;
+          --tab-selected-bgcolor: #161b22 !important;
           --tab-selected-textcolor: #cad3f5 !important;
+          --toolbarbutton-hover-background: #21262d !important;
+        }
+
+        #navigator-toolbox,
+        #navigator-toolbox * {
+          color: #cad3f5 !important;
         }
 
         #titlebar,
         #TabsToolbar,
         #tabbrowser-tabs,
-        .tabbrowser-tab .tab-background {
+        #nav-bar,
+        #PersonalToolbar {
           background-color: ${config.cookiegigi.theme.backgroundColor} !important;
+        }
+
+        #urlbar-background,
+        #searchbar {
+          background-color: #161b22 !important;
+          border: 1px solid #30363d !important;
+          border-radius: 10px !important;
+          box-shadow: none !important;
+        }
+
+        #urlbar[focused] #urlbar-background,
+        #searchbar:focus-within {
+          border-color: #8bd5ca !important;
+          box-shadow: 0 0 0 1px #8bd5ca !important;
+        }
+
+        .tabbrowser-tab .tab-background {
+          border: 0 !important;
+          border-radius: 8px !important;
+        }
+
+        .tabbrowser-tab[selected] .tab-background {
+          background-color: #161b22 !important;
+          box-shadow: inset 0 -2px #8bd5ca !important;
+        }
+
+        .tabbrowser-tab:not([selected]):hover .tab-background {
+          background-color: #21262d !important;
         }
       '';
 
