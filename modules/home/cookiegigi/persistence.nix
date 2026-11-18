@@ -2,6 +2,8 @@ _: {
   home.persistence."/persist" = {
     directories = [
       ".ssh"
+      # GitHub CLI authentication and configuration
+      ".config/gh"
       "Documents"
       "Downloads"
       "Pictures"
