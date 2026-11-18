@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   programs.firefox = {
     enable = true;
     configPath = ".mozilla/firefox";
@@ -116,6 +120,20 @@
         /* Compact title bar */
         #titlebar { max-height: 32px; }
         .titlebar-buttonbox { height: 32px; }
+
+        :root {
+          --toolbar-bgcolor: ${config.cookiegigi.theme.backgroundColor} !important;
+          --toolbar-color: #cad3f5 !important;
+          --tab-selected-bgcolor: ${config.cookiegigi.theme.backgroundColor} !important;
+          --tab-selected-textcolor: #cad3f5 !important;
+        }
+
+        #titlebar,
+        #TabsToolbar,
+        #tabbrowser-tabs,
+        .tabbrowser-tab .tab-background {
+          background-color: ${config.cookiegigi.theme.backgroundColor} !important;
+        }
       '';
 
       # -- Extensions ---------------------------------------------------
