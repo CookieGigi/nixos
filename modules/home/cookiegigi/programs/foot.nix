@@ -1,8 +1,10 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }: let
+  background = lib.removePrefix "#" config.cookiegigi.theme.backgroundColor;
   ini = pkgs.formats.ini {listsAsDuplicateKeys = true;};
   settings = {
     main = {
@@ -10,6 +12,7 @@
     };
     "colors-dark" = {
       alpha = 0.8;
+      inherit background;
     };
     cursor = {
       style = "beam";

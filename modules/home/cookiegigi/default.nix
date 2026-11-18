@@ -12,6 +12,7 @@
 
   home-manager.users.cookiegigi = {
     imports = [
+      ./theme.nix
       ./packages.nix
       ./persistence.nix
       ./programs

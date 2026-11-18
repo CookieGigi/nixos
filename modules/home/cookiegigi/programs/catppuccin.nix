@@ -3,9 +3,25 @@
   config,
   ...
 }: let
-  # ── Catppuccin Macchiato Teal palette ─────────────────────────
+  background = config.cookiegigi.theme.backgroundColor;
+  catppuccinKvantum = pkgs.catppuccin-kvantum.override {
+    variant = "macchiato";
+    accent = "teal";
+  };
+  customKvantum = pkgs.runCommand "catppuccin-macchiato-teal-custom" {} ''
+    themeDir="$out/share/Kvantum/catppuccin-macchiato-teal-custom"
+    mkdir -p "$themeDir"
+    cp -a ${catppuccinKvantum}/share/Kvantum/catppuccin-macchiato-teal/. "$themeDir/"
+    chmod -R u+w "$themeDir"
+    mv "$themeDir/catppuccin-macchiato-teal.kvconfig" "$themeDir/catppuccin-macchiato-teal-custom.kvconfig"
+    mv "$themeDir/catppuccin-macchiato-teal.svg" "$themeDir/catppuccin-macchiato-teal-custom.svg"
+    substituteInPlace "$themeDir/catppuccin-macchiato-teal-custom.kvconfig" \
+      --replace-fail "window.color=#24273A" "window.color=${background}" \
+      --replace-fail "base.color=#1E2030" "base.color=${background}"
+  '';
+  # ── Catppuccin Macchiato Teal palette with configured base ────
   c = {
-    base = "#24273a";
+    base = background;
     mantle = "#1e2030";
     crust = "#181926";
     surface0 = "#363a4f";
@@ -55,17 +71,32 @@ in {
       package = pkgs.catppuccin-cursors;
       size = 24;
     };
-    gtk3.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
+    gtk3 = {
+      extraConfig = {
+        Settings = ''
+          gtk-application-prefer-dark-theme=1
+        '';
+      };
+      extraCss = ''
+        window,
+        .background {
+          background-color: ${background};
+        }
       '';
     };
-    gtk4.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
+    gtk4 = {
+      extraConfig = {
+        Settings = ''
+          gtk-application-prefer-dark-theme=1
+        '';
+      };
+      extraCss = ''
+        window.background {
+          background-color: ${background};
+        }
       '';
+      theme = config.gtk.theme;
     };
-    gtk4.theme = config.gtk.theme;
   };
 
   # ── Qt / Kvantum ─────────────────────────────────────────────
@@ -74,9 +105,10 @@ in {
     platformTheme.name = "kvantum";
     style.name = "kvantum";
   };
+  xdg.configFile."Kvantum/kvantum.kvconfig".text = "theme=catppuccin-macchiato-teal-custom\n";
 
-  home.packages = with pkgs; [
-    catppuccin-kvantum
+  home.packages = [
+    customKvantum
   ];
 
   # ── Mako (notifications) ─────────────────────────────────────

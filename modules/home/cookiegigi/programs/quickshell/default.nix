@@ -1,8 +1,24 @@
 {
   pkgs,
   lib,
+  config,
   ...
-}: {
+}: let
+  background = config.cookiegigi.theme.backgroundColor;
+  source = pkgs.lib.cleanSourceWith {
+    src = ./.;
+    filter = path: type:
+      (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path)
+      || type == "directory";
+  };
+  configuredSource = pkgs.runCommand "quickshell-config" {} ''
+    mkdir -p $out
+    cp -r ${source}/. $out/
+    chmod -R u+w $out
+    substituteInPlace $out/theme/Theme.qml \
+      --replace-fail '"@themeBackground@"' '"${background}"'
+  '';
+in {
   home.packages = with pkgs; [
     quickshell
     (import ./prayer-times-json.nix {inherit pkgs lib;})
@@ -11,12 +27,7 @@
   # Symlink quickshell QML config into ~/.config/quickshell/bar/
   # so it can be launched with `qs -c bar`.
   xdg.configFile."quickshell/bar" = {
-    source = pkgs.lib.cleanSourceWith {
-      src = ./.;
-      filter = path: type:
-        (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path)
-        || type == "directory";
-    };
+    source = configuredSource;
     recursive = true;
   };
 
@@ -25,12 +36,7 @@
   xdg.configFile."quickshell/lockscreen" = {
     source = pkgs.runCommand "quickshell-lockscreen" {} ''
       mkdir -p $out/pam
-      cp -r ${pkgs.lib.cleanSourceWith {
-        src = ./.;
-        filter = path: type:
-          (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path)
-          || type == "directory";
-      }}/* $out/
+      cp -r ${configuredSource}/* $out/
       chmod -R u+w $out
       cp ${./lockscreen/shell.qml} $out/shell.qml
       cp ${./lockscreen/LockContext.qml} $out/LockContext.qml

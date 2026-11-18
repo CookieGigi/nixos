@@ -2,13 +2,13 @@ pragma Singleton
 import Quickshell
 import QtQuick
 
-// Catppuccin Macchiato Teal color palette singleton.
+// Catppuccin Macchiato Teal palette with a centrally configured background.
 // All bar components should import Theme and reference these colors.
 Singleton {
     id: root
 
     // ── Base colors ──────────────────────────────────────────
-    readonly property string base: "#24273a"
+    readonly property color base: "@themeBackground@"
     readonly property string mantle: "#1e2030"
     readonly property string crust: "#181926"
     readonly property string surface0: "#363a4f"
@@ -37,7 +37,7 @@ Singleton {
 
     // ── Convenience aliases ──────────────────────────────────
     readonly property color containerBg: root.base
-    readonly property color containerAlpha: "#cc1a2235"
+    readonly property color containerAlpha: Qt.rgba(root.base.r, root.base.g, root.base.b, 0.8)
     readonly property int containerRadius: 8
     readonly property int paddingV: 6
     readonly property int paddingH: 12
