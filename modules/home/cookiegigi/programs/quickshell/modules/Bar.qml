@@ -87,6 +87,13 @@ Scope {
             alignment: "center"
         }
 
+        BrightnessPopup {
+            id: brightnessPopup
+            screen: modelData
+            anchorWidget: brightnessWidget
+            alignment: "center"
+        }
+
         BatteryPopup {
             id: batteryPopup
             screen: modelData
@@ -170,6 +177,11 @@ Scope {
                     Layout.fillHeight: true
                     screen: modelData
                 }
+                BrightnessWidget {
+                    id: brightnessWidget
+                    Layout.fillHeight: true
+                    screen: modelData
+                }
                 NetworkWidget {
                     id: networkWidget
                     screen: modelData
@@ -203,6 +215,7 @@ Scope {
         PopupRegistry.register(modelData, "prayer", prayerPopup);
         PopupRegistry.register(modelData, "media", mediaPopup);
         PopupRegistry.register(modelData, "volume", volumePopup);
+        PopupRegistry.register(modelData, "brightness", brightnessPopup);
         PopupRegistry.register(modelData, "battery", batteryPopup);
         PopupRegistry.register(modelData, "notifications", notificationCenter);
     }

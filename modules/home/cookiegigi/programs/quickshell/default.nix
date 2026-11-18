@@ -16,11 +16,12 @@
     cp -r ${source}/. $out/
     chmod -R u+w $out
     substituteInPlace $out/theme/Theme.qml \
-      --replace-fail '"@themeBackground@"' '"${background}"'
+      --replace-fail 'readonly property color base: "#0d1117"' 'readonly property color base: "${background}"'
   '';
 in {
   home.packages = with pkgs; [
     quickshell
+    brightnessctl
     (import ./prayer-times-json.nix {inherit pkgs lib;})
   ];
 

@@ -103,6 +103,9 @@ Singleton {
     function toggleVolume(screen) {
         toggle(screen, "volume");
     }
+    function toggleBrightness(screen) {
+        toggle(screen, "brightness");
+    }
     function toggleBattery(screen) {
         toggle(screen, "battery");
     }

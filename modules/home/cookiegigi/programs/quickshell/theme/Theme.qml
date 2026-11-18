@@ -8,7 +8,7 @@ Singleton {
     id: root
 
     // ── Base colors ──────────────────────────────────────────
-    readonly property color base: "@themeBackground@"
+    readonly property color base: "#0d1117"
     readonly property string mantle: "#1e2030"
     readonly property string crust: "#181926"
     readonly property string surface0: "#363a4f"

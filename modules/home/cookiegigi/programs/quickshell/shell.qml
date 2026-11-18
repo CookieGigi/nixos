@@ -59,6 +59,14 @@ ShellRoot {
     }
 
     IpcHandler {
+        target: "brightness"
+        function toggle(): void {
+            const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
+            PopupRegistry.toggleBrightness(screen);
+        }
+    }
+
+    IpcHandler {
         target: "battery"
         function toggle(): void {
             const screen = Quickshell.screens.find(s => s.primary) ?? Quickshell.screens[0];
