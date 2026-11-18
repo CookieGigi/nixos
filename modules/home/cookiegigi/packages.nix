@@ -24,8 +24,6 @@ in {
   home.packages = with pkgs; [
     wget
     copilotWrapper
-    bubblewrap
-    slirp4netns
     github-copilot-app
   ];
 }
