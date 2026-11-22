@@ -1,0 +1,25 @@
+// Kiosk niri config for the greetd greeter session
+// (see modules/desktop/greetd.nix and the quickshell greeter config under
+// modules/home/cookiegigi/programs/quickshell/greeter/).
+//
+// niri runs as the greeter user before login and has exactly one job:
+// spawn the quickshell greeter, which renders layer-shell surfaces.
+// The greeter shell replaces this whole process tree on successful login;
+// there is nothing to configure beyond input defaults and the spawn.
+//
+// @qs@ and @greeterConfig@ are absolute store paths substituted by
+// greetd.nix at build time; the placeholders are plain strings so
+// `niri validate --config` still passes on the template.
+
+input {
+    keyboard {
+        numlock
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+    }
+}
+
+spawn-at-startup "@qs@" "-p" "@greeterConfig@"

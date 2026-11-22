@@ -6,6 +6,7 @@
     ./bluetooth.nix
     ./clipboard/wclip.nix
     ./comfyui.nix
+    ./greetd.nix
     ./nix-ld.nix
     ./ssh.nix
     ./niri.nix

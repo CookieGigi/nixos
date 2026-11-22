@@ -28,11 +28,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    pixie-sddm = {
-      url = "github:xCaptaiN09/pixie-sddm";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -57,7 +52,6 @@
     nixos-hardware,
     nur,
     sops-nix,
-    pixie-sddm,
     git-hooks,
     nixvim,
     ...
@@ -113,7 +107,7 @@
     nixosConfigurations = {
       xps = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit pixie-sddm inputs;};
+        specialArgs = {inherit inputs;};
         modules = [
           ./hosts/xps/configuration.nix
           impermanence.nixosModules.impermanence
