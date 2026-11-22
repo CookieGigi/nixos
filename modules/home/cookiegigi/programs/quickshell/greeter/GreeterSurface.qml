@@ -184,8 +184,16 @@ Rectangle {
             horizontalCenter: parent.horizontalCenter
         }
         visible: !root.context.available
-        text: "greetd socket unavailable — dry-run mode"
+        text: "greetd socket unavailable — dry-run mode · Esc to exit"
         styledColor: Theme.subtext0
+    }
+
+    // A dry run covers the whole session with exclusive keyboard focus and
+    // has no way out otherwise. Never escape a real greeter (the login screen
+    // is the point), hence the available check.
+    Keys.onEscapePressed: event => {
+        if (!root.context.available)
+            Qt.quit();
     }
 
     // Reclaim keyboard focus wherever the user interacts.
