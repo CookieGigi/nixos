@@ -56,14 +56,6 @@
       }
     }
 
-    comfyui.cookiegigi.com {
-      route {
-        import private_only
-        import authelia
-        reverse_proxy 192.168.1.14:8188
-      }
-    }
-
     hermes.cookiegigi.com {
       route {
         import private_only

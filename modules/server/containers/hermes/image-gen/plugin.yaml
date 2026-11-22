@@ -1,4 +1,0 @@
-name: comfyui-local
-version: 1.0.0
-description: Generate images with the laptop GPU ComfyUI service
-kind: backend

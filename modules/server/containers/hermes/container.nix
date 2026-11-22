@@ -23,7 +23,6 @@
     ${pkgs.python3.withPackages (ps: [ps.pyyaml])}/bin/python \
       ${./seed-config.py} /persist/hermes/config.yaml
   '';
-  workflow = pkgs.writeText "hermes-comfyui-workflow.json" (builtins.toJSON (import ../open-webui/comfyui-workflow.nix));
 in {
   environment.etc."containers/systemd/hermes.container".text = ''
     [Unit]
@@ -38,15 +37,12 @@ in {
     ContainerName=hermes
     Network=caddy.network
     Volume=/persist/hermes:/opt/data
-    Volume=${./image-gen}:/opt/data/plugins/image_gen/comfyui-local:ro
-    Volume=${workflow}:/opt/data/comfyui-workflow.json:ro
     Environment=HERMES_UID=409
     Environment=HERMES_GID=409
     Environment=HERMES_DASHBOARD=1
     Environment=HERMES_GATEWAY_BOOTSTRAP_STATE=running
     Environment=TZ=Europe/Paris
     Environment=SEARXNG_URL=http://searxng:8080
-    Environment=COMFYUI_URL=http://192.168.1.14:8188
     EnvironmentFile=/run/secrets/hermes-dashboard-env
     Exec=gateway run
 

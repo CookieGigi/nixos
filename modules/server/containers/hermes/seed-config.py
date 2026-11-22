@@ -12,13 +12,14 @@ model = config.setdefault("model", {})
 if model.get("default") == "Qwen3.5-4B-Q6_K":
     model["default"] = "Ornith-1.5-9B-Q5_K_M"
 config.setdefault("web", {}).update(search_backend="searxng", keyless_fallback=False)
-config.setdefault("image_gen", {})["provider"] = "comfyui-local"
-plugins = config.setdefault("plugins", {})
-enabled = plugins.setdefault("enabled", [])
-if "comfyui-local" not in enabled:
-    enabled.append("comfyui-local")
-if "comfyui-local" in plugins.get("disabled", []):
-    plugins["disabled"].remove("comfyui-local")
+# The laptop ComfyUI service is gone; drop its stale entries if present.
+image_gen = config.get("image_gen", {})
+if image_gen.get("provider") == "comfyui-local":
+    del config["image_gen"]
+plugins = config.get("plugins", {})
+enabled = plugins.get("enabled", [])
+if "comfyui-local" in enabled:
+    enabled.remove("comfyui-local")
 
 updated = yaml.safe_dump(config, sort_keys=False)
 if updated != path.read_text():
