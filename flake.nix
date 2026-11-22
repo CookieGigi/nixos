@@ -82,10 +82,19 @@
           types = ["file"];
           files = "\\.qml$";
         };
-        niri-validate = {
+        niri-validate = let
+          niri = nixpkgs.legacyPackages.x86_64-linux.niri;
+        in {
           enable = true;
           name = "niri-validate";
-          entry = "${nixpkgs.legacyPackages.x86_64-linux.niri}/bin/niri validate --config";
+          # niri validate takes exactly one --config file, but pre-commit
+          # appends every changed .kdl as a positional argument, so wrap
+          # and validate one file at a time.
+          entry = "${nixpkgs.legacyPackages.x86_64-linux.writeShellScript "niri-validate-hook" ''
+            for file in "$@"; do
+              ${nixpkgs.lib.getExe niri} validate --config "$file" || exit 1
+            done
+          ''}";
           types = ["file"];
           files = "\\.kdl$";
         };
