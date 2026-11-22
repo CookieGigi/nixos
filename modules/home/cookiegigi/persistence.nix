@@ -26,6 +26,8 @@ _: {
       ".local/share/uv"
       # GitHub Copilot CLI state
       ".copilot"
+      # Stardew Valley (saves, SMAPI logs/config)
+      ".config/StardewValley"
     ];
   };
 }
