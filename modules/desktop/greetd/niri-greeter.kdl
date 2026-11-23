@@ -2,14 +2,17 @@
 // (see modules/desktop/greetd.nix and the quickshell greeter config under
 // modules/home/cookiegigi/programs/quickshell/greeter/).
 //
-// niri runs as the greeter user before login and has exactly one job:
-// spawn the quickshell greeter, which renders layer-shell surfaces.
-// The greeter shell replaces this whole process tree on successful login;
-// there is nothing to configure beyond input defaults and the spawn.
+// niri runs as the greeter user before login and has exactly two jobs:
+// draw the wallpaper with swaybg (so the screen never shows niri's plain
+// gray default, including the short windows before quickshell paints and
+// while the session is being handed over to the user), and spawn the
+// quickshell greeter, which renders layer-shell surfaces on top of it.
+// The "Important Hotkeys" overlay (niri's startup key-bindings popup) is
+// skipped: a login screen has no key bindings to advertise.
 //
-// @qs@ and @greeterConfig@ are absolute store paths substituted by
-// greetd.nix at build time; the placeholders are plain strings so
-// `niri validate --config` still passes on the template.
+// @qs@, @greeterConfig@, @swaybg@ and @wallpaper@ are absolute store paths
+// substituted by greetd.nix at build time; the placeholders are plain
+// strings so `niri validate --config` still passes on the template.
 
 input {
     keyboard {
@@ -23,3 +26,8 @@ input {
 }
 
 spawn-at-startup "@qs@" "-p" "@greeterConfig@"
+spawn-at-startup "@swaybg@" "-i" "@wallpaper@" "-m" "fill"
+
+hotkey-overlay {
+    skip-at-startup
+}
