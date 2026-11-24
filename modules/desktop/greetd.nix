@@ -36,18 +36,42 @@
   # greeter session ends and greetd restarts it, instead of leaving an
   # interactive-less kiosk compositing a login screen nobody can type on.
   greeterSession = pkgs.writeShellScript "greetd-quickshell-greeter" ''
-    export HOME=/tmp/quickshell-greeter
-    export XDG_CACHE_HOME="$HOME/.cache"
-    export XDG_STATE_HOME="$HOME/.local/state"
+    HOME=/tmp/quickshell-greeter
+    XDG_CACHE_HOME="$HOME/.cache"
+    XDG_STATE_HOME="$HOME/.local/state"
+
+    # Everything below runs pre-auth as the unbaptised greeter user in
+    # world-writable /tmp: another local uid could pre-plant this
+    # directory (or a symlink) and host or replace the files the greeter
+    # uses, so require a same-owner dir and fall back to a private one
+    # otherwise. The login screen must come up; do not fail here.
+    if ! mkdir -p "$HOME" 2>/dev/null || [ -L "$HOME" ] || [ ! -O "$HOME" ]; then
+      HOME="$(${pkgs.coreutils}/bin/mktemp -d /tmp/quickshell-greeter.XXXXXX)"
+      XDG_CACHE_HOME="$HOME/.cache"
+      XDG_STATE_HOME="$HOME/.local/state"
+    fi
+    chmod 0700 "$HOME"
+    export HOME XDG_CACHE_HOME XDG_STATE_HOME
     mkdir -p "$XDG_CACHE_HOME" "$XDG_STATE_HOME"
 
     # Lifecycle trace for the failing parts of a login screen you can
     # only see before having a session: /tmp is tmpfs, so this log covers
-    # the current boot.
-    exec > /tmp/quickshell-greeter.log 2>&1
-    date_cmd="${pkgs.coreutils}/bin/date"
-    ts() { "$date_cmd" +%T.%3N; }
-    echo "$(ts) greeter session starting"
+    # the current boot. The fixed name is only used while it is (or can
+    # become) greeter-owned, so it cannot be pointed elsewhere through a
+    # pre-planted symlink; the fallback copy keeps the log working.
+    # The trace itself is not sensitive (compositor logs, no secrets).
+    log=/tmp/quickshell-greeter.log
+    if [ -e "$log" ] && [ ! -O "$log" ] || [ -L "$log" ]; then
+      log="$HOME/greeter-session.log"
+    fi
+    exec > "$log" 2>&1
+    # Caches etc. stay private behind the 0700 HOME; the trace is the
+    # one file the user needs to read after logging in.
+    chmod 644 "$log" 2>/dev/null || true
+    umask 077
+
+    ts() { ${pkgs.coreutils}/bin/date +%T.%3N; }
+    echo "$(ts) greeter session starting (HOME $HOME, log $log)"
 
     term_niri() {
       # Re-entry guarded: greetd TERMs every second until we are gone, and

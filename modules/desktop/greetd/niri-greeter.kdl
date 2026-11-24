@@ -31,3 +31,8 @@ spawn-at-startup "@swaybg@" "-i" "@wallpaper@" "-m" "fill"
 hotkey-overlay {
     skip-at-startup
 }
+
+// A login screen has no key bindings to offer anyone, and none may exist
+// pre-auth: an explicit empty section pins the zero-binds state instead
+// of relying on niri's built-in defaults staying empty.
+binds {}
