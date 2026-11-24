@@ -104,4 +104,14 @@ ShellRoot {
             PopupRegistry.toggle(screen, "notifications");
         }
     }
+
+    // Tell the session-opening splash (spawned by niri at session start)
+    // that the shell is up so it fades out. Fire-and-forget: the call
+    // fails silently when no splash instance is running (e.g. reloads).
+    Process {
+        id: splashDismiss
+        command: ["qs", "-c", "splash", "ipc", "call", "splash", "dismiss"]
+    }
+
+    Component.onCompleted: splashDismiss.running = true
 }

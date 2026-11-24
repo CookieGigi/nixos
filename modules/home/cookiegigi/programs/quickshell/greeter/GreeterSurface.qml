@@ -161,6 +161,13 @@ Rectangle {
                         function onPasswordTextChanged() {
                             passwordBox.text = root.context.passwordText;
                         }
+                        function onShowFailureChanged() {
+                            // Retype the password after a failure: the user
+                            // name was already accepted, so go straight to
+                            // the password field.
+                            if (root.context.showFailure)
+                                passwordBox.forceActiveFocus();
+                        }
                     }
                 }
             }
@@ -205,9 +212,22 @@ Rectangle {
         z: -1
     }
 
+    // Keys that reach the surface itself (i.e. nothing inside holds focus,
+    // e.g. after the fields got disabled during auth) land on the password
+    // box again, mirroring the lockscreen's activity handler. Editing the
+    // user box is respected: it holds activeFocus, so this never fires.
+    Keys.onPressed: event => {
+        if (!root.context.authInProgress)
+            passwordBox.forceActiveFocus();
+        // Let the key reach the newly focused field's chain.
+        event.accepted = false;
+    }
+
     // Only the primary surface grabs keyboard focus at startup;
     // other screens acquire it on interaction.
+    focus: true
     Component.onCompleted: {
+        forceActiveFocus();
         if (root.screen && root.screen.primary)
             passwordBox.forceActiveFocus();
     }

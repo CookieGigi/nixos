@@ -61,6 +61,9 @@ window-rule {
 }
 
 spawn-at-startup "qs" "-c" "bar"
+// Wallpaper + spinner while the session loads; the bar dismisses it over
+// IPC when it is up (see quickshell/shell.qml).
+spawn-at-startup "qs" "-c" "splash"
 spawn-at-startup "swaybg" "-i" "/home/cookiegigi/nixos/modules/home/cookiegigi/wallpapers/voyager-4.jpg" "-m" "fill"
 
 hotkey-overlay {

@@ -8,7 +8,7 @@
   source = pkgs.lib.cleanSourceWith {
     src = ./.;
     filter = path: type:
-      (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path && !pkgs.lib.hasInfix "/greeter/" path)
+      (pkgs.lib.hasSuffix ".qml" path && !pkgs.lib.hasInfix "/lockscreen/" path && !pkgs.lib.hasInfix "/greeter/" path && !pkgs.lib.hasInfix "/splash/" path)
       || type == "directory";
   };
   configuredSource = pkgs.runCommand "quickshell-config" {} ''
@@ -68,6 +68,20 @@ in {
         substituteInPlace $out/GreeterContext.qml \
           --replace-fail '"@niriSession@"' '"${pkgs.niri}/bin/niri-session"' \
           --replace-fail '"@defaultUser@"' '"${config.home.username}"'
+      '';
+      recursive = true;
+    };
+    # Session-opening splash: wallpaper + spinner over the session while
+    # the bar loads, dismissed by the bar over IPC once it is up (see the
+    # splashDismiss Process in shell.qml). Spawned by niri at session
+    # startup with `qs -c splash` (see the niri config.kdl).
+    "quickshell/splash" = {
+      source = pkgs.runCommand "quickshell-splash" {} ''
+        mkdir -p $out
+        cp -r ${configuredSource}/* $out/
+        chmod -R u+w $out
+        cp ${./splash/shell.qml} $out/shell.qml
+        cp ${../../wallpapers/voyager-4.jpg} $out/wallpaper.jpg
       '';
       recursive = true;
     };

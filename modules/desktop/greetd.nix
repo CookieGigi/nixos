@@ -57,11 +57,13 @@
     uid="$(${pkgs.coreutils}/bin/id -u)"
 
     # niri double-forks spawned commands, so quickshell is not a child of
-    # this shell: watch for it by process name + uid instead.
+    # this shell: watch for it by process name + uid instead. The kiosk
+    # spawns bin/quickshell (lib.getExe pkgs.quickshell); "qs" is accepted
+    # as well in case the binary ever changes.
     qs_pid=""
     waited=0
     while [ -z "$qs_pid" ] && [ "$waited" -lt 300 ]; do
-      qs_pid="$("$pgrep" -u "$uid" -x qs | ${pkgs.coreutils}/bin/head -n 1 || true)"
+      qs_pid="$("$pgrep" -u "$uid" -x '^(qs|quickshell)$' | ${pkgs.coreutils}/bin/head -n 1 || true)"
       waited=$((waited + 1))
       [ -n "$qs_pid" ] || "$sleep_cmd" 0.1
     done
