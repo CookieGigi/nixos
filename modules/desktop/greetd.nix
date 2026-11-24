@@ -50,6 +50,11 @@
     echo "$(ts) greeter session starting"
 
     term_niri() {
+      # Re-entry guarded: greetd TERMs every second until we are gone, and
+      # a second trap firing during wait() delayed the exit by seconds.
+      [ -n "$niri_gone" ] && exit 0
+      niri_gone=1
+      trap - TERM INT
       echo "$(ts) stopping niri (pid $niri_pid)"
       kill -TERM "$niri_pid" 2>/dev/null || true
       wait "$niri_pid" 2>/dev/null || true
@@ -70,17 +75,23 @@
     echo "$(ts) greeter uid $uid"
 
     # niri double-forks spawned commands, so quickshell is not a child of
-    # this shell: watch for it by process name + uid instead. The kiosk
-    # spawns bin/quickshell (lib.getExe pkgs.quickshell); "qs" is accepted
-    # as well in case the binary ever changes.
+    # this shell: watch for it by process name + uid instead. The nixpkgs
+    # quickshell package wraps its binaries, so the greeter process comm
+    # is ".quickshell-wrapped" (truncated to 15 chars: ".quickshell-wra"),
+    # not "qs"/"quickshell": match unanchored so both the wrapped and the
+    # plain binary name work.
     qs_pid=""
     waited=0
     while [ -z "$qs_pid" ] && [ "$waited" -lt 300 ]; do
-      qs_pid="$("$pgrep" -u "$uid" -x '^(qs|quickshell)$' | ${pkgs.coreutils}/bin/head -n 1 || true)"
+      qs_pid="$("$pgrep" -u "$uid" 'quickshell' | ${pkgs.coreutils}/bin/head -n 1 || true)"
       waited=$((waited + 1))
       [ -n "$qs_pid" ] || "$sleep_cmd" 0.1
     done
-    echo "$(ts) quickshell ''${qs_pid:-not found after $waited polls}"
+    if [ -n "$qs_pid" ]; then
+      echo "$(ts) quickshell pid $qs_pid comm $(< /proc/$qs_pid/comm)"
+    else
+      echo "$(ts) quickshell not found after $waited polls"
+    fi
 
     if [ -n "$qs_pid" ]; then
       # Poll until quickshell is gone (~100 ms): on success it exits the
