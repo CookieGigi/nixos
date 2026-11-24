@@ -108,10 +108,11 @@ ShellRoot {
     // Tell the session-opening splash (spawned by niri at session start)
     // that the shell is up so it fades out. Fire-and-forget: the call
     // fails silently when no splash instance is running (e.g. reloads).
+    // NOTE: ShellRoot does not support attached properties like
+    // Component.onCompleted ("Non-existent attached object", fatal), so
+    // run the call straight from the declarative running binding.
     Process {
-        id: splashDismiss
         command: ["qs", "-c", "splash", "ipc", "call", "splash", "dismiss"]
+        running: true
     }
-
-    Component.onCompleted: splashDismiss.running = true
 }

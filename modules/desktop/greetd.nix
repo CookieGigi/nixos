@@ -41,9 +41,19 @@
     export XDG_STATE_HOME="$HOME/.local/state"
     mkdir -p "$XDG_CACHE_HOME" "$XDG_STATE_HOME"
 
+    # Lifecycle trace for the failing parts of a login screen you can
+    # only see before having a session: /tmp is tmpfs, so this log covers
+    # the current boot.
+    exec > /tmp/quickshell-greeter.log 2>&1
+    date_cmd="${pkgs.coreutils}/bin/date"
+    ts() { "$date_cmd" +%T.%3N; }
+    echo "$(ts) greeter session starting"
+
     term_niri() {
+      echo "$(ts) stopping niri (pid $niri_pid)"
       kill -TERM "$niri_pid" 2>/dev/null || true
       wait "$niri_pid" 2>/dev/null || true
+      echo "$(ts) greeter session exiting"
       exit 0
     }
     # Also for greetd's own SIGTERM (e.g. on shutdown) and the Ctrl+C case.
@@ -51,10 +61,13 @@
 
     ${lib.getExe config.programs.niri.package} -c ${kioskConfig} &
     niri_pid=$!
+    echo "$(ts) niri started (pid $niri_pid)"
 
     pgrep="${pkgs.procps}/bin/pgrep"
     sleep_cmd="${pkgs.coreutils}/bin/sleep"
+    cut_cmd="${pkgs.coreutils}/bin/cut"
     uid="$(${pkgs.coreutils}/bin/id -u)"
+    echo "$(ts) greeter uid $uid"
 
     # niri double-forks spawned commands, so quickshell is not a child of
     # this shell: watch for it by process name + uid instead. The kiosk
@@ -67,17 +80,26 @@
       waited=$((waited + 1))
       [ -n "$qs_pid" ] || "$sleep_cmd" 0.1
     done
+    echo "$(ts) quickshell ''${qs_pid:-not found after $waited polls}"
 
     if [ -n "$qs_pid" ]; then
-      # Poll until quickshell is gone (~100 ms granularity): on success it
-      # exits the moment greetd acknowledges the session launch.
-      while kill -0 "$qs_pid" 2>/dev/null; do
+      # Poll until quickshell is gone (~100 ms): on success it exits the
+      # moment greetd acknowledges the session launch. Killed processes
+      # cannot be detected with kill -0 alone: this shell is a subreaper
+      # (the greetd session worker sets PR_SET_CHILD_SUBREAPER), so
+      # quickshell stays around as a zombie child until reaped. Watch the
+      # process state instead.
+      while :; do
+        state="$("$cut_cmd" -d ' ' -f 3 /proc/$qs_pid/stat 2>/dev/null)" || break
+        [ "$state" = "Z" ] && break
         "$sleep_cmd" 0.1
       done
+      wait "$qs_pid" 2>/dev/null || true
+      echo "$(ts) quickshell gone (state was $state)"
     fi
 
-    # If quickshell never started (bad config, crash at startup) give up on
-    # this greeter instance too: greetd restarts the service.
+    # If quickshell never started or crashed, give up on this greeter
+    # instance too: the session exits and greetd restarts the greeter.
     term_niri
   '';
 in {
