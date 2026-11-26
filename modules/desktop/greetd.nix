@@ -81,6 +81,15 @@
       trap - TERM INT
       echo "$(ts) stopping niri (pid $niri_pid)"
       kill -TERM "$niri_pid" 2>/dev/null || true
+      # niri's graceful shutdown waits out its clients (swaybg here) and
+      # took 1.5-3.4s per boot; a kiosk has nothing worth saving, so cap
+      # the grace and collect the exit.
+      i=0
+      while kill -0 "$niri_pid" 2>/dev/null && [ "$i" -lt 3 ]; do
+        i=$((i + 1))
+        "$sleep_cmd" 0.1
+      done
+      kill -KILL "$niri_pid" 2>/dev/null || true
       wait "$niri_pid" 2>/dev/null || true
       echo "$(ts) greeter session exiting"
       exit 0
@@ -88,14 +97,15 @@
     # Also for greetd's own SIGTERM (e.g. on shutdown) and the Ctrl+C case.
     trap term_niri TERM INT
 
-    ${lib.getExe config.programs.niri.package} -c ${kioskConfig} &
-    niri_pid=$!
-    echo "$(ts) niri started (pid $niri_pid)"
-
+    # Defined before any code that could fire the trap needs them.
     pgrep="${pkgs.procps}/bin/pgrep"
     sleep_cmd="${pkgs.coreutils}/bin/sleep"
     cut_cmd="${pkgs.coreutils}/bin/cut"
     uid="$(${pkgs.coreutils}/bin/id -u)"
+
+    ${lib.getExe config.programs.niri.package} -c ${kioskConfig} &
+    niri_pid=$!
+    echo "$(ts) niri started (pid $niri_pid)"
     echo "$(ts) greeter uid $uid"
 
     # niri double-forks spawned commands, so quickshell is not a child of
